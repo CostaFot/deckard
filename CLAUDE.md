@@ -46,7 +46,8 @@ Gradle uses the Android Studio JBR — **`JAVA_HOME` must be set** or `./gradlew
 
 To use it after install, open the app and work through `MainActivity`'s setup screen: enable the
 accessibility service (screen reading), grant draw-over-apps, then start Deckard. A left→right swipe
-on the left-edge tab summons the mascot.
+on the left-edge tab summons the mascot (a11y-tree read); a **long-press** on the tab summons via
+screenshot OCR content-isolation instead.
 
 The on-device LLM is required for OCR (the in-use screen reader), but optional to
 *launch*: with no model present, summoning Deckard reports it has no brain yet. To enable it,
@@ -76,24 +77,38 @@ under `model/` are gitignored.
   swipe
   isn't eaten by the Android 10+ system back gesture (exclusion budget is ~200dp/edge, so the tab is
   short).
+- The edge tab carries **two gestures**: a left→right **swipe** summons via the a11y-tree read
+  (`@AccessibilityScreenText`); a **long-press** (with a haptic tick) summons via the screenshot OCR
+  read (`@OcrContentScreenText`). The service injects both readers and routes each gesture through
+  `runDetection(reader)` → `detectSlop(reader)`. The two `pointerInput`s don't collide — a swipe
+  moves past touch slop (cancelling the long-press), a hold stays put (no drag).
 - Requires the draw-over-apps permission (checked in `onCreate`) and the accessibility service
   (for reading the screen). Started/stopped from `MainActivity`'s setup screen.
 
 ### Screen reading — `slop/` + `accessibility/`
 
-- `slop/ScreenTextReader` is the seam (returns `slop/ScreenReadResult`). Two impls behind Hilt
+- `slop/ScreenTextReader` is the seam (returns `slop/ScreenReadResult`). Three impls behind Hilt
   qualifiers in `di/ScreenTextModule.kt`:
-    - **`AccessibilityScreenTextReader`** (`@AccessibilityScreenText`, **in use**): pulls the
+    - **`AccessibilityScreenTextReader`** (`@AccessibilityScreenText`, **in use — swipe**): pulls
+      the
       visible
       on-screen text straight from the foreground app's a11y node tree via
       `accessibility/ScreenTextCapturer`. No model, no screenshot — returns in milliseconds. The
       chrome-trimming lives in the service (see below).
-    - **`OcrScreenTextReader`** (`@OcrScreenText`, fallback): grabs a screenshot via
-      `accessibility/ScreenshotCapturer` and asks `LlmEngine.generateWithImage` to transcribe it
-      (`suggestion/llm/OcrPrompt`). A screenshot is the visible viewport only, so it captures just
-      what the user sees. Accurate but slow (a vision inference per summon) and hard-requires a
-      loaded
-      model. Swap back by flipping the overlay's qualifier to `@OcrScreenText`.
+    - **`OcrContentScreenTextReader`** (`@OcrContentScreenText`, **in use — long-press**): grabs a
+      screenshot via `accessibility/ScreenshotCapturer` and asks `LlmEngine.generateWithImage` to
+      **isolate the single main post verbatim** out of it (`OcrPrompt.extractMainContent()`) —
+      content
+      isolation at the vision step, no per-app extractor needed. The verbatim rule is load-bearing:
+      if
+      the model rewrote the text it'd bias Pangram toward "AI". Slow (a vision inference per summon)
+      and hard-requires a loaded model.
+    - **`OcrScreenTextReader`** (`@OcrScreenText`, fallback): same screenshot path (the two OCR
+      readers
+      share one `ocrRead()`), but the prompt (`OcrPrompt.transcribe()`) dumps **all** the readable
+      text
+      rather than isolating one post. A screenshot is the visible viewport only, so it captures just
+      what the user sees. Swap it onto a gesture by flipping a qualifier in the service.
 - `accessibility/DeckardAccessibilityService` registers both on-demand bridges (only an
   `AccessibilityService` can `takeScreenshot` or read `rootInActiveWindow`): `ScreenshotCapturer`
   (JPEG for OCR) and `ScreenTextCapturer` (tree text). Its `captureScreenText` snapshots
@@ -120,6 +135,19 @@ under `model/` are gitignored.
       contentDescription**. Selection follows what the user centres: the content node under the
       **screen centre**, falling back to largest viewport overlap (so a big neighbour can't steal a
       centred post). Author/timestamp and comment/post-detail screens are TODO.
+  - **`XContentExtractor`** (`com.twitter.android`): the hostile case. On the timeline a tweet
+    exposes **no per-element text nodes** — X concatenates the whole card (name, `@handle`,
+    "Verified", "Replying to …", body, "Reposted by …", timestamp, engagement counts) into the card
+    node's single `contentDescription`, so the body is parsed *out of that one blob* with
+    end-/start-anchored regexes: strip the trailing metrics/timestamp/"Reposted by …" and the
+    leading byline (verified **and** unverified) + "Replying to …". Selection mirrors LinkedIn
+    (centred card, else largest overlap); promoted cards ("Promoted.") are skipped. A **quote
+    tweet** packs two authors into one desc and X embeds only a *truncated preview* of the quoted
+    original, so we judge the quoter's **own comment** (the text after "Added"), falling back to the
+    preview only when there's none. Detail screens reuse the same path. **This single-blob layout
+    makes perfect extraction a long-tail game, so it's frozen at good-enough** (the common centred
+    tweet, locked by fixture tests). Known gaps: absolute timestamps ("Jun 14") aren't stripped, and
+    a display name containing a "." can defeat the byline strip.
 - **Discovery loop**: on summon (debug builds only) `DeckardAccessibilityService.dumpTree` writes
   the
   active-window tree + every window's tree to `…/files/deckard_tree.txt`, which we `adb pull` and
@@ -128,9 +156,11 @@ under `model/` are gitignored.
   file is the exact `ScreenNode` snapshot the extractor saw. `adb shell uiautomator dump` is a
   zero-code cross-check. See the runbook below.
 - `slop/ContentExtractor` (+ `ContentExtractionPrompt`) is dormant: it would isolate the main
-  post/article text from a noisy capture **verbatim** (the model selects which captured lines are
-  content; it never rewrites them, which would bias detection toward "AI") before handing it to the
-  detector.
+  post/article text from a noisy **a11y** capture **verbatim** (the model selects which captured
+  lines
+  are content; it never rewrites them, which would bias detection toward "AI") before handing it to
+  the detector. The **long-press OCR path now does this same isolation at the vision step** (over a
+  screenshot instead of a text capture) — see `OcrContentScreenTextReader` above.
 
 ### Adding / tuning a per-app extractor (runbook)
 
@@ -230,9 +260,10 @@ bodies.
 ## Status & what's left (for the next session)
 
 The pivot + rename are done and the build is green (`:app:compileDebugKotlin`,
-`:app:testDebugUnitTest`). End to end today: summon Deckard → **a11y-tree screen read** → **Pangram
-detection** → the bubble shows the verdict as a Pangram-style **report card** (
-`mascot/SlopReportCard`).
+`:app:testDebugUnitTest`). End to end today: summon Deckard → **a11y-tree screen read** (swipe) **or
+screenshot OCR content-isolation** (long-press) → **Pangram detection** → the bubble shows the
+verdict
+as a Pangram-style **report card** (`mascot/SlopReportCard`).
 Steps 1–2 below are done (API→domain→UI wiring via `AiDetectorRepository` + `DetectSlopUseCase`,
 base
 URL/auth in `NetworkModule`, and the report-card UI). Remaining, in rough priority:
@@ -241,16 +272,21 @@ URL/auth in `NetworkModule`, and the report-card UI). Remaining, in rough priori
    like *"Slop, my son. (91.7%)"*, the confidence score deadpan, and his own catchphrase — keep the
    wise-elder archetype but avoid Blizzard's literal Deckard-Cain tells ("stay awhile and listen",
    robed-Horadrim imagery). Lands wherever the verdict is rendered (step 2).
-4. **(Optional) Content isolation.** `slop/ContentExtractor` (+ `ContentExtractionPrompt`) is built
-   but dormant — slot it in before detection so the model judges the main post, not chrome.
+4. **Content isolation.** Done for the **screenshot** path: a **long-press** on the edge tab runs
+   `OcrContentScreenTextReader` (`OcrPrompt.extractMainContent()`), which has the on-device model
+   pick
+   the main post out of the screenshot verbatim before detection — no per-app code (verified working
+   on device). The text-only `slop/ContentExtractor` (+ `ContentExtractionPrompt`) stays dormant; it
+   would do the same over a noisy a11y capture.
 5. **Per-app extractors (`accessibility/extract/`).** The in-use a11y reader now dispatches by
    foreground package to a per-app `ScreenContentExtractor`. **LinkedIn** (`com.linkedin.android`)
-   is
-   done — most-visible post. Next, one extractor each for **X, Reddit, Substack, Medium** (capture
-   the
-   tree via `uiautomator dump`, add a class + `@IntoSet` binding + fixture test). LinkedIn polish:
-   include author/timestamp, handle "…more" truncation, confirm post-detail screens. The OCR reader
-   remains a fallback behind `@OcrScreenText`.
+   and **X** (`com.twitter.android`) are done — most-visible / centred post (see their bullets
+   above; X's single-blob `contentDescription` is frozen at good-enough). Next, one extractor each
+   for **Reddit, Substack, Medium** (capture the tree via `uiautomator dump`, add a class +
+   `@IntoSet` binding + fixture test) — **Reddit** is the friendliest next target (native, id-rich
+   tree, more like LinkedIn than X). LinkedIn polish: include author/timestamp, handle "…more"
+   truncation, confirm post-detail screens. The OCR reader remains a fallback behind
+   `@OcrScreenText`.
 
 **Cruft worth deleting** (template/pivot leftovers, unused by the detector): the
 JSONPlaceholder/Todo

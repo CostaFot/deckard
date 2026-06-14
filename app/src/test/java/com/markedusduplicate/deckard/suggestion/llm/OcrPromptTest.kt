@@ -14,6 +14,14 @@ class OcrPromptTest {
     }
 
     @Test
+    fun `extractMainContent prompt isolates one post and forbids rewriting`() {
+        val prompt = OcrPrompt.extractMainContent()
+        assertTrue(prompt.contains("word for word"))
+        assertTrue(prompt.contains("Do not summarize"))
+        assertTrue(prompt.contains("one post"))
+    }
+
+    @Test
     fun `clean trims whitespace and surrounding quotes`() {
         assertEquals("Hello world", OcrPrompt.clean("  \"Hello world\" "))
     }

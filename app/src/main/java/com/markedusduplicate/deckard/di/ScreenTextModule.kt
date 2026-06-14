@@ -1,6 +1,7 @@
 package com.markedusduplicate.deckard.di
 
 import com.markedusduplicate.deckard.slop.AccessibilityScreenTextReader
+import com.markedusduplicate.deckard.slop.OcrContentScreenTextReader
 import com.markedusduplicate.deckard.slop.OcrScreenTextReader
 import com.markedusduplicate.deckard.slop.ScreenTextReader
 import dagger.Binds
@@ -15,6 +16,10 @@ interface ScreenTextModule {
     @Binds
     @OcrScreenText
     fun bindsOcrScreenTextReader(impl: OcrScreenTextReader): ScreenTextReader
+
+    @Binds
+    @OcrContentScreenText
+    fun bindsOcrContentScreenTextReader(impl: OcrContentScreenTextReader): ScreenTextReader
 
     @Binds
     @AccessibilityScreenText

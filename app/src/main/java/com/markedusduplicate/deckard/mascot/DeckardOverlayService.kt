@@ -23,6 +23,7 @@ import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.markedusduplicate.common.coroutine.DispatcherProvider
 import com.markedusduplicate.deckard.di.AccessibilityScreenText
+import com.markedusduplicate.deckard.di.OcrContentScreenText
 import com.markedusduplicate.deckard.slop.DetectSlopUseCase
 import com.markedusduplicate.deckard.slop.MIN_WORDS_TO_DETECT
 import com.markedusduplicate.deckard.slop.ScreenReadResult
@@ -46,7 +47,9 @@ import javax.inject.Inject
  * [ScreenTextReader] — accessibility-tree extraction), judges whether it's AI-generated "slop" via
  * [DetectSlopUseCase] (backed by
  * [com.markedusduplicate.deckard.slop.AiDetectorRepository]), and shows the verdict in a speech
- * bubble, then auto-hides. Tapping the mascot re-runs the check; tapping the bubble dismisses it.
+ * bubble, then auto-hides. **Long-pressing** the tab runs the alternative `@OcrContentScreenText`
+ * read instead — a screenshot the model isolates the main post out of. Tapping the mascot re-runs the
+ * a11y check; tapping the bubble dismisses it.
  *
  * An overlay service has no bind callbacks and no decor view, so it drives its own
  * [LifecycleRegistry] to RESUMED and sets the view-tree owners directly on the overlay view — both
@@ -65,6 +68,10 @@ class DeckardOverlayService :
     @Inject
     @AccessibilityScreenText
     lateinit var screenTextReader: ScreenTextReader
+
+    @Inject
+    @OcrContentScreenText
+    lateinit var screenshotReader: ScreenTextReader
 
     @Inject
     lateinit var detectSlopUseCase: DetectSlopUseCase
@@ -141,6 +148,7 @@ class DeckardOverlayService :
         val handle = DeckardEdgeHandleView(
             context = this,
             onSummon = ::detectSlopNow,
+            onLongPress = ::readScreenshotNow,
         ).also(::attachOwners)
         edgeHandleView = handle
         windowManager.addView(handle, handleParams)
@@ -160,13 +168,19 @@ class DeckardOverlayService :
 
     override fun onBind(intent: Intent?): IBinder? = null
 
-    /** Summon Deckard: show him, read the screen's text, and surface the verdict (stays until closed). */
-    private fun detectSlopNow() {
+    /** Summon Deckard via the a11y-tree read (swipe / tap): fast, no model, per-app extractors. */
+    private fun detectSlopNow() = runDetection(screenTextReader)
+
+    /** Summon Deckard via the screenshot + OCR "pick the post" read (long-press): slower, model-backed. */
+    private fun readScreenshotNow() = runDetection(screenshotReader)
+
+    /** Show Deckard, read the screen's text with [reader], and surface the verdict (stays until closed). */
+    private fun runDetection(reader: ScreenTextReader) {
         tapJob?.cancel()
         setOverlayFocusable(true)
         tapJob = scope.launch {
             state.value = DeckardState.Thinking
-            state.value = detectSlop()
+            state.value = detectSlop(reader)
         }
     }
 
@@ -192,8 +206,8 @@ class DeckardOverlayService :
         runCatching { windowManager.updateViewLayout(view, layoutParams) }
     }
 
-    private suspend fun detectSlop(): DeckardState =
-        when (val result = screenTextReader.read()) {
+    private suspend fun detectSlop(reader: ScreenTextReader): DeckardState =
+        when (val result = reader.read()) {
             is ScreenReadResult.Unavailable -> DeckardState.Unavailable(result.reason)
             is ScreenReadResult.Text -> {
                 val text = result.value
