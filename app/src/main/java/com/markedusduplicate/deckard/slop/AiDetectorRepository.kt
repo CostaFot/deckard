@@ -28,7 +28,7 @@ class AiDetectorRepository @Inject constructor(
     private val slopVerdictMapper: SlopVerdictMapper,
     private val dispatcherProvider: DispatcherProvider,
 ) {
-    suspend fun detect(text: String, isMocked: Boolean = false): Result<Throwable, DomainSlopVerdict> {
+    suspend fun detect(text: String, isMocked: Boolean = true): Result<Throwable, DomainSlopVerdict> {
         if (isMocked) return Result.Success(mockedVerdict(text))
         return withContext(dispatcherProvider.io) {
             attempt {
