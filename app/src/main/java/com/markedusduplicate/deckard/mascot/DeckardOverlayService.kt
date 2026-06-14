@@ -19,10 +19,12 @@ import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.markedusduplicate.common.coroutine.DispatcherProvider
+import com.markedusduplicate.common.result.fold
 import com.markedusduplicate.deckard.agent.AgentEngine
 import com.markedusduplicate.deckard.agent.AgentOverlayView
 import com.markedusduplicate.deckard.agent.AgentState
 import com.markedusduplicate.deckard.di.OcrScreenText
+import com.markedusduplicate.deckard.slop.DetectSlopUseCase
 import com.markedusduplicate.deckard.slop.ScreenReadResult
 import com.markedusduplicate.deckard.slop.ScreenTextReader
 import com.markedusduplicate.logging.logDebug
@@ -41,10 +43,9 @@ import javax.inject.Inject
  * Hosts the floating Deckard mascot in a system overlay window so it lives over every app. Deckard is
  * hidden until summoned by a left→right swipe on the [DeckardEdgeHandleView] tab pinned to the left
  * edge; summoning reads the text on the current screen (via the `@OcrScreenText` [ScreenTextReader]
- * — screenshot OCR) and shows it in a speech bubble, then auto-hides. Tapping the mascot re-runs the
- * check; tapping the bubble dismisses it. The captured text is destined for an AI-detection backend
- * ([com.markedusduplicate.deckard.slop.AiDetectorRepository]) to judge whether it's AI-generated
- * "slop" — see the TODO in [detectSlop].
+ * — screenshot OCR), judges whether it's AI-generated "slop" via [DetectSlopUseCase] (backed by
+ * [com.markedusduplicate.deckard.slop.AiDetectorRepository]), and shows the verdict in a speech
+ * bubble, then auto-hides. Tapping the mascot re-runs the check; tapping the bubble dismisses it.
  *
  * An overlay service has no bind callbacks and no decor view, so it drives its own
  * [LifecycleRegistry] to RESUMED and sets the view-tree owners directly on the overlay view — both
@@ -63,6 +64,9 @@ class DeckardOverlayService :
     @Inject
     @OcrScreenText
     lateinit var screenTextReader: ScreenTextReader
+
+    @Inject
+    lateinit var detectSlopUseCase: DetectSlopUseCase
 
     @Inject
     lateinit var dispatcherProvider: DispatcherProvider
@@ -238,9 +242,10 @@ class DeckardOverlayService :
             is ScreenReadResult.Unavailable -> DeckardState.Unavailable(result.reason)
             is ScreenReadResult.Text -> {
                 logDebug { "slop: captured ${result.value.length} chars" }
-                // TODO(ai-detector): hand result.value to AiDetectorRepository.detect(...) and show
-                //  the verdict here instead of this raw captured-text preview.
-                DeckardState.Speaking(result.value.take(PREVIEW_CHARS))
+                detectSlopUseCase(result.value).fold(
+                    ifError = { DeckardState.Unavailable("Couldn't reach the slop oracle") },
+                    ifSuccess = { DeckardState.Speaking(it.toString()) },
+                )
             }
         }
 
@@ -271,7 +276,6 @@ class DeckardOverlayService :
 
     companion object {
         private const val AUTO_HIDE_MS = 8000L
-        private const val PREVIEW_CHARS = 200
 
         /** True while the overlay is up; read by the setup screen to drive the start/stop toggle. */
         @Volatile

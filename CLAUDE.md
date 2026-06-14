@@ -104,12 +104,17 @@ under `model/` are gitignored.
 
 ### Slop detection — `slop/AiDetectorRepository.kt`
 
-- The provider-agnostic boundary: callers hand it the on-screen text and get back a
-  `slop/SlopVerdict`.
-  Currently a **placeholder** that reports the backend isn't wired yet — it's not on the live
-  overlay
-  path. The first planned backend is Pangram, a Retrofit service in `di/NetworkModule.kt`
-  authenticated with `BuildConfig.AI_DETECTOR_API_KEY` (resolved from env or `local.properties`).
+- The provider-agnostic boundary: callers hand it the on-screen text and get back a domain
+  `slop/DomainSlopVerdict` (API → domain only, no UI knowledge). Backed by **Pangram**
+  (`net/PangramService`, base URL + `x-api-key` auth interceptor in `di/NetworkModule.kt`, key from
+  `BuildConfig.AI_DETECTOR_API_KEY`). Pangram is async: `detect()` does `POST /task` then polls
+  `GET /task/{id}` until a terminal stage, mapping success via `slop/SlopVerdictMapper`
+  (`ApiPangramDetection` → `DomainSlopVerdict`). Both repo and use case are main-safe
+  (`withContext(io)`).
+- `slop/DetectSlopUseCase` is the **domain → UI** seam the overlay calls (never the repository
+  directly): `repository.detect(text).map { it.toUi() }` → `mascot/UiSlopVerdict`.
+- `isAi`/`aiLikelihood` derivations and the bubble copy are provisional (the bubble currently shows
+  `UiSlopVerdict.toString()`); refine later.
 
 ### Ambient screen agent — `agent/`
 
@@ -164,17 +169,11 @@ bodies.
 ## Status & what's left (for the next session)
 
 The pivot + rename are done and the build is green (`:app:compileDebugKotlin`,
-`:app:testDebugUnitTest`). End to end today: summon Deckard → screenshot OCR → the speech bubble
-shows the **raw captured text**. The actual slop verdict is not wired. In rough priority:
+`:app:testDebugUnitTest`). End to end today: summon Deckard → screenshot OCR → **Pangram detection**
+→ the speech bubble shows the verdict (`UiSlopVerdict.toString()` for now). Steps 1–2 below are done
+(API→domain→UI wiring via `AiDetectorRepository` + `DetectSlopUseCase`, base URL/auth in
+`NetworkModule`). Remaining, in rough priority:
 
-1. **Wire the slop detector.** `slop/AiDetectorRepository.detect()` is a placeholder that throws
-   "not wired yet". Implement the real backend (Pangram is the first candidate) as a Retrofit
-   service
-   in `di/NetworkModule.kt` (which still has the template `jsonplaceholder` base URL), authenticate
-   with `BuildConfig.AI_DETECTOR_API_KEY`, and return a real `slop/SlopVerdict`.
-2. **Render the verdict.** `mascot/DeckardOverlayService.detectSlop()` (see its `TODO(ai-detector)`)
-   still surfaces an OCR-text preview — call `AiDetectorRepository.detect(...)` and show the
-   verdict.
 3. **Deckard's voice.** The bubble copy is plain. Give him the weary-scholar persona: verdict lines
    like *"Slop, my son. (91.7%)"*, the confidence score deadpan, and his own catchphrase — keep the
    wise-elder archetype but avoid Blizzard's literal Deckard-Cain tells ("stay awhile and listen",

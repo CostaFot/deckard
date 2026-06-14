@@ -3,7 +3,9 @@ package com.markedusduplicate.deckard.di
 import android.content.Context
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.markedusduplicate.common.FlagProvider
+import com.markedusduplicate.deckard.BuildConfig
 import com.markedusduplicate.deckard.net.JsonPlaceHolderService
+import com.markedusduplicate.deckard.net.PangramService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -48,6 +50,12 @@ object NetworkModule {
     ): OkHttpClient {
         return OkHttpClient().newBuilder()
             .apply {
+                addInterceptor { chain ->
+                    val request = chain.request().newBuilder()
+                        .addHeader("x-api-key", BuildConfig.AI_DETECTOR_API_KEY)
+                        .build()
+                    chain.proceed(request)
+                }
                 addInterceptor(httpLoggingInterceptor)
                 cache(cache)
             }.build()
@@ -66,7 +74,7 @@ object NetworkModule {
     ): Retrofit {
         return Retrofit.Builder()
             .apply {
-                baseUrl("https://jsonplaceholder.typicode.com/")
+                baseUrl("https://text.external-api.pangram.com/")
                 client(okHttpClient)
                 addConverterFactory(
                     json.asConverterFactory("application/json".toMediaType())
@@ -78,4 +86,9 @@ object NetworkModule {
     fun providesJsonPlaceHolderService(
         retrofit: Retrofit
     ): JsonPlaceHolderService = retrofit.create(JsonPlaceHolderService::class.java)
+
+    @Provides
+    fun providesPangramService(
+        retrofit: Retrofit,
+    ): PangramService = retrofit.create(PangramService::class.java)
 }
