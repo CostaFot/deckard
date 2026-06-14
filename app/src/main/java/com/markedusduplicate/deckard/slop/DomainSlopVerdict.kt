@@ -20,4 +20,9 @@ data class DomainSlopVerdict(
     val numHumanSegments: Int,
     val dashboardLink: String?,
     val windows: List<DomainSlopWindow>,
+    val version: String,
+    val wordCount: Int,
+    val analyzedText: String,
+    val confidence: String,
+    val dominantLabel: String,
 )

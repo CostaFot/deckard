@@ -12,6 +12,8 @@ class SlopVerdictMapper @Inject constructor() {
 
     fun map(detection: ApiPangramDetection): DomainSlopVerdict {
         val predictionShort = detection.predictionShort.orEmpty()
+        val windows = detection.windows.orEmpty()
+        val dominant = windows.maxByOrNull { it.wordCount ?: 0 }
         return DomainSlopVerdict(
             isAi = predictionShort != HUMAN,
             aiLikelihood = detection.fractionAi ?: 0.0,
@@ -26,7 +28,12 @@ class SlopVerdictMapper @Inject constructor() {
             numAiAssistedSegments = detection.numAiAssistedSegments ?: 0,
             numHumanSegments = detection.numHumanSegments ?: 0,
             dashboardLink = detection.dashboardLink,
-            windows = detection.windows.orEmpty().map(::mapWindow),
+            windows = windows.map(::mapWindow),
+            version = detection.version.orEmpty(),
+            wordCount = windows.sumOf { it.wordCount ?: 0 },
+            analyzedText = detection.text.orEmpty(),
+            confidence = dominant?.confidence.orEmpty(),
+            dominantLabel = dominant?.label?.takeIf { it.isNotBlank() } ?: detection.headline.orEmpty(),
         )
     }
 

@@ -31,7 +31,9 @@ class AiDetectorRepository @Inject constructor(
     suspend fun detect(text: String): Result<Throwable, DomainSlopVerdict> =
         withContext(dispatcherProvider.io) {
             attempt {
-                val taskId = pangramService.createTask(ApiPangramTaskRequest(text)).taskId
+                val taskId = pangramService
+                    .createTask(ApiPangramTaskRequest(text, publicDashboardLink = true))
+                    .taskId
                 val detection = poll(taskId)
                 when (detection.stage) {
                     STAGE_SUCCESS -> slopVerdictMapper.map(detection)

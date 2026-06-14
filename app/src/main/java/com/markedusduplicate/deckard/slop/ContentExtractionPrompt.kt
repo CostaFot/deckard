@@ -6,8 +6,7 @@ package com.markedusduplicate.deckard.slop
  *
  * The model only ever picks line numbers — it never reproduces the text — so the bytes handed onward
  * stay exactly the user's own. That matters: AI-detectors score exact tokens, so letting the model
- * rewrite or "clean up" the text would bias the verdict toward "AI". Mirrors the index-based
- * [com.markedusduplicate.deckard.agent.AgentPrompt] pattern. Pure (no LiteRT types) so it's
+ * rewrite or "clean up" the text would bias the verdict toward "AI". Pure (no LiteRT types) so it's
  * unit-testable.
  */
 object ContentExtractionPrompt {

@@ -8,8 +8,7 @@
 **deckard** — an Android **AI-slop detector**. A floating "Deckard" mascot lives in a system
 overlay over every app; summoning it reads the text on the current screen and (eventually) judges
 whether that content is AI-generated "slop". Screen reading is on-device: a screenshot is
-transcribed by Gemma via LiteRT-LM (OCR). There's also an experimental ambient **screen agent** that
-suggests the next useful action on whatever app is in front.
+transcribed by Gemma via LiteRT-LM (OCR).
 
 The UI is Jetpack Compose, but it's rendered into `WindowManager` overlay windows from a plain
 `Service` (and driven by an `AccessibilityService`), **not** a normal Activity — the only Activity
@@ -18,9 +17,8 @@ a small setup screen (`MainActivity`) for granting permissions and starting/stop
 
 > History: this started as a custom soft-keyboard (IME) and was pivoted to the slop detector. The
 > keyboard, its predictive-suggestion engine (dictionary + n-gram learning), and the Room DB have
-> been removed. Only the on-device LLM layer (`LlmEngine`) survives from that era, reused for OCR
-> and
-> the agent. If you find lingering keyboard references, they're stragglers worth cleaning up.
+> been removed. Only the on-device LLM layer (`LlmEngine`) survives from that era, reused for OCR.
+> If you find lingering keyboard references, they're stragglers worth cleaning up.
 
 - applicationId / namespace: `com.markedusduplicate.deckard` (debug variant: `.debug`)
 - Build variants: `debug` / `release` only (no product flavors)
@@ -50,7 +48,7 @@ To use it after install, open the app and work through `MainActivity`'s setup sc
 accessibility service (screen reading), grant draw-over-apps, then start Deckard. A left→right swipe
 on the left-edge tab summons the mascot.
 
-The on-device LLM is required for OCR (the in-use screen reader) and the agent, but optional to
+The on-device LLM is required for OCR (the in-use screen reader), but optional to
 *launch*: with no model present, summoning Deckard reports it has no brain yet. To enable it,
 `adb push` a `.litertlm` into `/sdcard/Android/data/<applicationId>/files/models/` (≈2.4–3.5 GB; the
 `LlmEngine` loads the first `.litertlm` it finds there). For the **debug** build `<applicationId>`
@@ -66,10 +64,10 @@ under `model/` are gitignored.
 
 ### Overlay service — `mascot/DeckardOverlayService.kt`
 
-- A plain started `Service` (no Activity host) that hosts three `WindowManager` overlay windows: the
-  draggable mascot (`mascot/DeckardComposeView.kt`, an emoji + speech bubble), the always-present
-  left-edge summon tab (`mascot/DeckardEdgeHandleView.kt`), and the agent's full-screen highlight
-  overlay (`agent/AgentOverlayView.kt`).
+- A plain started `Service` (no Activity host) that hosts two `WindowManager` overlay windows: the
+  draggable mascot (`mascot/DeckardComposeView.kt`, an emoji + speech bubble / verdict report card
+  with an always-present X close button), and the always-present left-edge summon tab
+  (`mascot/DeckardEdgeHandleView.kt`).
 - An overlay service has no lifecycle/decor-view callbacks, so the service implements
   `LifecycleOwner` + `ViewModelStoreOwner` + `SavedStateRegistryOwner` itself, drives its own
   `LifecycleRegistry` to RESUMED, and sets the view-tree owners directly on each overlay view — all
@@ -112,23 +110,15 @@ under `model/` are gitignored.
   (`ApiPangramDetection` → `DomainSlopVerdict`). Both repo and use case are main-safe
   (`withContext(io)`).
 - `slop/DetectSlopUseCase` is the **domain → UI** seam the overlay calls (never the repository
-  directly): `repository.detect(text).map { it.toUi() }` → `mascot/UiSlopVerdict`.
-- `isAi`/`aiLikelihood` derivations and the bubble copy are provisional (the bubble currently shows
-  `UiSlopVerdict.toString()`); refine later.
-
-### Ambient screen agent — `agent/`
-
-- `agent/AgentEngine` (app-singleton, runs on the `@ApplicationCoroutineScope`) drives a guided
-  loop:
-  read the foreground app's actionable elements (`agent/ScreenController`, implemented by the
-  accessibility service), ask `LlmEngine` for the single most useful next action over that element
-  list (`agent/AgentPrompt` → parsed by `agent/AgentAction`), and surface it as
-  `AgentState.Suggest` — Deckard highlights the target and offers to do it. **Never auto-acts**:
-  every
-  step waits for the user's tap.
-- The LLM picks elements by their snapshot `index` (`agent/ActionableNode`), never by pixel
-  coordinates — the accessibility tree is the action space. Prompts/parsing are pure (no Android /
-  LiteRT types) so they're unit-testable.
+  directly): `repository.detect(text).map { it.toUi() }` → `mascot/UiSlopVerdict`. To support the
+  report card it requests a public dashboard link (`publicDashboardLink = true`) and the mapper
+  derives `version`, `wordCount`, `analyzedText`, overall `confidence`, and `dominantLabel` (from
+  the
+  dominant `window`).
+- The verdict renders as `mascot/SlopReportCard` — a faithful-core replica of Pangram's short report
+  (header, excerpt card, `Canvas` composition gauge, label/confidence row, "View full analysis" /
+  "Copy link" buttons) shown via `DeckardState.Verdict`. `isAi`/`aiLikelihood` derivations remain
+  provisional.
 
 ### LiteRT-LM / on-device GPU (hard-won, easy to get wrong)
 
@@ -170,9 +160,9 @@ bodies.
 
 The pivot + rename are done and the build is green (`:app:compileDebugKotlin`,
 `:app:testDebugUnitTest`). End to end today: summon Deckard → screenshot OCR → **Pangram detection**
-→ the speech bubble shows the verdict (`UiSlopVerdict.toString()` for now). Steps 1–2 below are done
-(API→domain→UI wiring via `AiDetectorRepository` + `DetectSlopUseCase`, base URL/auth in
-`NetworkModule`). Remaining, in rough priority:
+→ the bubble shows the verdict as a Pangram-style **report card** (`mascot/SlopReportCard`). Steps
+1–2 below are done (API→domain→UI wiring via `AiDetectorRepository` + `DetectSlopUseCase`, base
+URL/auth in `NetworkModule`, and the report-card UI). Remaining, in rough priority:
 
 3. **Deckard's voice.** The bubble copy is plain. Give him the weary-scholar persona: verdict lines
    like *"Slop, my son. (91.7%)"*, the confidence score deadpan, and his own catchphrase — keep the

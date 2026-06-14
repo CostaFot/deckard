@@ -19,4 +19,9 @@ data class UiSlopVerdict(
     val numAiAssistedSegments: Int,
     val numHumanSegments: Int,
     val dashboardLink: String?,
+    val version: String,
+    val wordCount: Int,
+    val analyzedText: String,
+    val confidence: String,
+    val dominantLabel: String,
 )

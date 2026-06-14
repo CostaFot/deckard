@@ -38,4 +38,9 @@ private fun DomainSlopVerdict.toUi(): UiSlopVerdict = UiSlopVerdict(
     numAiAssistedSegments = numAiAssistedSegments,
     numHumanSegments = numHumanSegments,
     dashboardLink = dashboardLink,
+    version = version,
+    wordCount = wordCount,
+    analyzedText = analyzedText,
+    confidence = confidence,
+    dominantLabel = dominantLabel,
 )

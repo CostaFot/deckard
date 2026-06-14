@@ -52,6 +52,11 @@ class SlopVerdictMapperTest {
         assertEquals("https://www.pangram.com/history/abc", verdict.dashboardLink)
         assertEquals(1, verdict.windows.size)
         assertEquals("AI-Generated", verdict.windows.first().label)
+        assertEquals("3.0", verdict.version)
+        assertEquals("the text", verdict.analyzedText)
+        assertEquals(1, verdict.wordCount)
+        assertEquals("High", verdict.confidence)
+        assertEquals("AI-Generated", verdict.dominantLabel)
     }
 
     @Test

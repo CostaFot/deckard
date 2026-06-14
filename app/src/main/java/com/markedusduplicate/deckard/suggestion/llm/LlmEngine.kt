@@ -22,8 +22,8 @@ import javax.inject.Singleton
  *
  * Warm-up runs on the application scope so it can't be cancelled and restarted by callers.
  * [engineOrNull] is non-blocking: it returns `null` while the model is still loading (or if no model
- * is present / every backend fails), so callers (OCR screen reading, the agent) degrade gracefully
- * until the engine comes online.
+ * is present / every backend fails), so callers (OCR screen reading) degrade gracefully until the
+ * engine comes online.
  *
  * The model is loaded from the first `.litertlm` file in the app's external `models/` directory
  * (push one with `adb push … /Android/data/<pkg>/files/models/`).
