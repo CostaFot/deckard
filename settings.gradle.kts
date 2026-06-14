@@ -14,7 +14,7 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-rootProject.name = "slopboard"
+rootProject.name = "deckard"
 include(":app")
 include(":lint")
 include(":design")

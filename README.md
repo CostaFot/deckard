@@ -1,3 +1,5 @@
-# slopboard
+# deckard
 
-This will be a cool compose keyboard
+An Android AI-slop detector: a floating "Clippy" mascot reads the text on your current screen
+(on-device screenshot OCR via Gemma/LiteRT-LM) and is built to judge whether that content is
+AI-generated "slop".

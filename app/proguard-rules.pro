@@ -47,8 +47,8 @@
     public static ** valueOf(java.lang.String);
 }
 
--keep class com.markedusduplicate.slopboard.net.model** { *; }
--keep class com.markedusduplicate.slopboard.analytics** { *; }
+-keep class com.markedusduplicate.deckard.net.model** { *; }
+-keep class com.markedusduplicate.deckard.analytics** { *; }
 -keep class com.markedusduplicate.voice.model** { *; }
 -keep class com.markedusduplicate.storage** { *; }
 -keep class com.nightonke.boommenu.** { *; }

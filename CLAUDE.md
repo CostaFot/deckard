@@ -5,7 +5,7 @@
 
 ## What this is
 
-**slopboard** — an Android **AI-slop detector**. A floating "Clippy" mascot lives in a system
+**deckard** — an Android **AI-slop detector**. A floating "Clippy" mascot lives in a system
 overlay over every app; summoning it reads the text on the current screen and (eventually) judges
 whether that content is AI-generated "slop". Screen reading is on-device: a screenshot is
 transcribed by Gemma via LiteRT-LM (OCR). There's also an experimental ambient **screen agent** that
@@ -22,9 +22,9 @@ a small setup screen (`MainActivity`) for granting permissions and starting/stop
 > and
 > the agent. If you find lingering keyboard references, they're stragglers worth cleaning up.
 
-- applicationId / namespace: `com.markedusduplicate.slopboard` (debug variant: `.debug`)
+- applicationId / namespace: `com.markedusduplicate.deckard` (debug variant: `.debug`)
 - Build variants: `debug` / `release` only (no product flavors)
-- DI: Hilt. App class: `SlopboardApplication` (`@HiltAndroidApp`)
+- DI: Hilt. App class: `DeckardApplication` (`@HiltAndroidApp`)
 
 ## Module layout
 
@@ -32,7 +32,7 @@ a small setup screen (`MainActivity`) for granting permissions and starting/stop
 - `design` — theme/UI (`AppTheme`)
 - `common`, `common-test`, `logging`, `work`, `auth`, `testing` — shared libs
   (namespaces stay `com.markedusduplicate.*`; only the app/template packages were renamed to
-  slopboard)
+  deckard)
 - `build-logic/convention` — Gradle convention plugins (`application.common`,
   `application.compose.common`, `hilt.common`, `library.common`, `library.compose.common`)
 
@@ -86,7 +86,7 @@ caches the loaded engine, so after pushing a new model `am force-stop` (or reins
     - **`AccessibilityScreenTextReader`** (`@AccessibilityScreenText`): a placeholder for pulling
       text
       straight out of the a11y node tree (faster, no model). Not implemented.
-- `accessibility/SlopboardAccessibilityService` registers the `ScreenshotCapturer` (only an
+- `accessibility/DeckardAccessibilityService` registers the `ScreenshotCapturer` (only an
   `AccessibilityService` can call `takeScreenshot`) and publishes visible window text to
   `accessibility/ScreenContextHolder`. The user must enable it under Settings → Accessibility;
   capture stays on-device.

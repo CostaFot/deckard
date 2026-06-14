@@ -17,7 +17,7 @@ val aiDetectorApiKey: String = System.getenv("AI_DETECTOR_API_KEY")?.takeIf { it
 
 android {
     defaultConfig {
-        applicationId = "com.markedusduplicate.slopboard"
+        applicationId = "com.markedusduplicate.deckard"
         versionCode = 1
         versionName = "0.0.1"
 
@@ -42,7 +42,7 @@ android {
     buildTypes {
         val debug by getting {
             applicationIdSuffix = ".debug"
-            resValue("string", "app_name", "Slopboard Debug")
+            resValue("string", "app_name", "Deckard Debug")
         }
         val release by getting {
             isMinifyEnabled = true
@@ -51,7 +51,7 @@ android {
                 "proguard-rules.pro"
             )
             signingConfig = signingConfigs.getByName("debug")
-            resValue("string", "app_name", "Slopboard")
+            resValue("string", "app_name", "Deckard")
         }
     }
 
@@ -68,7 +68,7 @@ android {
         }
     }
 
-    namespace = "com.markedusduplicate.slopboard"
+    namespace = "com.markedusduplicate.deckard"
 }
 
 dependencies {
