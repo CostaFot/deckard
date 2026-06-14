@@ -112,18 +112,61 @@ under `model/` are gitignored.
   in
   `accessibility/extract/NodeText.kt`.
     - **`LinkedInContentExtractor`** (`com.linkedin.android`): the feed is Jetpack Compose
-      (`sdui:lazyColumn`, mostly bare `android.view.View`s; the whole post body is one full-width
-      `TextView`), so it returns the **most-visible post** — the visible `TextView` inside the feed
-      container with the largest viewport overlap. Author/timestamp and post-detail screens are
-      TODO.
-- **Discovery loop**: `ScreenNode.toDebugString()` is dumped to logcat on summon (debug only — the
-  `logDebug` lambda is lazy) to design extractors against real trees. `adb shell uiautomator dump`
-  is the alternative capture (and the only one on devices that **encrypt logcat**, e.g. some Honor
-  devices).
+      (`sdui:lazyColumn`, mostly bare `android.view.View`s with no ids). A post body is one large
+      node but its class varies (`TextView` *or* clickable `Button`), so it matches on **content,
+      not
+      class** — any visible node carrying text. A collapsed post's visible `text` ends in "… more"
+      while the full post sits in `contentDescription`, so it reads the **fuller of text /
+      contentDescription**. Selection follows what the user centres: the content node under the
+      **screen centre**, falling back to largest viewport overlap (so a big neighbour can't steal a
+      centred post). Author/timestamp and comment/post-detail screens are TODO.
+- **Discovery loop**: on summon (debug builds only) `DeckardAccessibilityService.dumpTree` writes
+  the
+  active-window tree + every window's tree to `…/files/deckard_tree.txt`, which we `adb pull` and
+  read. It's a file (not logcat) because **some devices encrypt logcat** (e.g. Honor) and because
+  the
+  file is the exact `ScreenNode` snapshot the extractor saw. `adb shell uiautomator dump` is a
+  zero-code cross-check. See the runbook below.
 - `slop/ContentExtractor` (+ `ContentExtractionPrompt`) is dormant: it would isolate the main
   post/article text from a noisy capture **verbatim** (the model selects which captured lines are
   content; it never rewrites them, which would bias detection toward "AI") before handing it to the
   detector.
+
+### Adding / tuning a per-app extractor (runbook)
+
+The repeatable loop for a new app (X, Reddit, …) or fixing an existing one. Needs a connected device
+(`adb devices`) and a debug build.
+
+1. **Install & enable.** `./gradlew :app:installDebug`. Grant overlay + accessibility (once per
+   install) via adb — note this **overwrites** the enabled-a11y-services list, so re-enable any
+   others (e.g. TalkBack) afterwards:
+   ```
+   PKG=com.markedusduplicate.deckard.debug
+   SVC=$PKG/com.markedusduplicate.deckard.accessibility.DeckardAccessibilityService
+   adb shell appops set $PKG SYSTEM_ALERT_WINDOW allow
+   adb shell settings put secure enabled_accessibility_services $SVC
+   adb shell settings put secure accessibility_enabled 1
+   ```
+   (Changing `accessibility_service_config.xml` only takes effect after the service re-binds —
+   toggle it off/on by re-running the `settings put` lines.) Then open the app → **Start Deckard**.
+2. **Capture.** On the device, navigate to the exact screen/state to debug (e.g. a post with
+   "… more"), centre it, and **summon Deckard** (left-edge swipe). That writes the dump. Pull it:
+   ```
+   adb pull /sdcard/Android/data/$PKG/files/deckard_tree.txt
+   ```
+   The file has the **extracted** text (what the user got), the **active-window** tree (what the
+   extractor saw), and **all windows** (reveals content in a separate window, e.g. a bottom sheet).
+3. **Diagnose & write.** Read the dump: find the node holding the real content (check `class`, the
+   `viewId`, `text` vs `desc` — LinkedIn hides the full post in `desc`), and why the extractor
+   missed
+   it. Write/adjust the `ScreenContentExtractor`; for a new app add the class + one
+   `@Binds @IntoSet`
+   in `di/ScreenTextExtractorsModule`.
+4. **Lock it in with a test.** Hand-build a `ScreenNode` fixture from the dump (the `node(…)` helper
+   in `app/src/test/.../accessibility/TestNodes.kt`) and assert the extractor's output. Run
+   `./gradlew :app:testDebugUnitTest --tests "*<App>ContentExtractorTest"`.
+5. **Verify on device.** Re-`installDebug`, summon on the same screen, confirm the verdict reads the
+   right text. Iterate from step 2.
 
 ### Slop detection — `slop/AiDetectorRepository.kt`
 

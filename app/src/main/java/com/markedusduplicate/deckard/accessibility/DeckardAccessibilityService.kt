@@ -6,8 +6,8 @@ import android.graphics.Rect
 import android.view.Display
 import android.view.accessibility.AccessibilityEvent
 import androidx.core.graphics.scale
+import com.markedusduplicate.common.FlagProvider
 import com.markedusduplicate.common.coroutine.DispatcherProvider
-import com.markedusduplicate.deckard.BuildConfig
 import com.markedusduplicate.deckard.accessibility.extract.ScreenContentExtractors
 import com.markedusduplicate.deckard.accessibility.tree.ScreenNode
 import com.markedusduplicate.deckard.accessibility.tree.ScreenNodeSnapshot
@@ -51,6 +51,9 @@ class DeckardAccessibilityService : AccessibilityService() {
     @Inject
     lateinit var screenContentExtractors: ScreenContentExtractors
 
+    @Inject
+    lateinit var flagProvider: FlagProvider
+
     override fun onServiceConnected() {
         super.onServiceConnected()
         logDebug { "accessibility service connected" }
@@ -80,7 +83,7 @@ class DeckardAccessibilityService : AccessibilityService() {
 
         val text = screenContentExtractors.extract(packageName, snapshot)
         logDebug { "screen ($packageName): $text" }
-        if (BuildConfig.DEBUG) dumpTree(packageName, snapshot, text)
+        if (flagProvider.isDebugEnabled) dumpTree(packageName, snapshot, text)
         text
     }
 
