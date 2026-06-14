@@ -2,6 +2,11 @@ package com.markedusduplicate.deckard.mascot
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.os.Build
+import android.view.KeyEvent
+import android.window.OnBackInvokedCallback
+import android.window.OnBackInvokedDispatcher
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -51,6 +56,58 @@ class DeckardComposeView(
 
     init {
         id = R.id.deckardComposeView
+    }
+
+    /**
+     * Back callback for the modern path (Android 13+). The app opts into predictive back
+     * (`enableOnBackInvokedCallback=true`), so on API 33+ the framework routes back through the
+     * window's [OnBackInvokedDispatcher] instead of [KEYCODE_BACK][KeyEvent.KEYCODE_BACK]. Held so it
+     * can be unregistered on detach.
+     */
+    private var backCallback: OnBackInvokedCallback? = null
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) registerBackCallback()
+    }
+
+    override fun onDetachedFromWindow() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) unregisterBackCallback()
+        super.onDetachedFromWindow()
+    }
+
+    /**
+     * Register the back callback for the window's lifetime. It fires only while the overlay window is
+     * the back target, i.e. while [DeckardOverlayService] has it focusable (solely when Deckard is
+     * showing) — so back closes the mascot, not the app beneath it. Focusability (not registration)
+     * gates when it fires.
+     */
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    private fun registerBackCallback() {
+        val dispatcher = findOnBackInvokedDispatcher() ?: return
+        val callback = OnBackInvokedCallback { onDismiss() }
+        dispatcher.registerOnBackInvokedCallback(OnBackInvokedDispatcher.PRIORITY_DEFAULT, callback)
+        backCallback = callback
+    }
+
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    private fun unregisterBackCallback() {
+        backCallback?.let { findOnBackInvokedDispatcher()?.unregisterOnBackInvokedCallback(it) }
+        backCallback = null
+    }
+
+    /**
+     * Back-gesture dismissal, legacy fallback. Used on API 30–32 (pre-[OnBackInvokedDispatcher]) and
+     * if no dispatcher is available; on API 33+ with [backCallback] registered the framework consumes
+     * back via the dispatcher and never delivers [KEYCODE_BACK][KeyEvent.KEYCODE_BACK] here, so the
+     * two paths don't double-fire. Reaches here only while the window is focusable.
+     */
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        if (event.keyCode == KeyEvent.KEYCODE_BACK && event.action == KeyEvent.ACTION_UP) {
+            onDismiss()
+            return true
+        }
+        return super.dispatchKeyEvent(event)
     }
 
     @Composable

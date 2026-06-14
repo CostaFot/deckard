@@ -163,6 +163,7 @@ class DeckardOverlayService :
     /** Summon Deckard: show him, read the screen's text, and surface the verdict (stays until closed). */
     private fun detectSlopNow() {
         tapJob?.cancel()
+        setOverlayFocusable(true)
         tapJob = scope.launch {
             state.value = DeckardState.Thinking
             state.value = detectSlop()
@@ -172,6 +173,23 @@ class DeckardOverlayService :
     private fun dismiss() {
         tapJob?.cancel()
         state.value = DeckardState.Hidden
+        setOverlayFocusable(false)
+    }
+
+    /**
+     * Toggle the mascot window's focusability. Focusable so it captures the back key/gesture (to
+     * [dismiss]) only while Deckard is showing; otherwise [WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE]
+     * is restored so key/IME focus stays with the app beneath. Touch pass-through is unaffected
+     * (governed by `FLAG_NOT_TOUCH_MODAL`).
+     */
+    private fun setOverlayFocusable(focusable: Boolean) {
+        val view = overlayView ?: return
+        layoutParams.flags = if (focusable) {
+            layoutParams.flags and WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE.inv()
+        } else {
+            layoutParams.flags or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+        }
+        runCatching { windowManager.updateViewLayout(view, layoutParams) }
     }
 
     private suspend fun detectSlop(): DeckardState =
