@@ -23,7 +23,7 @@ import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.markedusduplicate.common.coroutine.DispatcherProvider
 import com.markedusduplicate.common.result.fold
-import com.markedusduplicate.deckard.di.OcrScreenText
+import com.markedusduplicate.deckard.di.AccessibilityScreenText
 import com.markedusduplicate.deckard.slop.DetectSlopUseCase
 import com.markedusduplicate.deckard.slop.ScreenReadResult
 import com.markedusduplicate.deckard.slop.ScreenTextReader
@@ -41,8 +41,9 @@ import javax.inject.Inject
 /**
  * Hosts the floating Deckard mascot in a system overlay window so it lives over every app. Deckard is
  * hidden until summoned by a left→right swipe on the [DeckardEdgeHandleView] tab pinned to the left
- * edge; summoning reads the text on the current screen (via the `@OcrScreenText` [ScreenTextReader]
- * — screenshot OCR), judges whether it's AI-generated "slop" via [DetectSlopUseCase] (backed by
+ * edge; summoning reads the text on the current screen (via the `@AccessibilityScreenText`
+ * [ScreenTextReader] — accessibility-tree extraction), judges whether it's AI-generated "slop" via
+ * [DetectSlopUseCase] (backed by
  * [com.markedusduplicate.deckard.slop.AiDetectorRepository]), and shows the verdict in a speech
  * bubble, then auto-hides. Tapping the mascot re-runs the check; tapping the bubble dismisses it.
  *
@@ -61,7 +62,7 @@ class DeckardOverlayService :
     SavedStateRegistryOwner {
 
     @Inject
-    @OcrScreenText
+    @AccessibilityScreenText
     lateinit var screenTextReader: ScreenTextReader
 
     @Inject

@@ -83,18 +83,43 @@ under `model/` are gitignored.
 
 - `slop/ScreenTextReader` is the seam (returns `slop/ScreenReadResult`). Two impls behind Hilt
   qualifiers in `di/ScreenTextModule.kt`:
-    - **`OcrScreenTextReader`** (`@OcrScreenText`, **in use**): grabs a screenshot via
+    - **`AccessibilityScreenTextReader`** (`@AccessibilityScreenText`, **in use**): pulls the
+      visible
+      on-screen text straight from the foreground app's a11y node tree via
+      `accessibility/ScreenTextCapturer`. No model, no screenshot — returns in milliseconds. The
+      chrome-trimming lives in the service (see below).
+    - **`OcrScreenTextReader`** (`@OcrScreenText`, fallback): grabs a screenshot via
       `accessibility/ScreenshotCapturer` and asks `LlmEngine.generateWithImage` to transcribe it
       (`suggestion/llm/OcrPrompt`). A screenshot is the visible viewport only, so it captures just
-      what
-      the user sees. Hard-requires a loaded model.
-    - **`AccessibilityScreenTextReader`** (`@AccessibilityScreenText`): a placeholder for pulling
-      text
-      straight out of the a11y node tree (faster, no model). Not implemented.
-- `accessibility/DeckardAccessibilityService` registers the `ScreenshotCapturer` (only an
-  `AccessibilityService` can call `takeScreenshot`) and publishes visible window text to
-  `accessibility/ScreenContextHolder`. The user must enable it under Settings → Accessibility;
-  capture stays on-device.
+      what the user sees. Accurate but slow (a vision inference per summon) and hard-requires a
+      loaded
+      model. Swap back by flipping the overlay's qualifier to `@OcrScreenText`.
+- `accessibility/DeckardAccessibilityService` registers both on-demand bridges (only an
+  `AccessibilityService` can `takeScreenshot` or read `rootInActiveWindow`): `ScreenshotCapturer`
+  (JPEG for OCR) and `ScreenTextCapturer` (tree text). Its `captureScreenText` snapshots
+  `rootInActiveWindow` into a framework-free `accessibility/tree/ScreenNode` (via
+  `ScreenNodeSnapshot`)
+  and dispatches by foreground package to a **per-app extractor**. The user must enable it under
+  Settings → Accessibility; capture stays on-device.
+- **Per-app extraction** — `accessibility/extract/`. Each app the user reads in lays its a11y tree
+  out differently, so each gets a `ScreenContentExtractor` (pure function over a `ScreenNode`
+  snapshot, so it unit-tests against captured trees — no Robolectric/mockk).
+  `ScreenContentExtractors`
+  picks the first extractor whose `handles(packageName)` is true, else `GenericContentExtractor`
+  (viewport-clipped whole-tree / WebView-only walk — the unknown-app fallback). Extractors are
+  contributed via Hilt `@IntoSet` in `di/ScreenTextExtractorsModule` (add an app = new class + one
+  binding). Shared helpers (`viewport`, `collectVisibleText`, `find`/`findAll`, `mostVisible`) live
+  in
+  `accessibility/extract/NodeText.kt`.
+    - **`LinkedInContentExtractor`** (`com.linkedin.android`): the feed is Jetpack Compose
+      (`sdui:lazyColumn`, mostly bare `android.view.View`s; the whole post body is one full-width
+      `TextView`), so it returns the **most-visible post** — the visible `TextView` inside the feed
+      container with the largest viewport overlap. Author/timestamp and post-detail screens are
+      TODO.
+- **Discovery loop**: `ScreenNode.toDebugString()` is dumped to logcat on summon (debug only — the
+  `logDebug` lambda is lazy) to design extractors against real trees. `adb shell uiautomator dump`
+  is the alternative capture (and the only one on devices that **encrypt logcat**, e.g. some Honor
+  devices).
 - `slop/ContentExtractor` (+ `ContentExtractionPrompt`) is dormant: it would isolate the main
   post/article text from a noisy capture **verbatim** (the model selects which captured lines are
   content; it never rewrites them, which would bias detection toward "AI") before handing it to the
@@ -159,9 +184,11 @@ bodies.
 ## Status & what's left (for the next session)
 
 The pivot + rename are done and the build is green (`:app:compileDebugKotlin`,
-`:app:testDebugUnitTest`). End to end today: summon Deckard → screenshot OCR → **Pangram detection**
-→ the bubble shows the verdict as a Pangram-style **report card** (`mascot/SlopReportCard`). Steps
-1–2 below are done (API→domain→UI wiring via `AiDetectorRepository` + `DetectSlopUseCase`, base
+`:app:testDebugUnitTest`). End to end today: summon Deckard → **a11y-tree screen read** → **Pangram
+detection** → the bubble shows the verdict as a Pangram-style **report card** (
+`mascot/SlopReportCard`).
+Steps 1–2 below are done (API→domain→UI wiring via `AiDetectorRepository` + `DetectSlopUseCase`,
+base
 URL/auth in `NetworkModule`, and the report-card UI). Remaining, in rough priority:
 
 3. **Deckard's voice.** The bubble copy is plain. Give him the weary-scholar persona: verdict lines
@@ -170,8 +197,14 @@ URL/auth in `NetworkModule`, and the report-card UI). Remaining, in rough priori
    robed-Horadrim imagery). Lands wherever the verdict is rendered (step 2).
 4. **(Optional) Content isolation.** `slop/ContentExtractor` (+ `ContentExtractionPrompt`) is built
    but dormant — slot it in before detection so the model judges the main post, not chrome.
-5. **(Optional) Alt screen reader.** `slop/AccessibilityScreenTextReader` is an unimplemented,
-   model-free a11y-tree alternative to the OCR reader (bound via `@AccessibilityScreenText`).
+5. **Per-app extractors (`accessibility/extract/`).** The in-use a11y reader now dispatches by
+   foreground package to a per-app `ScreenContentExtractor`. **LinkedIn** (`com.linkedin.android`)
+   is
+   done — most-visible post. Next, one extractor each for **X, Reddit, Substack, Medium** (capture
+   the
+   tree via `uiautomator dump`, add a class + `@IntoSet` binding + fixture test). LinkedIn polish:
+   include author/timestamp, handle "…more" truncation, confirm post-detail screens. The OCR reader
+   remains a fallback behind `@OcrScreenText`.
 
 **Cruft worth deleting** (template/pivot leftovers, unused by the detector): the
 JSONPlaceholder/Todo

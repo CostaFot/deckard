@@ -4,18 +4,15 @@ import android.accessibilityservice.AccessibilityService
 import android.graphics.Bitmap
 import android.view.Display
 import android.view.accessibility.AccessibilityEvent
-import android.view.accessibility.AccessibilityNodeInfo
 import androidx.core.graphics.scale
 import com.markedusduplicate.common.coroutine.DispatcherProvider
-import com.markedusduplicate.common.di.ApplicationCoroutineScope
+import com.markedusduplicate.deckard.accessibility.extract.ScreenContentExtractors
+import com.markedusduplicate.deckard.accessibility.tree.ScreenNodeSnapshot
+import com.markedusduplicate.deckard.accessibility.tree.toDebugString
 import com.markedusduplicate.logging.logDebug
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.asExecutor
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
@@ -24,13 +21,14 @@ import kotlin.coroutines.resume
 
 /**
  * The app's eyes on the screen. It does two things, both of which only an `AccessibilityService` can
- * do, so it registers itself with the singletons the rest of the app drives it through:
+ * do, so it registers itself with the on-demand bridges the rest of the app drives it through:
  *
- * 1. **Screenshots** for OCR — registers [ScreenshotCapturer]'s handler (the in-use screen reader,
- *    [com.markedusduplicate.deckard.slop.OcrScreenTextReader], asks for a JPEG of the display).
- * 2. **Window text** — publishes the visible on-screen text to [ScreenContextHolder]. Text capture
- *    is filtered to cut chrome (only visible nodes, only their `text`, de-duplicated) and bursts of
- *    `TYPE_WINDOW_CONTENT_CHANGED` are debounced so a settling screen is captured once.
+ * 1. **Window text** — snapshots the foreground app's accessibility tree on demand and hands it to
+ *    the right per-app [ScreenContentExtractors] extractor; the result feeds [ScreenTextCapturer]
+ *    (the in-use screen reader, [com.markedusduplicate.deckard.slop.AccessibilityScreenTextReader],
+ *    pulls it when Deckard is summoned).
+ * 2. **Screenshots** — registers [ScreenshotCapturer]'s handler for the fallback OCR reader
+ *    ([com.markedusduplicate.deckard.slop.OcrScreenTextReader], which asks for a JPEG of the display).
  *
  * The user must enable this service under Settings → Accessibility; everything stays on-device.
  */
@@ -38,83 +36,48 @@ import kotlin.coroutines.resume
 class DeckardAccessibilityService : AccessibilityService() {
 
     @Inject
-    lateinit var screenContextHolder: ScreenContextHolder
-
-    @Inject
-    @ApplicationCoroutineScope
-    lateinit var scope: CoroutineScope
-
-    @Inject
     lateinit var dispatcherProvider: DispatcherProvider
 
     @Inject
     lateinit var screenshotCapturer: ScreenshotCapturer
 
-    private var captureJob: Job? = null
-    private var lastText: String = ""
+    @Inject
+    lateinit var screenTextCapturer: ScreenTextCapturer
+
+    @Inject
+    lateinit var screenContentExtractors: ScreenContentExtractors
 
     override fun onServiceConnected() {
         super.onServiceConnected()
         logDebug { "accessibility service connected" }
         screenshotCapturer.setHandler(::captureScreenshot)
+        screenTextCapturer.setHandler(::captureScreenText)
     }
 
     override fun onDestroy() {
         screenshotCapturer.setHandler(null)
+        screenTextCapturer.setHandler(null)
         super.onDestroy()
     }
 
-    override fun onAccessibilityEvent(event: AccessibilityEvent?) {
-        event ?: return
-        when (event.eventType) {
-            AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED,
-            AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED,
-                -> Unit
-
-            else -> return
-        }
-        if (event.packageName == packageName) return
-        scheduleCapture()
-    }
+    override fun onAccessibilityEvent(event: AccessibilityEvent?) = Unit
 
     override fun onInterrupt() = Unit
 
-    /** Coalesce a storm of content-changed events into a single capture of the settled screen. */
-    private fun scheduleCapture() {
-        captureJob?.cancel()
-        captureJob = scope.launch(dispatcherProvider.io) {
-            delay(DEBOUNCE_MS)
-            capture()
-        }
-    }
+    /**
+     * Snapshot the foreground app's accessibility tree and let the per-app extractor pull the content
+     * worth checking. The tree is dumped to logcat (debug builds only — the lambda is lazy) so we can
+     * design and tune each app's extractor against real captures.
+     */
+    private suspend fun captureScreenText(): String? = withContext(dispatcherProvider.io) {
+        val root = rootInActiveWindow ?: return@withContext null
+        val snapshot = ScreenNodeSnapshot.from(root) ?: return@withContext null
+        val packageName = root.packageName?.toString().orEmpty()
 
-    private fun capture() {
-        val root = rootInActiveWindow ?: return
-        val focused = root.findFocus(AccessibilityNodeInfo.FOCUS_INPUT) ?: return
-
-        val lines = LinkedHashSet<String>()
-        collectText(root, focused, lines)
-        val text = lines.joinToString("\n").take(MAX_SCREEN_CHARS)
-        if (text.isEmpty() || text == lastText) return
-
-        lastText = text
-        screenContextHolder.update(text)
-        logDebug { "screen (${root.packageName}): $text" }
-    }
-
-    private fun collectText(
-        node: AccessibilityNodeInfo?,
-        focused: AccessibilityNodeInfo,
-        out: LinkedHashSet<String>,
-    ) {
-        if (node == null || out.size >= MAX_LINES) return
-        if (node != focused && node.isVisibleToUser && !node.isPassword) {
-            val text = node.text?.toString()?.trim()
-            if (!text.isNullOrEmpty()) out.add(text)
-        }
-        for (i in 0 until node.childCount) {
-            collectText(node.getChild(i), focused, out)
-        }
+        logDebug { "tree ($packageName):\n${snapshot.toDebugString()}" }
+        val text = screenContentExtractors.extract(packageName, snapshot)
+        logDebug { "screen ($packageName): $text" }
+        text
     }
 
     /** Capture the current display as a downscaled JPEG (null on failure). */
@@ -162,9 +125,6 @@ class DeckardAccessibilityService : AccessibilityService() {
     }
 
     private companion object {
-        const val DEBOUNCE_MS = 350L
-        const val MAX_SCREEN_CHARS = 2000
-        const val MAX_LINES = 200
         const val MAX_SCREENSHOT_DIM = 1024
         const val JPEG_QUALITY = 85
     }
