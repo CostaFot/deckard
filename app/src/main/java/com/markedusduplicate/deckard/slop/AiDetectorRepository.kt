@@ -28,8 +28,9 @@ class AiDetectorRepository @Inject constructor(
     private val slopVerdictMapper: SlopVerdictMapper,
     private val dispatcherProvider: DispatcherProvider,
 ) {
-    suspend fun detect(text: String): Result<Throwable, DomainSlopVerdict> =
-        withContext(dispatcherProvider.io) {
+    suspend fun detect(text: String, isMocked: Boolean = false): Result<Throwable, DomainSlopVerdict> {
+        if (isMocked) return Result.Success(mockedVerdict(text))
+        return withContext(dispatcherProvider.io) {
             attempt {
                 val taskId = pangramService
                     .createTask(ApiPangramTaskRequest(text, publicDashboardLink = true))
@@ -41,6 +42,30 @@ class AiDetectorRepository @Inject constructor(
                 }
             }
         }
+    }
+
+    /** Canned "AI slop" verdict for local testing without spending ~5¢ on a real Pangram call. */
+    private fun mockedVerdict(text: String): DomainSlopVerdict = DomainSlopVerdict(
+        isAi = true,
+        aiLikelihood = 1.0,
+        summary = "AI Generated",
+        predictionShort = "AI",
+        headline = "AI Generated",
+        prediction = "We believe that this document is fully AI-generated",
+        fractionAi = 1.0,
+        fractionAiAssisted = 0.0,
+        fractionHuman = 0.0,
+        numAiSegments = 1,
+        numAiAssistedSegments = 0,
+        numHumanSegments = 0,
+        dashboardLink = "https://www.pangram.com/history/00000000-0000-0000-0000-000000000000",
+        windows = emptyList(),
+        version = "3.3.2",
+        wordCount = 137,
+        analyzedText = text,
+        confidence = "High",
+        dominantLabel = "AI-Generated",
+    )
 
     private suspend fun poll(taskId: String): ApiPangramDetection {
         repeat(MAX_POLL_ATTEMPTS) {
