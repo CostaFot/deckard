@@ -1,4 +1,4 @@
-package com.markedusduplicate.deckard.clippy
+package com.markedusduplicate.deckard.mascot
 
 import android.content.Context
 import android.content.Intent
@@ -38,8 +38,8 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
- * Hosts the floating Clippy mascot in a system overlay window so it lives over every app. Clippy is
- * hidden until summoned by a left→right swipe on the [ClippyEdgeHandleView] tab pinned to the left
+ * Hosts the floating Deckard mascot in a system overlay window so it lives over every app. Deckard is
+ * hidden until summoned by a left→right swipe on the [DeckardEdgeHandleView] tab pinned to the left
  * edge; summoning reads the text on the current screen (via the `@OcrScreenText` [ScreenTextReader]
  * — screenshot OCR) and shows it in a speech bubble, then auto-hides. Tapping the mascot re-runs the
  * check; tapping the bubble dismisses it. The captured text is destined for an AI-detection backend
@@ -54,7 +54,7 @@ import javax.inject.Inject
  * reading the screen). Started/stopped from the setup screen; runs as a plain started service for now.
  */
 @AndroidEntryPoint
-class ClippyOverlayService :
+class DeckardOverlayService :
     android.app.Service(),
     LifecycleOwner,
     ViewModelStoreOwner,
@@ -81,7 +81,7 @@ class ClippyOverlayService :
 
     private val scope by lazy { CoroutineScope(dispatcherProvider.ui + SupervisorJob()) }
 
-    private val state = MutableStateFlow<ClippyState>(ClippyState.Hidden)
+    private val state = MutableStateFlow<DeckardState>(DeckardState.Hidden)
 
     private val windowManager by lazy { getSystemService(WindowManager::class.java) }
 
@@ -122,8 +122,8 @@ class ClippyOverlayService :
         ).apply { gravity = Gravity.TOP or Gravity.START }
     }
 
-    private var overlayView: ClippyComposeView? = null
-    private var edgeHandleView: ClippyEdgeHandleView? = null
+    private var overlayView: DeckardComposeView? = null
+    private var edgeHandleView: DeckardEdgeHandleView? = null
     private var agentOverlayView: AgentOverlayView? = null
     private var agentOverlayAdded = false
     private var tapJob: Job? = null
@@ -137,12 +137,12 @@ class ClippyOverlayService :
         lifecycleRegistry.currentState = Lifecycle.State.RESUMED
 
         if (!Settings.canDrawOverlays(this)) {
-            logDebug { "clippy: no draw-over permission, stopping" }
+            logDebug { "deckard: no draw-over permission, stopping" }
             stopSelf()
             return
         }
 
-        val view = ClippyComposeView(
+        val view = DeckardComposeView(
             context = this,
             state = state.asStateFlow(),
             onTap = ::detectSlopNow,
@@ -152,7 +152,7 @@ class ClippyOverlayService :
         overlayView = view
         windowManager.addView(view, layoutParams)
 
-        val handle = ClippyEdgeHandleView(
+        val handle = DeckardEdgeHandleView(
             context = this,
             onSummon = ::detectSlopNow,
             onOpenAgent = agentEngine::start,
@@ -164,7 +164,7 @@ class ClippyOverlayService :
         scope.launch { agentEngine.state.collect(::applyAgentState) }
 
         isRunning = true
-        logDebug { "clippy overlay + edge handle added" }
+        logDebug { "deckard overlay + edge handle added" }
     }
 
     /** Make the service the owner of [view]'s tree so Compose can find a lifecycle / saved state. */
@@ -208,12 +208,12 @@ class ClippyOverlayService :
 
     override fun onBind(intent: Intent?): IBinder? = null
 
-    /** Summon Clippy: show him, read the screen's text, surface it, then auto-hide. */
+    /** Summon Deckard: show him, read the screen's text, surface it, then auto-hide. */
     private fun detectSlopNow() {
         autoHideJob?.cancel()
         tapJob?.cancel()
         tapJob = scope.launch {
-            state.value = ClippyState.Thinking
+            state.value = DeckardState.Thinking
             state.value = detectSlop()
             scheduleAutoHide()
         }
@@ -222,25 +222,25 @@ class ClippyOverlayService :
     private fun dismiss() {
         autoHideJob?.cancel()
         tapJob?.cancel()
-        state.value = ClippyState.Hidden
+        state.value = DeckardState.Hidden
     }
 
     private fun scheduleAutoHide() {
         autoHideJob?.cancel()
         autoHideJob = scope.launch {
             delay(AUTO_HIDE_MS)
-            state.value = ClippyState.Hidden
+            state.value = DeckardState.Hidden
         }
     }
 
-    private suspend fun detectSlop(): ClippyState =
+    private suspend fun detectSlop(): DeckardState =
         when (val result = screenTextReader.read()) {
-            is ScreenReadResult.Unavailable -> ClippyState.Unavailable(result.reason)
+            is ScreenReadResult.Unavailable -> DeckardState.Unavailable(result.reason)
             is ScreenReadResult.Text -> {
                 logDebug { "slop: captured ${result.value.length} chars" }
                 // TODO(ai-detector): hand result.value to AiDetectorRepository.detect(...) and show
                 //  the verdict here instead of this raw captured-text preview.
-                ClippyState.Speaking(result.value.take(PREVIEW_CHARS))
+                DeckardState.Speaking(result.value.take(PREVIEW_CHARS))
             }
         }
 
@@ -279,11 +279,11 @@ class ClippyOverlayService :
             private set
 
         fun start(context: Context) {
-            context.startService(Intent(context, ClippyOverlayService::class.java))
+            context.startService(Intent(context, DeckardOverlayService::class.java))
         }
 
         fun stop(context: Context) {
-            context.stopService(Intent(context, ClippyOverlayService::class.java))
+            context.stopService(Intent(context, DeckardOverlayService::class.java))
         }
     }
 }

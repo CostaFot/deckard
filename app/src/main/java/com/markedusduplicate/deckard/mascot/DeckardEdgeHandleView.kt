@@ -1,4 +1,4 @@
-package com.markedusduplicate.deckard.clippy
+package com.markedusduplicate.deckard.mascot
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -23,7 +23,7 @@ import com.markedusduplicate.deckard.R
 import com.markedusduplicate.design.theme.AppTheme
 
 /**
- * A slim, always-present tab pinned to the left edge. A left→right swipe across it summons Clippy
+ * A slim, always-present tab pinned to the left edge. A left→right swipe across it summons Deckard
  * ([onSummon]) — the "back-gesture, but on one spot only" the feature is named after.
  *
  * The catch on Android 10+: the screen edges are reserved for the system back gesture, which would
@@ -32,14 +32,14 @@ import com.markedusduplicate.design.theme.AppTheme
  * kept short.
  */
 @SuppressLint("ViewConstructor")
-class ClippyEdgeHandleView(
+class DeckardEdgeHandleView(
     context: Context,
     private val onSummon: () -> Unit,
     private val onOpenAgent: () -> Unit,
 ) : AbstractComposeView(context) {
 
     init {
-        id = R.id.clippyEdgeHandleView
+        id = R.id.deckardEdgeHandleView
         addOnLayoutChangeListener { _, left, top, right, bottom, _, _, _, _ ->
             systemGestureExclusionRects = listOf(Rect(0, 0, right - left, bottom - top))
         }

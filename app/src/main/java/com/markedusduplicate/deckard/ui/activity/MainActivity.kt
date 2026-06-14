@@ -35,7 +35,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import com.markedusduplicate.deckard.accessibility.DeckardAccessibilityService
-import com.markedusduplicate.deckard.clippy.ClippyOverlayService
+import com.markedusduplicate.deckard.mascot.DeckardOverlayService
 import com.markedusduplicate.design.theme.AppTheme
 import com.markedusduplicate.logging.logDebug
 import dagger.hilt.android.AndroidEntryPoint
@@ -68,14 +68,14 @@ private fun SetupScreen() {
 
     var isAccessibilityEnabled by remember { mutableStateOf(false) }
     var canDrawOverlays by remember { mutableStateOf(false) }
-    var isClippyRunning by remember { mutableStateOf(false) }
+    var isDeckardRunning by remember { mutableStateOf(false) }
 
     // Re-read status every time the Activity resumes, so returning from system
     // settings refreshes the indicators.
     LifecycleResumeEffect(Unit) {
         isAccessibilityEnabled = isAccessibilityServiceEnabled(context)
         canDrawOverlays = Settings.canDrawOverlays(context)
-        isClippyRunning = ClippyOverlayService.isRunning
+        isDeckardRunning = DeckardOverlayService.isRunning
         onPauseOrDispose {}
     }
 
@@ -96,8 +96,8 @@ private fun SetupScreen() {
         Spacer(modifier = Modifier.height(16.dp))
 
         StatusRow(label = "Screen reading (accessibility)", ok = isAccessibilityEnabled)
-        StatusRow(label = "Draw over apps (Clippy)", ok = canDrawOverlays)
-        StatusRow(label = "Clippy running", ok = isClippyRunning)
+        StatusRow(label = "Draw over apps (Deckard)", ok = canDrawOverlays)
+        StatusRow(label = "Deckard running", ok = isDeckardRunning)
 
         Spacer(modifier = Modifier.height(24.dp))
 
@@ -123,7 +123,7 @@ private fun SetupScreen() {
                 )
             },
         ) {
-            Text(text = "2. Allow Clippy to draw over apps")
+            Text(text = "2. Allow Deckard to draw over apps")
         }
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -132,16 +132,16 @@ private fun SetupScreen() {
             modifier = Modifier.fillMaxWidth(),
             enabled = canDrawOverlays && isAccessibilityEnabled,
             onClick = {
-                if (isClippyRunning) {
-                    ClippyOverlayService.stop(context)
-                    isClippyRunning = false
+                if (isDeckardRunning) {
+                    DeckardOverlayService.stop(context)
+                    isDeckardRunning = false
                 } else {
-                    ClippyOverlayService.start(context)
-                    isClippyRunning = true
+                    DeckardOverlayService.start(context)
+                    isDeckardRunning = true
                 }
             },
         ) {
-            Text(text = if (isClippyRunning) "3. Stop Clippy" else "3. Start Clippy")
+            Text(text = if (isDeckardRunning) "3. Stop Deckard" else "3. Start Deckard")
         }
     }
 }

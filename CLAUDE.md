@@ -5,7 +5,7 @@
 
 ## What this is
 
-**deckard** — an Android **AI-slop detector**. A floating "Clippy" mascot lives in a system
+**deckard** — an Android **AI-slop detector**. A floating "Deckard" mascot lives in a system
 overlay over every app; summoning it reads the text on the current screen and (eventually) judges
 whether that content is AI-generated "slop". Screen reading is on-device: a screenshot is
 transcribed by Gemma via LiteRT-LM (OCR). There's also an experimental ambient **screen agent** that
@@ -47,28 +47,29 @@ Gradle uses the Android Studio JBR — **`JAVA_HOME` must be set** or `./gradlew
 - Unit tests: `./gradlew :app:testDebugUnitTest`
 
 To use it after install, open the app and work through `MainActivity`'s setup screen: enable the
-accessibility service (screen reading), grant draw-over-apps, then start Clippy. A left→right swipe
+accessibility service (screen reading), grant draw-over-apps, then start Deckard. A left→right swipe
 on the left-edge tab summons the mascot.
 
 The on-device LLM is required for OCR (the in-use screen reader) and the agent, but optional to
-*launch*: with no model present, summoning Clippy reports it has no brain yet. To enable it,
+*launch*: with no model present, summoning Deckard reports it has no brain yet. To enable it,
 `adb push` a `.litertlm` into `/sdcard/Android/data/<applicationId>/files/models/` (≈2.4–3.5 GB; the
 `LlmEngine` loads the first `.litertlm` it finds there). `LlmEngine` warms up once per process and
 caches the loaded engine, so after pushing a new model `am force-stop` (or reinstall) to reload it.
 
 ## Architecture notes (the non-obvious bits)
 
-### Overlay service — `clippy/ClippyOverlayService.kt`
+### Overlay service — `mascot/DeckardOverlayService.kt`
 
 - A plain started `Service` (no Activity host) that hosts three `WindowManager` overlay windows: the
-  draggable mascot (`clippy/ClippyComposeView.kt`, an emoji + speech bubble), the always-present
-  left-edge summon tab (`clippy/ClippyEdgeHandleView.kt`), and the agent's full-screen highlight
+  draggable mascot (`mascot/DeckardComposeView.kt`, an emoji + speech bubble), the always-present
+  left-edge summon tab (`mascot/DeckardEdgeHandleView.kt`), and the agent's full-screen highlight
   overlay (`agent/AgentOverlayView.kt`).
 - An overlay service has no lifecycle/decor-view callbacks, so the service implements
   `LifecycleOwner` + `ViewModelStoreOwner` + `SavedStateRegistryOwner` itself, drives its own
   `LifecycleRegistry` to RESUMED, and sets the view-tree owners directly on each overlay view — all
   required for Compose to compose and recompose.
-- `clippy/ClippyEdgeHandleView.kt` declares `setSystemGestureExclusionRects` so its left→right swipe
+- `mascot/DeckardEdgeHandleView.kt` declares `setSystemGestureExclusionRects` so its left→right
+  swipe
   isn't eaten by the Android 10+ system back gesture (exclusion budget is ~200dp/edge, so the tab is
   short).
 - Requires the draw-over-apps permission (checked in `onCreate`) and the accessibility service
@@ -111,7 +112,7 @@ caches the loaded engine, so after pushing a new model `am force-stop` (or reins
   read the foreground app's actionable elements (`agent/ScreenController`, implemented by the
   accessibility service), ask `LlmEngine` for the single most useful next action over that element
   list (`agent/AgentPrompt` → parsed by `agent/AgentAction`), and surface it as
-  `AgentState.Suggest` — Clippy highlights the target and offers to do it. **Never auto-acts**:
+  `AgentState.Suggest` — Deckard highlights the target and offers to do it. **Never auto-acts**:
   every
   step waits for the user's tap.
 - The LLM picks elements by their snapshot `index` (`agent/ActionableNode`), never by pixel
@@ -151,5 +152,5 @@ bodies.
 
 `logDebug { … }` (`com.markedusduplicate.logging`) and `Timber` (tag `"KeyboardComposeView"` for the
 overlay view lifecycle). `logDebug` uses Timber's `DebugTree`, so the tag is the calling class's
-simple name (e.g. `LlmEngine`, `ClippyOverlayService`). The native LiteRT runtime logs under
+simple name (e.g. `LlmEngine`, `DeckardOverlayService`). The native LiteRT runtime logs under
 `litert` / `litert-lm`.

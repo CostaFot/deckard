@@ -1,4 +1,4 @@
-package com.markedusduplicate.deckard.clippy
+package com.markedusduplicate.deckard.mascot
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -27,36 +27,36 @@ import com.markedusduplicate.design.theme.AppTheme
 import kotlinx.coroutines.flow.StateFlow
 
 /**
- * The floating mascot itself: a draggable 📎 emoji with a speech bubble that shows whatever the LLM
- * just said. Rendered into a `WindowManager` overlay by [ClippyOverlayService], so the content is
+ * The floating mascot itself: a draggable 🧙 emoji with a speech bubble that shows whatever the LLM
+ * just said. Rendered into a `WindowManager` overlay by [DeckardOverlayService], so the content is
  * wrap-sized and the background stays transparent — only the emoji and bubble occupy (and intercept
  * touches in) the window; everything else passes through to the app beneath.
  */
 @SuppressLint("ViewConstructor")
-class ClippyComposeView(
+class DeckardComposeView(
     context: Context,
-    private val state: StateFlow<ClippyState>,
+    private val state: StateFlow<DeckardState>,
     private val onTap: () -> Unit,
     private val onDrag: (dx: Float, dy: Float) -> Unit,
     private val onDismiss: () -> Unit,
 ) : AbstractComposeView(context) {
 
     init {
-        id = R.id.clippyComposeView
+        id = R.id.deckardComposeView
     }
 
     @Composable
     override fun Content() {
         val s by state.collectAsStateWithLifecycle()
         AppTheme {
-            if (s == ClippyState.Hidden) return@AppTheme
+            if (s == DeckardState.Hidden) return@AppTheme
             Column(
                 modifier = Modifier.wrapContentSize(),
                 horizontalAlignment = Alignment.Start,
                 verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
                 Text(
-                    text = "📎",
+                    text = "🧙",
                     fontSize = 40.sp,
                     modifier = Modifier
                         .pointerInput(Unit) { detectTapGestures(onTap = { onTap() }) }
@@ -69,10 +69,10 @@ class ClippyComposeView(
                 )
 
                 val bubble = when (val current = s) {
-                    ClippyState.Hidden -> null
-                    ClippyState.Thinking -> "🤔 …"
-                    is ClippyState.Speaking -> current.remark
-                    is ClippyState.Unavailable -> current.reason
+                    DeckardState.Hidden -> null
+                    DeckardState.Thinking -> "🤔 …"
+                    is DeckardState.Speaking -> current.remark
+                    is DeckardState.Unavailable -> current.reason
                 }
                 if (bubble != null) Bubble(text = bubble, onClick = onDismiss)
             }

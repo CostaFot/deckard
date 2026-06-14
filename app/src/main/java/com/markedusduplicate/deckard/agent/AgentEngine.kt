@@ -17,7 +17,7 @@ import javax.inject.Singleton
 /**
  * Drives the ambient screen assistant: read the foreground app's actionable elements
  * ([ScreenController]), ask the LLM ([LlmEngine]) for the single most useful next action over that
- * element list (no goal, no pixel coordinates) and surface it as a [AgentState.Suggest] — Clippy
+ * element list (no goal, no pixel coordinates) and surface it as a [AgentState.Suggest] — Deckard
  * highlights the target and offers to do it. On accept it performs the action, then suggests the next
  * one, forming a guided loop. Nothing runs without the user's tap.
  *

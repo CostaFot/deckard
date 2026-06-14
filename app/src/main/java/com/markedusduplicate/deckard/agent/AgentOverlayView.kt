@@ -42,8 +42,8 @@ import com.markedusduplicate.design.theme.AppTheme
 
 /**
  * Full-screen, mostly pass-through overlay that renders the suggestion loop: a highlight box around
- * the element Clippy wants to act on, plus a chip that names the action and lets the user run it. The
- * window is only made touchable (by [com.markedusduplicate.deckard.clippy.ClippyOverlayService])
+ * the element Deckard wants to act on, plus a chip that names the action and lets the user run it. The
+ * window is only made touchable (by [com.markedusduplicate.deckard.mascot.DeckardOverlayService])
  * while a suggestion or result is showing, so it doesn't block the phone the rest of the time.
  */
 @SuppressLint("ViewConstructor")
