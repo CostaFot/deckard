@@ -24,6 +24,7 @@ import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.markedusduplicate.common.coroutine.DispatcherProvider
 import com.markedusduplicate.deckard.di.AccessibilityScreenText
 import com.markedusduplicate.deckard.di.OcrContentScreenText
+import com.markedusduplicate.deckard.mascot.DeckardOverlayService.Companion.detectText
 import com.markedusduplicate.deckard.slop.DetectSlopUseCase
 import com.markedusduplicate.deckard.slop.MIN_WORDS_TO_DETECT
 import com.markedusduplicate.deckard.slop.ScreenReadResult
@@ -50,6 +51,10 @@ import javax.inject.Inject
  * bubble, then auto-hides. **Long-pressing** the tab runs the alternative `@OcrContentScreenText`
  * read instead — a screenshot the model isolates the main post out of. Tapping the mascot re-runs the
  * a11y check; tapping the bubble dismisses it.
+ *
+ * Text can also be judged **without reading the screen**: [detectText] (driven by the share-sheet
+ * [com.markedusduplicate.deckard.ui.activity.ShareTextActivity]) feeds already-captured text straight
+ * into the same verdict flow and pops the mascot up to speak it — auto-starting the service if needed.
  *
  * An overlay service has no bind callbacks and no decor view, so it drives its own
  * [LifecycleRegistry] to RESUMED and sets the view-tree owners directly on the overlay view — both
@@ -164,7 +169,12 @@ class DeckardOverlayService :
         view.setViewTreeSavedStateRegistryOwner(this)
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int = START_STICKY
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if (intent?.action == ACTION_DETECT_TEXT) {
+            intent.getStringExtra(EXTRA_TEXT)?.takeIf { it.isNotBlank() }?.let(::runDetectionOnText)
+        }
+        return START_STICKY
+    }
 
     override fun onBind(intent: Intent?): IBinder? = null
 
@@ -175,12 +185,18 @@ class DeckardOverlayService :
     private fun readScreenshotNow() = runDetection(screenshotReader)
 
     /** Show Deckard, read the screen's text with [reader], and surface the verdict (stays until closed). */
-    private fun runDetection(reader: ScreenTextReader) {
+    private fun runDetection(reader: ScreenTextReader) = runDetecting { detectSlop(reader) }
+
+    /** Show Deckard and judge already-captured [text] (e.g. text shared into the app) — no screen read. */
+    private fun runDetectionOnText(text: String) = runDetecting { judge(text) }
+
+    /** Show Deckard, run [produce] to get a verdict, and surface it (stays until closed). */
+    private fun runDetecting(produce: suspend () -> DeckardState) {
         tapJob?.cancel()
         setOverlayFocusable(true)
         tapJob = scope.launch {
             state.value = DeckardState.Thinking
-            state.value = detectSlop(reader)
+            state.value = produce()
         }
     }
 
@@ -209,18 +225,20 @@ class DeckardOverlayService :
     private suspend fun detectSlop(reader: ScreenTextReader): DeckardState =
         when (val result = reader.read()) {
             is ScreenReadResult.Unavailable -> DeckardState.Unavailable(result.reason)
-            is ScreenReadResult.Text -> {
-                val text = result.value
-                logDebug { "slop: captured ${text.length} chars" }
-                when (val check = detectSlopUseCase(text)) {
-                    is SlopCheck.Judged -> DeckardState.Verdict(check.verdict)
-                    SlopCheck.NotEnoughText ->
-                        DeckardState.Unavailable("Not enough text here to judge — I need about $MIN_WORDS_TO_DETECT words.")
-
-                    SlopCheck.Failed -> DeckardState.Unavailable("Couldn't reach the slop oracle")
-                }
-            }
+            is ScreenReadResult.Text -> judge(result.value)
         }
+
+    /** Run [text] through the detector and map the outcome to a mascot state. */
+    private suspend fun judge(text: String): DeckardState {
+        logDebug { "slop: judging ${text.length} chars" }
+        return when (val check = detectSlopUseCase(text)) {
+            is SlopCheck.Judged -> DeckardState.Verdict(check.verdict)
+            SlopCheck.NotEnoughText ->
+                DeckardState.Unavailable("Not enough text here to judge — I need about $MIN_WORDS_TO_DETECT words.")
+
+            SlopCheck.Failed -> DeckardState.Unavailable("Couldn't reach the slop oracle")
+        }
+    }
 
     private fun openAnalysis(url: String) {
         runCatching {
@@ -257,6 +275,9 @@ class DeckardOverlayService :
     }
 
     companion object {
+        private const val ACTION_DETECT_TEXT = "com.markedusduplicate.deckard.action.DETECT_TEXT"
+        private const val EXTRA_TEXT = "com.markedusduplicate.deckard.extra.TEXT"
+
         /** True while the overlay is up; read by the setup screen to drive the start/stop toggle. */
         @Volatile
         var isRunning: Boolean = false
@@ -268,6 +289,19 @@ class DeckardOverlayService :
 
         fun stop(context: Context) {
             context.stopService(Intent(context, DeckardOverlayService::class.java))
+        }
+
+        /**
+         * Judge [text] directly (e.g. text shared into the app via the share sheet) and surface the
+         * verdict through the mascot. Starts the service if it isn't already up, so a share auto-summons
+         * Deckard. Requires the draw-over-apps permission; no accessibility/screen read is involved.
+         */
+        fun detectText(context: Context, text: String) {
+            context.startService(
+                Intent(context, DeckardOverlayService::class.java)
+                    .setAction(ACTION_DETECT_TEXT)
+                    .putExtra(EXTRA_TEXT, text),
+            )
         }
     }
 }
