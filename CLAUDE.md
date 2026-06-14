@@ -53,8 +53,14 @@ on the left-edge tab summons the mascot.
 The on-device LLM is required for OCR (the in-use screen reader) and the agent, but optional to
 *launch*: with no model present, summoning Deckard reports it has no brain yet. To enable it,
 `adb push` a `.litertlm` into `/sdcard/Android/data/<applicationId>/files/models/` (≈2.4–3.5 GB; the
-`LlmEngine` loads the first `.litertlm` it finds there). `LlmEngine` warms up once per process and
-caches the loaded engine, so after pushing a new model `am force-stop` (or reinstall) to reload it.
+`LlmEngine` loads the first `.litertlm` it finds there). For the **debug** build `<applicationId>`
+is
+`com.markedusduplicate.deckard.debug`, so the dir is
+`/sdcard/Android/data/com.markedusduplicate.deckard.debug/files/models/` — create it with
+`adb shell mkdir -p` and push to a full filename (a trailing-slash dest fails with "Is a directory"
+if `models/` doesn't exist yet). `LlmEngine` warms up once per process and caches the loaded engine,
+so after pushing a new model `am force-stop` (or reinstall) to reload it. Local `.litertlm` files
+under `model/` are gitignored.
 
 ## Architecture notes (the non-obvious bits)
 
@@ -150,7 +156,39 @@ bodies.
 
 ## Logging
 
-`logDebug { … }` (`com.markedusduplicate.logging`) and `Timber` (tag `"KeyboardComposeView"` for the
-overlay view lifecycle). `logDebug` uses Timber's `DebugTree`, so the tag is the calling class's
-simple name (e.g. `LlmEngine`, `DeckardOverlayService`). The native LiteRT runtime logs under
-`litert` / `litert-lm`.
+`logDebug { … }` (`com.markedusduplicate.logging`) is the standard logger. It plants Timber's
+`DebugTree` (in `AppInitializer`, debug builds only), so the tag is the calling class's simple name
+(e.g. `LlmEngine`, `DeckardOverlayService`). The native LiteRT runtime logs under `litert` /
+`litert-lm`.
+
+## Status & what's left (for the next session)
+
+The pivot + rename are done and the build is green (`:app:compileDebugKotlin`,
+`:app:testDebugUnitTest`). End to end today: summon Deckard → screenshot OCR → the speech bubble
+shows the **raw captured text**. The actual slop verdict is not wired. In rough priority:
+
+1. **Wire the slop detector.** `slop/AiDetectorRepository.detect()` is a placeholder that throws
+   "not wired yet". Implement the real backend (Pangram is the first candidate) as a Retrofit
+   service
+   in `di/NetworkModule.kt` (which still has the template `jsonplaceholder` base URL), authenticate
+   with `BuildConfig.AI_DETECTOR_API_KEY`, and return a real `slop/SlopVerdict`.
+2. **Render the verdict.** `mascot/DeckardOverlayService.detectSlop()` (see its `TODO(ai-detector)`)
+   still surfaces an OCR-text preview — call `AiDetectorRepository.detect(...)` and show the
+   verdict.
+3. **Deckard's voice.** The bubble copy is plain. Give him the weary-scholar persona: verdict lines
+   like *"Slop, my son. (91.7%)"*, the confidence score deadpan, and his own catchphrase — keep the
+   wise-elder archetype but avoid Blizzard's literal Deckard-Cain tells ("stay awhile and listen",
+   robed-Horadrim imagery). Lands wherever the verdict is rendered (step 2).
+4. **(Optional) Content isolation.** `slop/ContentExtractor` (+ `ContentExtractionPrompt`) is built
+   but dormant — slot it in before detection so the model judges the main post, not chrome.
+5. **(Optional) Alt screen reader.** `slop/AccessibilityScreenTextReader` is an unimplemented,
+   model-free a11y-tree alternative to the OCR reader (bound via `@AccessibilityScreenText`).
+
+**Cruft worth deleting** (template/pivot leftovers, unused by the detector): the
+JSONPlaceholder/Todo
+demo — `domain/JsonPlaceHolderRepository`, `domain/TodoMapper`, `domain/model/DomainTodo`,
+`net/JsonPlaceHolderService`, `net/model/ApiTodo`, the `jsonPlaceHolderRepository()` entry-point
+method in `DeckardApplication`, `NetworkModule`'s todo wiring, `:work`'s `ExpeditedGetTodoWorker`,
+and
+the `get_todo` / `title_activity_second|third` strings. Also: `LlmEngine` + `OcrPrompt` still live
+under `suggestion/llm/` (a vestigial keyboard-era package name) — consider moving them to `llm/`.
