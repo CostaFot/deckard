@@ -2,6 +2,7 @@ package com.markedusduplicate.deckard.di
 
 import com.markedusduplicate.deckard.accessibility.extract.LinkedInContentExtractor
 import com.markedusduplicate.deckard.accessibility.extract.ScreenContentExtractor
+import com.markedusduplicate.deckard.accessibility.extract.XContentExtractor
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -21,4 +22,8 @@ interface ScreenTextExtractorsModule {
     @Binds
     @IntoSet
     fun bindsLinkedInContentExtractor(impl: LinkedInContentExtractor): ScreenContentExtractor
+
+    @Binds
+    @IntoSet
+    fun bindsXContentExtractor(impl: XContentExtractor): ScreenContentExtractor
 }
