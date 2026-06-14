@@ -1,5 +1,7 @@
 package com.markedusduplicate.deckard.mascot
 
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.PixelFormat
@@ -7,6 +9,7 @@ import android.os.IBinder
 import android.provider.Settings
 import android.view.Gravity
 import android.view.WindowManager
+import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
@@ -19,10 +22,9 @@ import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.markedusduplicate.common.coroutine.DispatcherProvider
-import com.markedusduplicate.deckard.agent.AgentEngine
-import com.markedusduplicate.deckard.agent.AgentOverlayView
-import com.markedusduplicate.deckard.agent.AgentState
+import com.markedusduplicate.common.result.fold
 import com.markedusduplicate.deckard.di.OcrScreenText
+import com.markedusduplicate.deckard.slop.DetectSlopUseCase
 import com.markedusduplicate.deckard.slop.ScreenReadResult
 import com.markedusduplicate.deckard.slop.ScreenTextReader
 import com.markedusduplicate.logging.logDebug
@@ -31,7 +33,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -41,10 +42,9 @@ import javax.inject.Inject
  * Hosts the floating Deckard mascot in a system overlay window so it lives over every app. Deckard is
  * hidden until summoned by a left→right swipe on the [DeckardEdgeHandleView] tab pinned to the left
  * edge; summoning reads the text on the current screen (via the `@OcrScreenText` [ScreenTextReader]
- * — screenshot OCR) and shows it in a speech bubble, then auto-hides. Tapping the mascot re-runs the
- * check; tapping the bubble dismisses it. The captured text is destined for an AI-detection backend
- * ([com.markedusduplicate.deckard.slop.AiDetectorRepository]) to judge whether it's AI-generated
- * "slop" — see the TODO in [detectSlop].
+ * — screenshot OCR), judges whether it's AI-generated "slop" via [DetectSlopUseCase] (backed by
+ * [com.markedusduplicate.deckard.slop.AiDetectorRepository]), and shows the verdict in a speech
+ * bubble, then auto-hides. Tapping the mascot re-runs the check; tapping the bubble dismisses it.
  *
  * An overlay service has no bind callbacks and no decor view, so it drives its own
  * [LifecycleRegistry] to RESUMED and sets the view-tree owners directly on the overlay view — both
@@ -65,10 +65,10 @@ class DeckardOverlayService :
     lateinit var screenTextReader: ScreenTextReader
 
     @Inject
-    lateinit var dispatcherProvider: DispatcherProvider
+    lateinit var detectSlopUseCase: DetectSlopUseCase
 
     @Inject
-    lateinit var agentEngine: AgentEngine
+    lateinit var dispatcherProvider: DispatcherProvider
 
     private val lifecycleRegistry = LifecycleRegistry(this)
     override val lifecycle: Lifecycle get() = lifecycleRegistry
@@ -107,27 +107,9 @@ class DeckardOverlayService :
         overlayParams(Gravity.LEFT or Gravity.CENTER_VERTICAL, x = 0, y = 0)
     }
 
-    // Full-screen so the highlight box can be drawn at any element's screen coordinates. Pass-through
-    // (FLAG_NOT_TOUCHABLE) by default; made touchable only while a suggestion is showing.
-    private val agentOverlayParams by lazy {
-        WindowManager.LayoutParams(
-            WindowManager.LayoutParams.MATCH_PARENT,
-            WindowManager.LayoutParams.MATCH_PARENT,
-            WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
-            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
-                    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE or
-                    WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or
-                    WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
-            PixelFormat.TRANSLUCENT,
-        ).apply { gravity = Gravity.TOP or Gravity.START }
-    }
-
     private var overlayView: DeckardComposeView? = null
     private var edgeHandleView: DeckardEdgeHandleView? = null
-    private var agentOverlayView: AgentOverlayView? = null
-    private var agentOverlayAdded = false
     private var tapJob: Job? = null
-    private var autoHideJob: Job? = null
 
     private fun dp(value: Int): Int = (value * resources.displayMetrics.density).toInt()
 
@@ -148,6 +130,8 @@ class DeckardOverlayService :
             onTap = ::detectSlopNow,
             onDrag = ::onDrag,
             onDismiss = ::dismiss,
+            onViewAnalysis = ::openAnalysis,
+            onCopyLink = ::copyLink,
         ).also(::attachOwners)
         overlayView = view
         windowManager.addView(view, layoutParams)
@@ -155,13 +139,9 @@ class DeckardOverlayService :
         val handle = DeckardEdgeHandleView(
             context = this,
             onSummon = ::detectSlopNow,
-            onOpenAgent = agentEngine::start,
         ).also(::attachOwners)
         edgeHandleView = handle
         windowManager.addView(handle, handleParams)
-
-        agentOverlayView = AgentOverlayView(this, agentEngine).also(::attachOwners)
-        scope.launch { agentEngine.state.collect(::applyAgentState) }
 
         isRunning = true
         logDebug { "deckard overlay + edge handle added" }
@@ -174,63 +154,22 @@ class DeckardOverlayService :
         view.setViewTreeSavedStateRegistryOwner(this)
     }
 
-    /** Add/remove the agent overlay window and tune touch/visibility as the suggestion loop runs. */
-    private fun applyAgentState(st: AgentState) {
-        val overlay = agentOverlayView ?: return
-        if (st == AgentState.Idle) {
-            if (agentOverlayAdded) {
-                runCatching { windowManager.removeView(overlay) }
-                agentOverlayAdded = false
-            }
-            return
-        }
-        if (!agentOverlayAdded) {
-            windowManager.addView(overlay, agentOverlayParams)
-            agentOverlayAdded = true
-        }
-        // Touchable only when there's something to tap (a suggestion / a result); pass-through while
-        // thinking, and hidden while acting so the injected tap lands on the app beneath, not on us.
-        setAgentTouchable(st is AgentState.Suggest || st is AgentState.Done || st is AgentState.Failed)
-        val acting = st == AgentState.Acting
-        overlay.visibility = if (acting) android.view.View.GONE else android.view.View.VISIBLE
-        edgeHandleView?.visibility = if (acting) android.view.View.GONE else android.view.View.VISIBLE
-    }
-
-    private fun setAgentTouchable(touchable: Boolean) {
-        val overlay = agentOverlayView ?: return
-        val flag = WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
-        agentOverlayParams.flags =
-            if (touchable) agentOverlayParams.flags and flag.inv() else agentOverlayParams.flags or flag
-        if (agentOverlayAdded) windowManager.updateViewLayout(overlay, agentOverlayParams)
-    }
-
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int = START_STICKY
 
     override fun onBind(intent: Intent?): IBinder? = null
 
-    /** Summon Deckard: show him, read the screen's text, surface it, then auto-hide. */
+    /** Summon Deckard: show him, read the screen's text, and surface the verdict (stays until closed). */
     private fun detectSlopNow() {
-        autoHideJob?.cancel()
         tapJob?.cancel()
         tapJob = scope.launch {
             state.value = DeckardState.Thinking
             state.value = detectSlop()
-            scheduleAutoHide()
         }
     }
 
     private fun dismiss() {
-        autoHideJob?.cancel()
         tapJob?.cancel()
         state.value = DeckardState.Hidden
-    }
-
-    private fun scheduleAutoHide() {
-        autoHideJob?.cancel()
-        autoHideJob = scope.launch {
-            delay(AUTO_HIDE_MS)
-            state.value = DeckardState.Hidden
-        }
     }
 
     private suspend fun detectSlop(): DeckardState =
@@ -238,11 +177,26 @@ class DeckardOverlayService :
             is ScreenReadResult.Unavailable -> DeckardState.Unavailable(result.reason)
             is ScreenReadResult.Text -> {
                 logDebug { "slop: captured ${result.value.length} chars" }
-                // TODO(ai-detector): hand result.value to AiDetectorRepository.detect(...) and show
-                //  the verdict here instead of this raw captured-text preview.
-                DeckardState.Speaking(result.value.take(PREVIEW_CHARS))
+                detectSlopUseCase(result.value).fold(
+                    ifError = { DeckardState.Unavailable("Couldn't reach the slop oracle") },
+                    ifSuccess = { DeckardState.Verdict(it) },
+                )
             }
         }
+
+    private fun openAnalysis(url: String) {
+        runCatching {
+            startActivity(
+                Intent(Intent.ACTION_VIEW, url.toUri()).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+            )
+        }
+        dismiss()
+    }
+
+    private fun copyLink(url: String) {
+        getSystemService(ClipboardManager::class.java)
+            ?.setPrimaryClip(ClipData.newPlainText("Pangram result", url))
+    }
 
     private fun onDrag(dx: Float, dy: Float) {
         val view = overlayView ?: return
@@ -254,15 +208,10 @@ class DeckardOverlayService :
     override fun onDestroy() {
         isRunning = false
         tapJob?.cancel()
-        autoHideJob?.cancel()
-        agentEngine.close()
         overlayView?.let { runCatching { windowManager.removeView(it) } }
         edgeHandleView?.let { runCatching { windowManager.removeView(it) } }
-        agentOverlayView?.let { if (agentOverlayAdded) runCatching { windowManager.removeView(it) } }
         overlayView = null
         edgeHandleView = null
-        agentOverlayView = null
-        agentOverlayAdded = false
         lifecycleRegistry.currentState = Lifecycle.State.DESTROYED
         viewModelStore.clear()
         scope.cancel()
@@ -270,9 +219,6 @@ class DeckardOverlayService :
     }
 
     companion object {
-        private const val AUTO_HIDE_MS = 8000L
-        private const val PREVIEW_CHARS = 200
-
         /** True while the overlay is up; read by the setup screen to drive the start/stop toggle. */
         @Volatile
         var isRunning: Boolean = false

@@ -3,30 +3,85 @@ package com.markedusduplicate.deckard.slop
 import com.markedusduplicate.common.coroutine.DispatcherProvider
 import com.markedusduplicate.common.result.Result
 import com.markedusduplicate.common.result.attempt
+import com.markedusduplicate.deckard.net.PangramService
+import com.markedusduplicate.deckard.net.model.ApiPangramDetection
+import com.markedusduplicate.deckard.net.model.ApiPangramTaskRequest
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Generic boundary for AI-content ("slop") detection: callers hand it the on-screen text and get back
- * a [SlopVerdict]. Provider-agnostic by design — the concrete detection backend lives behind this
- * repository and can be swapped without touching callers.
+ * Boundary for AI-content ("slop") detection: callers hand it the on-screen text and get back a
+ * [DomainSlopVerdict]. Maps API → domain only (no UI knowledge); the domain → UI step lives in
+ * [DetectSlopUseCase].
  *
- * The first planned backend is Pangram: a Retrofit service provided in
- * [com.markedusduplicate.deckard.di.NetworkModule], authenticated with
- * `BuildConfig.AI_DETECTOR_API_KEY`, called inside `withContext(dispatcherProvider.io)` and wrapped
- * with `attempt {}` — mirroring [com.markedusduplicate.deckard.domain.JsonPlaceHolderRepository].
- * Until those API details land, [detect] is a placeholder that reports it isn't wired yet, and is not
- * on the live overlay path.
+ * Backed by Pangram ([PangramService]), whose API is asynchronous: [detect] submits the text with
+ * `POST /task`, polls `GET /task/{id}` until the task reaches a terminal stage, and maps a
+ * successful result via [SlopVerdictMapper]. The whole flow runs on `dispatcherProvider.io` and is
+ * wrapped with `attempt {}`, so any network error, failure stage, or timeout surfaces as a
+ * [Result.Error] and callers degrade gracefully.
  */
 @Singleton
 class AiDetectorRepository @Inject constructor(
+    private val pangramService: PangramService,
+    private val slopVerdictMapper: SlopVerdictMapper,
     private val dispatcherProvider: DispatcherProvider,
 ) {
-    suspend fun detect(text: String): Result<Throwable, SlopVerdict> =
-        withContext(dispatcherProvider.io) {
+    suspend fun detect(text: String, isMocked: Boolean = true): Result<Throwable, DomainSlopVerdict> {
+        if (isMocked) return Result.Success(mockedVerdict(text))
+        return withContext(dispatcherProvider.io) {
             attempt {
-                error("AI-detection backend not wired yet (received ${text.length} chars)")
+                val taskId = pangramService
+                    .createTask(ApiPangramTaskRequest(text, publicDashboardLink = true))
+                    .taskId
+                val detection = poll(taskId)
+                when (detection.stage) {
+                    STAGE_SUCCESS -> slopVerdictMapper.map(detection)
+                    else -> error("Pangram detection ${detection.stage}: ${detection.headline}")
+                }
             }
         }
+    }
+
+    /** Canned "AI slop" verdict for local testing without spending ~5¢ on a real Pangram call. */
+    private fun mockedVerdict(text: String): DomainSlopVerdict = DomainSlopVerdict(
+        isAi = true,
+        aiLikelihood = 1.0,
+        summary = "AI Generated",
+        predictionShort = "AI",
+        headline = "AI Generated",
+        prediction = "We believe that this document is fully AI-generated",
+        fractionAi = 1.0,
+        fractionAiAssisted = 0.0,
+        fractionHuman = 0.0,
+        numAiSegments = 1,
+        numAiAssistedSegments = 0,
+        numHumanSegments = 0,
+        dashboardLink = "https://www.pangram.com/history/00000000-0000-0000-0000-000000000000",
+        windows = emptyList(),
+        version = "3.3.2",
+        wordCount = 137,
+        analyzedText = text,
+        confidence = "High",
+        dominantLabel = "AI-Generated",
+    )
+
+    private suspend fun poll(taskId: String): ApiPangramDetection {
+        repeat(MAX_POLL_ATTEMPTS) {
+            val detection = pangramService.getTask(taskId)
+            if (detection.stage == STAGE_SUCCESS || detection.stage == STAGE_FAILED) {
+                return detection
+            }
+            delay(POLL_INTERVAL_MS)
+        }
+        error("Pangram detection timed out after ${MAX_POLL_ATTEMPTS * POLL_INTERVAL_MS} ms")
+    }
+
+    private companion object {
+        const val STAGE_SUCCESS = "STAGE_SUCCESS"
+        const val STAGE_FAILED = "STAGE_FAILED"
+        const val POLL_INTERVAL_MS = 1500L
+        const val MAX_POLL_ATTEMPTS = 40
+    }
 }

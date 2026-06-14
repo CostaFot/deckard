@@ -5,7 +5,6 @@ import android.content.Context
 import android.graphics.Rect
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -35,7 +34,6 @@ import com.markedusduplicate.design.theme.AppTheme
 class DeckardEdgeHandleView(
     context: Context,
     private val onSummon: () -> Unit,
-    private val onOpenAgent: () -> Unit,
 ) : AbstractComposeView(context) {
 
     init {
@@ -52,7 +50,6 @@ class DeckardEdgeHandleView(
                 modifier = Modifier
                     .width(36.dp)
                     .height(140.dp)
-                    .pointerInput(Unit) { detectTapGestures(onLongPress = { onOpenAgent() }) }
                     .pointerInput(Unit) {
                         val threshold = 48.dp.toPx()
                         var total = 0f
