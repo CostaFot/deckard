@@ -30,6 +30,11 @@ data class Bounds(val left: Int, val top: Int, val right: Int, val bottom: Int) 
     fun intersects(other: Bounds): Boolean =
         left < other.right && other.left < right && top < other.bottom && other.top < bottom
 
+    fun contains(x: Int, y: Int): Boolean = x in left until right && y in top until bottom
+
+    val centerX: Int get() = (left + right) / 2
+    val centerY: Int get() = (top + bottom) / 2
+
     /** Area (px²) of the overlap with [other]; 0 when they don't overlap. Used to pick the
      *  most-visible node within the viewport. */
     fun intersectionArea(other: Bounds): Long {

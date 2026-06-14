@@ -2,11 +2,14 @@ package com.markedusduplicate.deckard.accessibility
 
 import android.accessibilityservice.AccessibilityService
 import android.graphics.Bitmap
+import android.graphics.Rect
 import android.view.Display
 import android.view.accessibility.AccessibilityEvent
 import androidx.core.graphics.scale
 import com.markedusduplicate.common.coroutine.DispatcherProvider
+import com.markedusduplicate.deckard.BuildConfig
 import com.markedusduplicate.deckard.accessibility.extract.ScreenContentExtractors
+import com.markedusduplicate.deckard.accessibility.tree.ScreenNode
 import com.markedusduplicate.deckard.accessibility.tree.ScreenNodeSnapshot
 import com.markedusduplicate.deckard.accessibility.tree.toDebugString
 import com.markedusduplicate.logging.logDebug
@@ -16,6 +19,7 @@ import kotlinx.coroutines.asExecutor
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
+import java.io.File
 import javax.inject.Inject
 import kotlin.coroutines.resume
 
@@ -66,7 +70,7 @@ class DeckardAccessibilityService : AccessibilityService() {
 
     /**
      * Snapshot the foreground app's accessibility tree and let the per-app extractor pull the content
-     * worth checking. The tree is dumped to logcat (debug builds only — the lambda is lazy) so we can
+     * worth checking. On debug builds the full tree is written to a file (see [dumpTree]) so we can
      * design and tune each app's extractor against real captures.
      */
     private suspend fun captureScreenText(): String? = withContext(dispatcherProvider.io) {
@@ -74,10 +78,42 @@ class DeckardAccessibilityService : AccessibilityService() {
         val snapshot = ScreenNodeSnapshot.from(root) ?: return@withContext null
         val packageName = root.packageName?.toString().orEmpty()
 
-        logDebug { "tree ($packageName):\n${snapshot.toDebugString()}" }
         val text = screenContentExtractors.extract(packageName, snapshot)
         logDebug { "screen ($packageName): $text" }
+        if (BuildConfig.DEBUG) dumpTree(packageName, snapshot, text)
         text
+    }
+
+    /**
+     * Debug only: write the active-window tree (what the extractor sees) plus every window's tree to
+     * a file we can `adb pull` — logcat is encrypted on some devices, and a file is the exact snapshot
+     * the extractor received. Dumping all windows reveals content (e.g. a comment sheet) that lives
+     * outside `rootInActiveWindow`.
+     */
+    private fun dumpTree(packageName: String, activeTree: ScreenNode, extracted: String?) {
+        runCatching {
+            val dir = getExternalFilesDir(null) ?: return
+            val content = buildString {
+                append("package: ").append(packageName).append('\n')
+                append("--- extracted ---\n").append(extracted ?: "(null)").append("\n\n")
+                append("=== active window (what the extractor sees) ===\n")
+                append(activeTree.toDebugString()).append('\n')
+                append("=== all windows ===\n")
+                windows.forEach { window ->
+                    val bounds = Rect().also { window.getBoundsInScreen(it) }
+                    append("\n[window type=").append(window.type)
+                        .append(" active=").append(window.isActive)
+                        .append(" focused=").append(window.isFocused)
+                        .append(" layer=").append(window.layer)
+                        .append(" bounds=").append(bounds.toShortString())
+                        .append("]\n")
+                    val root = window.root
+                    append(root?.let { ScreenNodeSnapshot.from(it)?.toDebugString() } ?: "(no tree)\n")
+                }
+            }
+            File(dir, TREE_DUMP_FILE).writeText(content)
+            logDebug { "tree dump written to ${File(dir, TREE_DUMP_FILE).absolutePath}" }
+        }
     }
 
     /** Capture the current display as a downscaled JPEG (null on failure). */
@@ -127,5 +163,6 @@ class DeckardAccessibilityService : AccessibilityService() {
     private companion object {
         const val MAX_SCREENSHOT_DIM = 1024
         const val JPEG_QUALITY = 85
+        const val TREE_DUMP_FILE = "deckard_tree.txt"
     }
 }

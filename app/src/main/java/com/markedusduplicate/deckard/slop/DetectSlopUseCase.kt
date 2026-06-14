@@ -3,6 +3,7 @@ package com.markedusduplicate.deckard.slop
 import com.markedusduplicate.common.coroutine.DispatcherProvider
 import com.markedusduplicate.common.result.fold
 import com.markedusduplicate.deckard.mascot.UiSlopVerdict
+import com.markedusduplicate.logging.logDebug
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -22,6 +23,7 @@ class DetectSlopUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(text: String): SlopCheck =
         withContext(dispatcherProvider.io) {
+            logDebug { text }
             if (wordCount(text) < MIN_WORDS_TO_DETECT) {
                 return@withContext SlopCheck.NotEnoughText
             }
