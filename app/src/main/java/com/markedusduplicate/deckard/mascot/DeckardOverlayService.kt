@@ -22,11 +22,12 @@ import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.markedusduplicate.common.coroutine.DispatcherProvider
-import com.markedusduplicate.common.result.fold
 import com.markedusduplicate.deckard.di.AccessibilityScreenText
 import com.markedusduplicate.deckard.slop.DetectSlopUseCase
+import com.markedusduplicate.deckard.slop.MIN_WORDS_TO_DETECT
 import com.markedusduplicate.deckard.slop.ScreenReadResult
 import com.markedusduplicate.deckard.slop.ScreenTextReader
+import com.markedusduplicate.deckard.slop.SlopCheck
 import com.markedusduplicate.logging.logDebug
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -177,11 +178,15 @@ class DeckardOverlayService :
         when (val result = screenTextReader.read()) {
             is ScreenReadResult.Unavailable -> DeckardState.Unavailable(result.reason)
             is ScreenReadResult.Text -> {
-                logDebug { "slop: captured ${result.value.length} chars" }
-                detectSlopUseCase(result.value).fold(
-                    ifError = { DeckardState.Unavailable("Couldn't reach the slop oracle") },
-                    ifSuccess = { DeckardState.Verdict(it) },
-                )
+                val text = result.value
+                logDebug { "slop: captured ${text.length} chars" }
+                when (val check = detectSlopUseCase(text)) {
+                    is SlopCheck.Judged -> DeckardState.Verdict(check.verdict)
+                    SlopCheck.NotEnoughText ->
+                        DeckardState.Unavailable("Not enough text here to judge — I need about $MIN_WORDS_TO_DETECT words.")
+
+                    SlopCheck.Failed -> DeckardState.Unavailable("Couldn't reach the slop oracle")
+                }
             }
         }
 

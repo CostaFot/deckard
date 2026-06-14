@@ -1,8 +1,7 @@
 package com.markedusduplicate.deckard.slop
 
 import com.markedusduplicate.common.coroutine.DispatcherProvider
-import com.markedusduplicate.common.result.Result
-import com.markedusduplicate.common.result.map
+import com.markedusduplicate.common.result.fold
 import com.markedusduplicate.deckard.mascot.UiSlopVerdict
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -12,15 +11,24 @@ import javax.inject.Inject
  * ([UiSlopVerdict]) — the domain → UI seam the overlay calls (it never touches the repository
  * directly). Screen reading stays with the caller; this use case takes the already-read text.
  *
+ * Gates on [MIN_WORDS_TO_DETECT]: text below the threshold returns [SlopCheck.NotEnoughText] without
+ * hitting the detector (short snippets can't be judged reliably and waste the call).
+ *
  * Main-safe: all work runs on `dispatcherProvider.io`, so callers may invoke it from any thread.
  */
 class DetectSlopUseCase @Inject constructor(
     private val aiDetectorRepository: AiDetectorRepository,
     private val dispatcherProvider: DispatcherProvider,
 ) {
-    suspend operator fun invoke(text: String): Result<Throwable, UiSlopVerdict> =
+    suspend operator fun invoke(text: String): SlopCheck =
         withContext(dispatcherProvider.io) {
-            aiDetectorRepository.detect(text).map { it.toUi() }
+            if (wordCount(text) < MIN_WORDS_TO_DETECT) {
+                return@withContext SlopCheck.NotEnoughText
+            }
+            aiDetectorRepository.detect(text).fold(
+                ifError = { SlopCheck.Failed },
+                ifSuccess = { SlopCheck.Judged(it.toUi()) },
+            )
         }
 }
 

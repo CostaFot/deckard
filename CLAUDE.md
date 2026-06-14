@@ -135,7 +135,10 @@ under `model/` are gitignored.
   (`ApiPangramDetection` → `DomainSlopVerdict`). Both repo and use case are main-safe
   (`withContext(io)`).
 - `slop/DetectSlopUseCase` is the **domain → UI** seam the overlay calls (never the repository
-  directly): `repository.detect(text).map { it.toUi() }` → `mascot/UiSlopVerdict`. To support the
+  directly): it returns a `slop/SlopCheck` (`Judged(mascot/UiSlopVerdict)` / `NotEnoughText` /
+  `Failed`). It gates on `MIN_WORDS_TO_DETECT` (50, in `slop/WordCount.kt`) — text below the
+  threshold returns `NotEnoughText` without hitting Pangram — then maps `repository.detect(text)` →
+  `it.toUi()`. To support the
   report card it requests a public dashboard link (`publicDashboardLink = true`) and the mapper
   derives `version`, `wordCount`, `analyzedText`, overall `confidence`, and `dominantLabel` (from
   the
