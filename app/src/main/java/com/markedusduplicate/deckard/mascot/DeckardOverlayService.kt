@@ -27,7 +27,6 @@ import com.markedusduplicate.common.coroutine.DispatcherProvider
 import com.markedusduplicate.deckard.di.AccessibilityScreenText
 import com.markedusduplicate.deckard.di.OcrContentScreenText
 import com.markedusduplicate.deckard.mascot.DeckardOverlayService.Companion.detectText
-import com.markedusduplicate.deckard.poc.PocNavOverlayView
 import com.markedusduplicate.deckard.slop.DetectSlopUseCase
 import com.markedusduplicate.deckard.slop.MIN_WORDS_TO_DETECT
 import com.markedusduplicate.deckard.slop.ScreenReadResult
@@ -132,14 +131,8 @@ class DeckardOverlayService :
         overlayParams(Gravity.LEFT or Gravity.CENTER_VERTICAL, x = 0, y = 0)
     }
 
-    // POC Nav3 panel, pinned to the right edge.
-    private val pocParams by lazy {
-        overlayParams(Gravity.RIGHT or Gravity.CENTER_VERTICAL, x = 0, y = 0)
-    }
-
     private var overlayView: DeckardComposeView? = null
     private var edgeHandleView: DeckardEdgeHandleView? = null
-    private var pocView: PocNavOverlayView? = null
     private var tapJob: Job? = null
 
     private fun dp(value: Int): Int = (value * resources.displayMetrics.density).toInt()
@@ -175,21 +168,8 @@ class DeckardOverlayService :
         edgeHandleView = handle
         windowManager.addView(handle, handleParams)
 
-        val poc = PocNavOverlayView(
-            context = this,
-            viewModelFactory = overlayViewModelFactory,
-            onClose = ::removePocPanel,
-        ).also(::attachOwners)
-        pocView = poc
-        windowManager.addView(poc, pocParams)
-
         isRunning = true
-        logDebug { "deckard overlay + edge handle + poc nav panel added" }
-    }
-
-    private fun removePocPanel() {
-        pocView?.let { runCatching { windowManager.removeView(it) } }
-        pocView = null
+        logDebug { "deckard overlay + edge handle added" }
     }
 
     /** Make the service the owner of [view]'s tree so Compose can find a lifecycle / saved state. */
@@ -296,7 +276,6 @@ class DeckardOverlayService :
         tapJob?.cancel()
         overlayView?.let { runCatching { windowManager.removeView(it) } }
         edgeHandleView?.let { runCatching { windowManager.removeView(it) } }
-        removePocPanel()
         overlayView = null
         edgeHandleView = null
         lifecycleRegistry.currentState = Lifecycle.State.DESTROYED

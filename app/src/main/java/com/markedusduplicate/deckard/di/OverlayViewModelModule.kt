@@ -2,9 +2,6 @@ package com.markedusduplicate.deckard.di
 
 import androidx.lifecycle.ViewModel
 import com.markedusduplicate.deckard.mascot.ExperimentViewModel
-import com.markedusduplicate.deckard.poc.PocScreenAViewModel
-import com.markedusduplicate.deckard.poc.PocScreenBViewModel
-import com.markedusduplicate.deckard.poc.PocScreenCViewModel
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -26,19 +23,4 @@ interface OverlayViewModelModule {
     @IntoMap
     @ClassKey(ExperimentViewModel::class)
     fun bindExperimentViewModel(viewModel: ExperimentViewModel): ViewModel
-
-    @Binds
-    @IntoMap
-    @ClassKey(PocScreenAViewModel::class)
-    fun bindPocScreenAViewModel(viewModel: PocScreenAViewModel): ViewModel
-
-    @Binds
-    @IntoMap
-    @ClassKey(PocScreenBViewModel::class)
-    fun bindPocScreenBViewModel(viewModel: PocScreenBViewModel): ViewModel
-
-    @Binds
-    @IntoMap
-    @ClassKey(PocScreenCViewModel::class)
-    fun bindPocScreenCViewModel(viewModel: PocScreenCViewModel): ViewModel
 }
