@@ -10,9 +10,11 @@ import android.provider.Settings
 import android.view.Gravity
 import android.view.WindowManager
 import androidx.core.net.toUri
+import androidx.lifecycle.HasDefaultViewModelProviderFactory
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.setViewTreeLifecycleOwner
@@ -68,6 +70,7 @@ class DeckardOverlayService :
     android.app.Service(),
     LifecycleOwner,
     ViewModelStoreOwner,
+    HasDefaultViewModelProviderFactory,
     SavedStateRegistryOwner {
 
     @Inject
@@ -88,6 +91,13 @@ class DeckardOverlayService :
     override val lifecycle: Lifecycle get() = lifecycleRegistry
 
     override val viewModelStore: ViewModelStore = ViewModelStore()
+
+    @Inject
+    lateinit var overlayViewModelFactory: OverlayViewModelFactory
+
+    /** Hand the overlay composition our singleton-graph-backed factory, so `viewModel()` resolves DI'd VMs. */
+    override val defaultViewModelProviderFactory: ViewModelProvider.Factory
+        get() = overlayViewModelFactory
 
     private val savedStateRegistryController = SavedStateRegistryController.create(this)
     override val savedStateRegistry: SavedStateRegistry
