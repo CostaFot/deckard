@@ -72,11 +72,11 @@ class DeckardOverlayService :
 
     @Inject
     @AccessibilityScreenText
-    lateinit var screenTextReader: ScreenTextReader
+    lateinit var accessibilityReader: ScreenTextReader
 
     @Inject
     @OcrContentScreenText
-    lateinit var screenshotReader: ScreenTextReader
+    lateinit var screenshotOcrReader: ScreenTextReader
 
     @Inject
     lateinit var detectSlopUseCase: DetectSlopUseCase
@@ -141,7 +141,7 @@ class DeckardOverlayService :
         val view = DeckardComposeView(
             context = this,
             state = state.asStateFlow(),
-            onTap = ::detectSlopNow,
+            onTap = ::summonViaAccessibilityRead,
             onDrag = ::onDrag,
             onDismiss = ::dismiss,
             onViewAnalysis = ::openAnalysis,
@@ -152,8 +152,8 @@ class DeckardOverlayService :
 
         val handle = DeckardEdgeHandleView(
             context = this,
-            onSummon = ::detectSlopNow,
-            onLongPress = ::readScreenshotNow,
+            onSummon = ::summonViaAccessibilityRead,
+            onLongPress = ::summonViaScreenshotOcr,
         ).also(::attachOwners)
         edgeHandleView = handle
         windowManager.addView(handle, handleParams)
@@ -179,13 +179,13 @@ class DeckardOverlayService :
     override fun onBind(intent: Intent?): IBinder? = null
 
     /** Summon Deckard via the a11y-tree read (swipe / tap): fast, no model, per-app extractors. */
-    private fun detectSlopNow() = runDetection(screenTextReader)
+    private fun summonViaAccessibilityRead() = runDetection(accessibilityReader)
 
     /** Summon Deckard via the screenshot + OCR "pick the post" read (long-press): slower, model-backed. */
-    private fun readScreenshotNow() = runDetection(screenshotReader)
+    private fun summonViaScreenshotOcr() = runDetection(screenshotOcrReader)
 
     /** Show Deckard, read the screen's text with [reader], and surface the verdict (stays until closed). */
-    private fun runDetection(reader: ScreenTextReader) = runDetecting { detectSlop(reader) }
+    private fun runDetection(reader: ScreenTextReader) = runDetecting { readScreenAndJudge(reader) }
 
     /** Show Deckard and judge already-captured [text] (e.g. text shared into the app) — no screen read. */
     private fun runDetectionOnText(text: String) = runDetecting { judge(text) }
@@ -222,7 +222,7 @@ class DeckardOverlayService :
         runCatching { windowManager.updateViewLayout(view, layoutParams) }
     }
 
-    private suspend fun detectSlop(reader: ScreenTextReader): DeckardState =
+    private suspend fun readScreenAndJudge(reader: ScreenTextReader): DeckardState =
         when (val result = reader.read()) {
             is ScreenReadResult.Unavailable -> DeckardState.Unavailable(result.reason)
             is ScreenReadResult.Text -> judge(result.value)

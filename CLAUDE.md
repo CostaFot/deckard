@@ -80,7 +80,8 @@ under `model/` are gitignored.
 - The edge tab carries **two gestures**: a left→right **swipe** summons via the a11y-tree read
   (`@AccessibilityScreenText`); a **long-press** (with a haptic tick) summons via the screenshot OCR
   read (`@OcrContentScreenText`). The service injects both readers and routes each gesture through
-  `runDetection(reader)` → `detectSlop(reader)`. The two `pointerInput`s don't collide — a swipe
+  `runDetection(reader)` → `readScreenAndJudge(reader)`. The two `pointerInput`s don't collide — a
+  swipe
   moves past touch slop (cancelling the long-press), a hold stays put (no drag).
 - Requires the draw-over-apps permission (checked in `onCreate`) and the accessibility service
   (for reading the screen). Started/stopped from `MainActivity`'s setup screen.
