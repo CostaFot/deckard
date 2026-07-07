@@ -3,8 +3,10 @@ package com.markedusduplicate.deckard.mascot
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Rect
+import android.view.HapticFeedbackConstants
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -17,13 +19,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.AbstractComposeView
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
 import com.markedusduplicate.deckard.R
 import com.markedusduplicate.design.theme.AppTheme
 
 /**
  * A slim, always-present tab pinned to the left edge. A left→right swipe across it summons Deckard
- * ([onSummon]) — the "back-gesture, but on one spot only" the feature is named after.
+ * ([onSummon]) — the "back-gesture, but on one spot only" the feature is named after. A **long-press**
+ * on the tab triggers [onLongPress] instead: the slower screenshot + OCR "pick the post" read.
  *
  * The catch on Android 10+: the screen edges are reserved for the system back gesture, which would
  * otherwise eat our swipe. We declare this view's bounds via [setSystemGestureExclusionRects] so the
@@ -34,6 +38,7 @@ import com.markedusduplicate.design.theme.AppTheme
 class DeckardEdgeHandleView(
     context: Context,
     private val onSummon: () -> Unit,
+    private val onLongPress: () -> Unit,
 ) : AbstractComposeView(context) {
 
     init {
@@ -45,6 +50,7 @@ class DeckardEdgeHandleView(
 
     @Composable
     override fun Content() {
+        val view = LocalView.current
         AppTheme {
             Box(
                 modifier = Modifier
@@ -59,6 +65,16 @@ class DeckardEdgeHandleView(
                             onHorizontalDrag = { change, amount ->
                                 change.consume()
                                 total += amount
+                            },
+                        )
+                    }
+                    // A stationary hold fires the long-press; a swipe moves past touch slop and
+                    // cancels it, falling through to the horizontal-drag summon above.
+                    .pointerInput(Unit) {
+                        detectTapGestures(
+                            onLongPress = {
+                                view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+                                onLongPress()
                             },
                         )
                     },

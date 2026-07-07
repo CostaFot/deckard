@@ -125,6 +125,9 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.testManifest)
 
+    // unit testing
+    testImplementation(libs.mockk)
+
     // UI testing
     androidTestImplementation(project(":testing"))
     androidTestImplementation(project(":common-test"))

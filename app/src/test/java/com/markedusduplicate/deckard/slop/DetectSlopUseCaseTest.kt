@@ -2,10 +2,9 @@ package com.markedusduplicate.deckard.slop
 
 import com.markedusduplicate.common.result.Result
 import com.markedusduplicate.deckard.CoroutinesTestRule
-import com.markedusduplicate.deckard.net.PangramService
-import com.markedusduplicate.deckard.net.model.ApiPangramDetection
-import com.markedusduplicate.deckard.net.model.ApiPangramTaskCreated
-import com.markedusduplicate.deckard.net.model.ApiPangramTaskRequest
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -17,50 +16,60 @@ class DetectSlopUseCaseTest {
     @get:Rule
     val coroutinesTestRule = CoroutinesTestRule()
 
+    private val aiDetectorRepository = mockk<AiDetectorRepository>()
+
+    private val useCase = DetectSlopUseCase(aiDetectorRepository, coroutinesTestRule.testDispatcherProvider)
+
     @Test
-    fun `maps a successful detection through to the UI verdict`() = runTest {
-        val useCase = useCaseFor(
-            ApiPangramDetection(
-                stage = "STAGE_SUCCESS",
-                headline = "AI Detected",
-                predictionShort = "AI",
-                fractionAi = 0.917,
-            ),
-        )
+    fun `judges text at or above the word threshold`() = runTest {
+        coEvery { aiDetectorRepository.detect(any(), any()) } returns Result.Success(aiVerdict)
 
-        val result = useCase("some text")
+        val result = useCase(text(words = MIN_WORDS_TO_DETECT))
 
-        assertTrue(result is Result.Success)
-        val ui = (result as Result.Success).value
-        assertTrue(ui.isAi)
-        assertEquals(0.917, ui.aiLikelihood, 0.0)
-        assertEquals("AI Detected", ui.summary)
+        assertTrue(result is SlopCheck.Judged)
+        assertTrue((result as SlopCheck.Judged).verdict.isAi)
     }
 
     @Test
-    fun `a failed task surfaces as an error`() = runTest {
-        val useCase = useCaseFor(
-            ApiPangramDetection(stage = "STAGE_FAILED", headline = "bad input"),
-        )
+    fun `surfaces a detection failure`() = runTest {
+        coEvery { aiDetectorRepository.detect(any(), any()) } returns Result.Error(RuntimeException("boom"))
 
-        assertTrue(useCase("some text") is Result.Error)
+        val result = useCase(text(words = MIN_WORDS_TO_DETECT))
+
+        assertEquals(SlopCheck.Failed, result)
     }
 
-    private fun useCaseFor(detection: ApiPangramDetection): DetectSlopUseCase {
-        val repository = AiDetectorRepository(
-            pangramService = FakePangramService(detection),
-            slopVerdictMapper = SlopVerdictMapper(),
-            dispatcherProvider = coroutinesTestRule.testDispatcherProvider,
-        )
-        return DetectSlopUseCase(repository, coroutinesTestRule.testDispatcherProvider)
+    @Test
+    fun `skips detection for text below the word threshold`() = runTest {
+        val result = useCase(text(words = MIN_WORDS_TO_DETECT - 1))
+
+        assertEquals(SlopCheck.NotEnoughText, result)
+        coVerify(exactly = 0) { aiDetectorRepository.detect(any(), any()) }
     }
 
-    private class FakePangramService(
-        private val detection: ApiPangramDetection,
-    ) : PangramService {
-        override suspend fun createTask(request: ApiPangramTaskRequest): ApiPangramTaskCreated =
-            ApiPangramTaskCreated(taskId = "task-1")
+    private fun text(words: Int): String = (1..words).joinToString(" ") { "word" }
 
-        override suspend fun getTask(taskId: String): ApiPangramDetection = detection
+    private companion object {
+        val aiVerdict = DomainSlopVerdict(
+            isAi = true,
+            aiLikelihood = 0.917,
+            summary = "AI Detected",
+            predictionShort = "AI",
+            headline = "AI Detected",
+            prediction = "likely AI",
+            fractionAi = 0.917,
+            fractionAiAssisted = 0.0,
+            fractionHuman = 0.083,
+            numAiSegments = 1,
+            numAiAssistedSegments = 0,
+            numHumanSegments = 0,
+            dashboardLink = null,
+            windows = emptyList(),
+            version = "3.3.2",
+            wordCount = 60,
+            analyzedText = "word word word",
+            confidence = "High",
+            dominantLabel = "AI-Generated",
+        )
     }
 }

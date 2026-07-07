@@ -8,4 +8,8 @@ annotation class OcrScreenText
 
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME)
+annotation class OcrContentScreenText
+
+@Qualifier
+@Retention(AnnotationRetention.RUNTIME)
 annotation class AccessibilityScreenText

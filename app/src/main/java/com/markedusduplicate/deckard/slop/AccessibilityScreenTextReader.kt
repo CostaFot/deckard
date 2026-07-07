@@ -1,20 +1,30 @@
 package com.markedusduplicate.deckard.slop
 
+import com.markedusduplicate.deckard.accessibility.ScreenTextCapturer
 import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Placeholder for a custom accessibility-tree [ScreenTextReader] — an alternative to
- * [OcrScreenTextReader] that pulls the best text straight out of the a11y node tree (faster, no model
- * needed). Not implemented yet.
+ * [ScreenTextReader] backed by the accessibility tree: pulls the visible on-screen text straight from
+ * the foreground app's a11y nodes (via the accessibility service's [ScreenTextCapturer]). No model and
+ * no screenshot, so it returns in milliseconds — far faster than [OcrScreenTextReader]'s per-summon
+ * vision inference. The chrome-trimming (viewport clipping + WebView targeting) lives in the service's
+ * capture; see `DeckardAccessibilityService.captureScreenText`.
  */
 @Singleton
-class AccessibilityScreenTextReader @Inject constructor() : ScreenTextReader {
+class AccessibilityScreenTextReader @Inject constructor(
+    private val screenTextCapturer: ScreenTextCapturer,
+) : ScreenTextReader {
 
-    // TODO: custom accessibility-tree extraction. Read the foreground app's a11y tree on demand
-    //  (needs a bridge to DeckardAccessibilityService, like the old ScreenTextCapturer) and select
-    //  the best content text. A naive whole-tree + viewport-bounds pass over-captured feed scrollback
-    //  (LinkedIn reports off-screen nodes as visible), so this needs a smarter strategy.
-    override suspend fun read(): ScreenReadResult =
-        ScreenReadResult.Unavailable("Accessibility-tree reader not implemented yet.")
+    override suspend fun read(): ScreenReadResult {
+        if (!screenTextCapturer.isAvailable) {
+            return ScreenReadResult.Unavailable("Turn on the accessibility service so I can read your screen.")
+        }
+        val text = screenTextCapturer.capture()
+        return if (text.isNullOrEmpty()) {
+            ScreenReadResult.Unavailable("I didn't find any text to check.")
+        } else {
+            ScreenReadResult.Text(text)
+        }
+    }
 }
