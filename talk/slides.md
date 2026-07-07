@@ -312,35 +312,30 @@ the privacy bridge setup.)
 
 ---
 
-# War story #1: LinkedIn lies to you
+# WTF #1: LinkedIn trips up the reader
 
 <div class="grid grid-cols-2 gap-6 pt-4 items-center">
 
-<div class="flex items-center justify-center border-2 border-dashed rounded-xl opacity-70" style="height: 300px">
-  <div class="text-center px-6">
-    🖼️ <b>PLACEHOLDER</b><br>
-    <span class="text-sm">screenshot of a collapsed LinkedIn post —
-    the visible text ends in <b>"…more"</b></span>
-  </div>
+<div class="flex items-center justify-center">
+  <img src="./assets/linked_in_more_collapsed.png" class="w-full rounded-xl shadow-lg" alt="A collapsed LinkedIn post — the visible text is cut off and ends in '…more'" />
 </div>
 
 <div>
 
-The post you can *see* ends in **"…more"**.
+This post looks **short**.
 
 <v-click>
 
-<div class="pt-2">
+<div class="pt-6 text-xl">
+But the reader doesn't stop at "…more" — it hands back the <b>entire post</b>.
+</div>
 
-The **full** post hides in `contentDescription`:
+</v-click>
 
-```kotlin
-// read the fuller of the two
-fun ScreenNode.bestText() =
-    if (description.length > text.length)
-        description else text
-```
+<v-click>
 
+<div class="pt-6 text-2xl font-bold">
+We're getting <span class="underline">more</span> text than expected. 💢
 </div>
 
 </v-click>
@@ -350,16 +345,17 @@ fun ScreenNode.bestText() =
 </div>
 
 <!--
-First contact with reality: the tree is only as good as the app developer made it — and
-you don't control LinkedIn.
-
-You're writing LinkedIn-specific logic just to FIND the post body. Foreshadowing: this is
-already one bespoke parser.
+- With your eyes the post looks short — it's truncated at "…more".
+- But the accessibility reader returns the FULL post: LinkedIn stores the whole text in the
+  node's contentDescription (so TalkBack can read it aloud), and we get all of it.
+- The beat: what you SEE isn't what your code GETS — you get MORE. The tree is richer than
+  the pixels.
+- Sets up the flip side: X (next) turns that same "one node holds everything" into a mess.
 -->
 
 ---
 
-# War story #2: X declares war
+# WTF #2: Twitter
 
 <div class="pt-2 opacity-80">On the timeline, a tweet exposes <b>no per-element text at all</b> — the entire card is <b>one string</b>.</div>
 
