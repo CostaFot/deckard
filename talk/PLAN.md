@@ -48,7 +48,7 @@ slide count first, Costa trims.
 
 ## Status log
 
-- **2026-07-07** — **Close built — FULL DECK COMPLETE, 40 slides** (skeleton §9): takeaway
+- **2026-07-07** — **Close built — FULL DECK COMPLETE, 41 slides** (skeleton §9): takeaway
   #1 "local LLMs are ready. I was surprised too." (easy/small/capable → "the worst they'll
   ever be 🔮"), takeaway #2 "Compose finally feels… complete" (the gossip: VM-scoping never
   had an answer, core APIs years late 🙊 → "this is the year Compose is really ready"),
@@ -205,14 +205,71 @@ slide count first, Costa trims.
 1. ~~Structure the new skeleton with Costa~~ — done 2026-07-07, complete in `skeleton.md`.
 2. ~~Turn the skeleton into slides~~ — done 2026-07-07: full 40-slide deck in `slides.md`,
    all sections, real snippets, speaker notes throughout.
-3. Costa records/provides the placeholder assets (into `assets/`, then wire into slides).
+3. **← NEXT SESSION: slide-by-slide review with Costa.** How to run it: start the dev
+   server (`npm run dev` in `talk/`), go through the deck **one slide at a time, Costa
+   driving** — for each slide he gives a verdict: keep / cut / edit. Two goals at once:
+   - **Tone pass:** fix wording against `blog_writing_style.md` (adapted for slides — his
+     words on a slide should sound like him, not like a deck template). Expect edits.
+   - **Trim pass:** 40 slides → ~20 for the 15–20 min slot. Overshoot was intentional.
+     First cut candidate: Nav 3 (slide 36). Don't cut the heroes: hero demo, regex wall,
+     prompt-vs-regexes, four-XML-lines, busy-screen problem.
+   Slide numbers below in the deck map. Update this file as decisions land.
+4. Costa records/provides the placeholder assets (into `assets/`, then wire into slides).
    The list: 2 real-slop screenshots · hero demo GIF · scary-permissions dialog ·
    LinkedIn tree-dump excerpt · long-press demo GIF · demo-zoom GIF · busy JET screen ·
    Nav3-in-overlay GIF (needs POC resurrection) · repo QR code. Prerequisites: flip
    `isMocked` + API key for real verdicts; optionally the persona line on the report card
    for "This is slop, son" on screen.
-4. Rehearsal pass: count minutes against slides; trim 40 → ~20 (Nav3 slide is first cut
-   candidate; overshoot is intentional; use skeleton's keep/cut markers).
+5. Rehearsal pass: count minutes against the trimmed deck; export
+   (`npm run export`) as the backup copy.
+
+## Deck map (slides.md as of 2026-07-07, 41 slides)
+
+| Slides | Section (skeleton §) |
+|---|---|
+| 1 | Title |
+| 2–3 | Cold open: slop screenshots ×2 (§1) |
+| 4 | "So I built a thing" — hero demo 🎬 (§1) |
+| 5 | Why "Deckard" — double reference (§1) |
+| 6 | Pivot divider "how is this done?" (§1) |
+| 7 | The machine at a glance (§2) |
+| 8 | Attempt #1: read the tree (§3) |
+| 9 | Harder than it seems — scary permissions 🖼️ (§3) |
+| 10 | War story #1: LinkedIn (§3) |
+| 11 | War story #2: X one-string card (§3) |
+| 12 | The "scalable architecture" interface (§3) |
+| 13 | The regex wall + gags (§3) |
+| 14 | "That was one app" / treadmill (§3) |
+| 15 | Aside: a11y is your API (§3b) |
+| 16 | "Maybe the model can just look at it" (§4) |
+| 17 | Step one: get the pixels — irony + pipeline (§4) |
+| 18 | "One problem." — privacy (§5) |
+| 19 | "Brain has to live on the phone" divider (§5) |
+| 20 | "Doesn't Android give you this?" — Gemini Nano ⚠️verify (§6) |
+| 21 | Bring your own brain — adb 🧌 / Play delivery (§6) |
+| 22 | The engine: LiteRT-LM (§6) |
+| 23 | First run: CPU fallback war story (§6) |
+| 24 | Four lines of XML (§6) |
+| 25 | Fine print: version pin / AI Edge Gallery / fallback ladder (§6) |
+| 26 | Hardware floor + fragility-trade synthesis (§6) |
+| 27 | Prompt vs regex wall — hero (§6) |
+| 28 | Understands, not OCRs + verbatim + gags + 🎬 (§6) |
+| 29 | Callback: demo zoom 🎬 + share-sheet door (§7) |
+| 30 | "Everything you just saw is a real app" (§8) |
+| 31 | "How did I even go about this?" — trench coat (§8) |
+| 32 | Your problem: the busy JET screen 🖼️ (§8) |
+| 33 | What we actually want — checklist (§8) |
+| 34 | `retain` — the plain API (§8) |
+| 35 | "…so I built a ViewModel out of it" (§8) |
+| 36 | `rememberViewModelStoreOwner` (§8) |
+| 37 | Navigation 3 — ⚠️ CUTTABLE (§8) |
+| 38 | "Fragment-shaped hole: filled" (§8) |
+| 39 | Takeaway #1: local LLMs (§9) |
+| 40 | Takeaway #2: Compose mature (§9) |
+| 41 | "That's the talk" — QR 🖼️ / repo / sign-off (§9) |
+
+(Numbering will drift as slides get cut in the trim — the section order is the stable
+reference; re-verify numbers against the overview at http://localhost:3030/overview/.)
 
 ## Raw-material index (verified against the codebase, 2026-07-07)
 
