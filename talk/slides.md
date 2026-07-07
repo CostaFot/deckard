@@ -40,6 +40,8 @@ layout: center
 </div>
 
 <!--
+TODO need rocketemojis interspersed
+
 Flash slide — a couple of seconds, let the room read it, move on. Real content gets the
 laugh that a parody can't.
 -->
@@ -66,8 +68,9 @@ And I got <b>sick</b> of it.
 
 <!--
 Second flash — pass through quickly, then land the line: "did a person write this, or did
-they paste it out of ChatGPT? I genuinely can't tell anymore — and it's everywhere. And I
-got sick of it."
+they paste it out of ChatGPT? I genuinely can't tell anymore — and it's everywhere. And I got sick of it."
+
+TODO add another slide next with placeholder for my Victoria Beckham meme
 -->
 
 ---
@@ -128,6 +131,8 @@ You bring him your loot. He tells you what it's worth. — <i>"This is slop, son
 </v-click>
 
 <!--
+TODO remove "you bring him your loot.. son" thing
+
 ~10 seconds, millennial double reference — both halves are intended.
 
 Blade Runner: detects what's human. Diablo: you bring Cain an unidentified item, he tells
@@ -142,6 +147,8 @@ class: text-center
 # So… how is this done?
 
 <!--
+TODO replace with "wow Costa you are so cool how did you do this" and "glad you asked" meme
+
 The pivot out of the cold open. Next: the machine at a glance, then we descend.
 -->
 
@@ -199,6 +206,8 @@ The <b>eyes</b> are where the story is. 👀
 </v-click>
 
 <!--
+TODO I do not like the exaplanation "the brain is the easy part... the story is" etc let's skip all that
+
 "Let's look at this thing at a glance — then we go into detail."
 
 One beat only — this is the map for the descent, not a lecture. Three pieces:
@@ -236,6 +245,8 @@ Structured. Free. Returns in <b>milliseconds</b>. No model needed. 😎
 </v-click>
 
 <!--
+TODO: add slide before this with "interstellar" meme this is going to take us 10 years making a joke about a weekend project typically turning itself into a 1 month long project
+
 (Heavily elided, like every snippet in this deck.)
 
 The naive plan: I started by just reading the accessibility tree — the thing screen
@@ -315,6 +326,8 @@ node is sometimes a <code>TextView</code>, sometimes a <code>Button</code>. You 
 </div>
 
 <!--
+TODO make this simpler. People just need to see a small snippet and an image with a post with "..more". Can we do side by side? 
+
 First contact with reality: the tree is only as good as the app developer made it — and
 you don't control LinkedIn.
 
@@ -355,6 +368,8 @@ To get the tweet out… you parse it back apart. With regexes. 🫠
 </v-click>
 
 <!--
+TODO in this case I think it's better to get a placeholder image with a few examples or quote tweets, reply tweets etc. reading the accesibility with those is a mess
+
 The hostile case. X concatenates the whole card into a single contentDescription so a
 screen reader reads it as one unit. There is no child TextView holding just the body.
 
@@ -386,6 +401,8 @@ class ScreenContentExtractors @Inject constructor(
 ```
 
 <!--
+TODO probably need a slide previously with a "challenge accepted" meme. put placeholder
+
 This looks GREAT in a design doc. Clean seam, Hilt multibinding, add an app = one class +
 one binding. I was very proud of it.
 
@@ -455,6 +472,8 @@ A per-app parser isn't a roadmap. It's a <b>treadmill</b>. 🏃‍♂️
 </v-click>
 
 <!--
+TODO placeholder meme "sweating guy"
+
 The dead end, said plainly: I really tried. Interfaces and implementations per app,
 special-casing the browser, content-vs-class matching, centre-of-screen heuristics.
 
@@ -714,6 +733,8 @@ We're hacking around with adb, and I'm not sorry.
 </v-click>
 
 <!--
+TODO thhe ADB snippet should show up as transition when going forward 
+
 Get the "you're not seriously shipping over adb" question out of the way before anyone
 asks it — Play Asset Delivery / Play's on-device AI delivery is the production path.
 
@@ -791,6 +812,8 @@ then it <b>silently</b> falls back to CPU — <b>~10× slower</b>. Basically unu
 </v-click>
 
 <!--
+TODO probably need to show it here with a gif/video. side by side with  the text.
+
 The war story, spend time here. The model loaded, generated text, everything "worked" —
 except a summon took the better part of a minute. It was shit.
 
@@ -830,6 +853,8 @@ Four lines. Two weeks. 🫠
 </v-click>
 
 <!--
+TODO explanation not good here. we need simple stuff. noone is familiar with what OpenCL is.
+
 This is the slide the LiteRT half of the talk exists for. The single most useful thing an
 audience member ships next week.
 
@@ -866,6 +891,8 @@ for (backend in listOf(Backend.GPU(), Backend.CPU(numOfThreads = 4), Backend.NPU
 </v-click>
 
 <!--
+TODO remove this slide. not useful
+
 The 0.12.0 regression cost days: same code, new version, GPU gone. Downgrade → works.
 There was no changelog entry that would tell you.
 
@@ -1059,6 +1086,8 @@ And there is <b>no Activity anywhere</b>. 😳
 </v-click>
 
 <!--
+TODO probably put these as bullet points animating in on every transition
+
 Hammer the point: this isn't "some Compose in an overlay" — it's a complete app
 architecture (ViewModels talking to repositories doing API calls, all DI'd) running in a
 place where NONE of the usual machinery exists.
@@ -1097,6 +1126,8 @@ But that's <i>my</i> weird problem. Here's the part that's <b>yours</b>…
 </v-click>
 
 <!--
+TODO we should show these 3 registries and basically hammer home that as long as compose is handed those, everything works  fine. Keep short and simple
+
 One beat only — do NOT descend into overlay plumbing. The Service implements the three
 owner interfaces and sets them as view-tree owners; that's the whole story, and it's in
 the repo for anyone curious.
@@ -1258,6 +1289,8 @@ overlay. <b>The sky's the limit.</b> 💸
 </v-click>
 
 <!--
+TODO "you dont even need a ViewModel anymore" and make it 3 code snippets. animate every transition in so I can do through them without overloading the audience
+
 The complex solution, built on the plain API: ~15 lines and you have the full ViewModel
 experience with none of the owner machinery.
 
@@ -1502,8 +1535,3 @@ hear that isn't a joke.
 
 Sign-off is the blog sign-off. "Later."
 -->
-
-
-
-
-
