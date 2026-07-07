@@ -364,7 +364,7 @@ We're getting <span class="underline">more</span> text than expected. 💢
 <div class="text-xs uppercase tracking-widest opacity-50 mb-2">the whole tweet card · one <code>contentDescription</code></div>
 
 <div class="border-2 rounded-xl p-5 text-xl leading-relaxed">
-<span class="opacity-40">bobby @bobby Verified. </span><span class="font-semibold bg-green-400/30 rounded px-1 box-decoration-clone">Clavicular ran into a frat leader at ASU and got brutally frame mogged by him👀😂</span><span class="opacity-40"> 14 replies. 92 reposts. 1,203 likes. 88,417 views. 3h</span>
+<span class="opacity-40">bobby @bobby Verified. </span><span class="font-semibold rounded px-1 box-decoration-clone transition-colors duration-500" :class="$clicks >= 1 ? 'bg-green-400/30' : 'bg-transparent'">Clavicular ran into a frat leader at ASU and got brutally frame mogged by him👀😂</span><span class="opacity-40"> 14 replies. 92 reposts. 1,203 likes. 88,417 views. 3h</span>
 </div>
 
 <v-click at="1">
@@ -397,14 +397,11 @@ replies/reposts/likes/views and the timestamp — all one string.
 -->
 
 ---
+layout: center
+class: text-center
+---
 
-<div class="mx-auto flex items-center justify-center border-2 border-dashed rounded-xl opacity-70" style="width: 480px; height: 320px">
-  <div class="text-center px-6">
-    🖼️ <b>PLACEHOLDER — "challenge accepted" meme</b><br>
-    <span class="text-sm">the moment before writing a parser per app seemed like a
-    good idea</span>
-  </div>
-</div>
+<img src="./assets/challenge_accepted.png" class="mx-auto rounded-xl shadow-lg" style="max-height: 440px" alt="'Challenge accepted' meme — the moment before writing a parser per app seemed like a good idea" />
 
 <!--
 Beat between the war stories and the architecture: I saw the mess and thought "fine.
