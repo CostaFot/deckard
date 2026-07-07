@@ -26,65 +26,34 @@ Cold open, before advancing: no agenda slide, no "about me" slide. Straight into
 -->
 
 ---
-layout: center
+layout: two-cols-header
 ---
 
 # The internet is drowning in slop 🚀
 
-<div class="relative mt-6 mx-auto" style="width: 420px">
-  <span class="absolute text-4xl" style="top: -20px; left: -56px; transform: rotate(-20deg)">🚀</span>
-  <span class="absolute text-3xl" style="top: 90px; right: -52px; transform: rotate(25deg)">🚀</span>
-  <span class="absolute text-3xl" style="bottom: 70px; left: -50px; transform: rotate(15deg)">🚀</span>
-  <span class="absolute text-4xl" style="bottom: -16px; right: -58px; transform: rotate(-10deg)">🚀</span>
-  <div class="flex items-center justify-center border-2 border-dashed rounded-xl opacity-70" style="width: 420px; height: 320px">
-    <div class="text-center px-6">
-      🖼️ <b>PLACEHOLDER — real slop post #1</b><br>
-      <span class="text-sm">actual screenshot of a maximally sloppy LinkedIn post —
-      🚀 emojis, "I'm humbled to announce…", the works</span>
-    </div>
-  </div>
+::left::
+
+<div class="pr-6 pt-6 text-lg leading-relaxed opacity-80">
+Every feed. Every day. 🚀 "I'm humbled to announce…", the em-dashes, the engagement bait.
+<br><br>
+Did a person write this, or did they paste it out of ChatGPT? I genuinely can't tell anymore.
 </div>
 
+::right::
+
+<img src="./assets/linkedin_slop_post.png" class="rounded-xl shadow-lg" style="max-height: 420px" alt="A maximally sloppy LinkedIn post — 🚀 emojis, 'I got fired on Monday.', numbered life lessons, flagged AI" />
+
 <!--
-Flash slide — a couple of seconds, let the room read it, move on. Real content gets the
-laugh that a parody can't.
+Flash slide — a couple of seconds, let the room read the real specimen, move on. Real
+content gets the laugh that a parody can't. The screenshot does the work; the line on the
+left is the beat: "I genuinely can't tell anymore — and it's everywhere."
 -->
 
 ---
 layout: center
 ---
 
-<div class="mx-auto flex items-center justify-center border-2 border-dashed rounded-xl opacity-70" style="width: 420px; height: 320px">
-  <div class="text-center px-6">
-    🖼️ <b>PLACEHOLDER — real slop post #2</b><br>
-    <span class="text-sm">second real specimen — different flavour (X thread bait /
-    "Let that sink in" / AI-image engagement farm)</span>
-  </div>
-</div>
-
-<v-click>
-
-<div class="pt-8 text-2xl text-center">
-And I got <b>sick</b> of it.
-</div>
-
-</v-click>
-
-<!--
-Second flash — pass through quickly, then land the line: "did a person write this, or did
-they paste it out of ChatGPT? I genuinely can't tell anymore — and it's everywhere. And I got sick of it."
--->
-
----
-layout: center
----
-
-<div class="mx-auto flex items-center justify-center border-2 border-dashed rounded-xl opacity-70" style="width: 480px; height: 340px">
-  <div class="text-center px-6">
-    🖼️ <b>PLACEHOLDER — Costa's Victoria Beckham meme</b><br>
-    <span class="text-sm">(Costa provides — his own meme, drops in as-is)</span>
-  </div>
-</div>
+<img src="./assets/victoria_meme.jpg" class="mx-auto rounded-xl shadow-lg" style="max-height: 460px" alt="Victoria Beckham 'be honest' meme — 'OK I slopped it on Claude'" />
 
 <!--
 Meme beat — let it land, say nothing. Then next slide.

@@ -48,6 +48,17 @@ slide count first, Costa trims.
 
 ## Status log
 
+- **2026-07-07 (evening)** — Slide-by-slide refinement started. **Slide 2** ("Drowning in
+  slop") reworked to a `two-cols-header` **side-by-side** layout — heading on top, the
+  "can't tell anymore" beat on the left, the real-slop screenshot on the right (real asset
+  now wired: `assets/linkedin_slop_post.png` — "I got fired on Monday", 🚀 spam, flagged AI);
+  dropped the four overlapping 🚀 decorations that cluttered the box.
+  **Old slide 3** (second slop screenshot + "And I got sick of it.") **dropped entirely**
+  per Costa — the Victoria meme carries the sentiment. **Deck: 42 slides.** Asset list loses
+  the second real-slop screenshot (now one).
+- **2026-07-07 (evening)** — First real asset wired in: `assets/victoria_meme.jpg` (Victoria
+  Beckham "be honest" meme, punchline "OK I slopped it on Claude") replaces the slide-4
+  placeholder.
 - **2026-07-07 (evening)** — **Costa's 16 slide-note TODOs all addressed.** Added 4 meme
   placeholder slides (Victoria Beckham after slop #2, "glad you asked" replacing the plain
   pivot divider, Interstellar before Attempt #1, "challenge accepted" before the
@@ -236,21 +247,21 @@ slide count first, Costa trims.
    dialog · LinkedIn collapsed-post "…more" screenshot · X annotated captures
    (normal/quote/reply blobs) · slow-CPU-run recording · long-press demo GIF · demo-zoom
    GIF · busy JET screen · Nav3-in-overlay GIF (needs POC resurrection) · repo QR code.
-   **Memes (Costa's own / to make):** Victoria Beckham · "glad you asked" · Interstellar ·
+   **Memes (Costa's own / to make):** ~~Victoria Beckham~~ (done, `victoria_meme.jpg`) ·
+   "glad you asked" · Interstellar ·
    "challenge accepted" · "sweating guy". Prerequisites: flip `isMocked` + API key for
    real verdicts; optionally the persona line on the report card for "This is slop, son"
    on screen.
 5. Rehearsal pass: count minutes against the trimmed deck; export
    (`npm run export`) as the backup copy.
 
-## Deck map (slides.md as of 2026-07-07 evening, 43 slides)
+## Deck map (slides.md as of 2026-07-07 evening, 42 slides)
 
 | Slides | Section (skeleton §) |
 |---|---|
 | 1 | Title |
-| 2 | "Drowning in slop" + slop screenshot #1, 🚀 interspersed (§1) |
-| 3 | Slop screenshot #2 → "I got sick of it" (§1) |
-| 4 | 🖼️ Victoria Beckham meme (Costa provides) (§1) |
+| 2 | "Drowning in slop" — side-by-side: beat text ∥ real-slop screenshot ✅ `assets/linkedin_slop_post.png` (§1) |
+| 3 | Victoria Beckham meme — ✅ `assets/victoria_meme.jpg` (§1) |
 | 5 | "So I built a thing" — hero demo 🎬 (§1) |
 | 6 | Why "Deckard" — double reference (§1) |
 | 7 | 🖼️ "glad you asked" meme — the pivot (§1) |
