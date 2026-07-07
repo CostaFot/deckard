@@ -410,9 +410,13 @@ I'll just handle every app myself."
 
 ---
 
-# But first, the "scalable architecture" 😎
+# Let's write some Java from 1998
 
-<div class="pt-2 opacity-80">One interface per app. Dispatch on the foreground package. What could go wrong?</div>
+<v-click>
+
+<div class="pt-4 opacity-80">One interface per app. What could go wrong?</div>
+
+<div class="pt-8">
 
 ```kotlin
 interface ScreenContentExtractor {
@@ -420,6 +424,16 @@ interface ScreenContentExtractor {
     fun extract(root: ScreenNode): String?      // the text worth judging
 }
 ```
+
+</div>
+
+</v-click>
+
+<v-click>
+
+<div class="pt-4 opacity-80">Then wire them all up</div>
+
+<div class="pt-4">
 
 ```kotlin
 class ScreenContentExtractors @Inject constructor(
@@ -430,6 +444,10 @@ class ScreenContentExtractors @Inject constructor(
         (extractors.firstOrNull { it.handles(packageName) } ?: generic).extract(root)
 }
 ```
+
+</div>
+
+</v-click>
 
 <!--
 This looks GREAT in a design doc. Clean seam, Hilt multibinding, add an app = one class +
