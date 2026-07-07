@@ -1,10 +1,11 @@
 ---
 theme: seriph
 background: https://cover.sli.dev
-title: Deckard — GDG Android talk
+title: Fighting AI slop with anti-slop
 info: |
-  Working deck for the GDG (Android circuit) talk about Deckard,
-  the on-device AI-slop detector.
+  Fighting AI slop with anti-slop — GDG (Android circuit) talk about Deckard,
+  the on-device AI-slop detector. On-device LLMs with LiteRT-LM, accessibility,
+  and the new Compose/Lifecycle encapsulation APIs.
 class: text-center
 drawings:
   persist: false
@@ -12,9 +13,9 @@ transition: slide-left
 mdc: true
 ---
 
-# Deckard
+# Fighting AI slop with anti-slop
 
-A default slide, just to prove the deck runs.
+The on-device Android engineering behind a slop detector
 
 <div class="pt-12">
   <span @click="$slidev.nav.next" class="px-2 py-1 rounded cursor-pointer" hover="bg-white bg-opacity-10">

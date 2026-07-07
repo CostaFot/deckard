@@ -10,8 +10,47 @@ A 15–20 min talk for Android developers at GDG (Android circuit) about **Decka
 on-device AI-slop detector in this repo. Roughly 15–20 slides; deliberately overshoot on
 slide count first, Costa trims.
 
+## Title & synopsis (locked, 2026-07-07)
+
+**Title:** *Fighting AI slop with anti-slop*
+
+> The internet is drowning in AI slop. So I built a detector that reads whatever's on the
+> screen and ships it off to an API for slop-validation. Turns out a lot has changed on Android
+> these past few months — enough to make the whole thing far more straightforward than I'd
+> imagined.
+>
+> First, we'll load a Gemma model with **LiteRT-LM** and watch it *understand* a screenshot
+> rather than just OCR it. Along the way, we'll see why exposing the right **accessibility**
+> information might be about to matter even more than it already does.
+>
+> Then, with the newer **Compose** and **Lifecycle** APIs (`retain`,
+> `rememberViewModelStoreOwner`), we'll work out how a composable can own its ViewModel and its
+> dependencies — scoped exactly to the composition — bringing back the drop-in encapsulation we
+> lost when Fragments faded.
+>
+> You'll leave able to:
+>
+> - Ship an on-device LLM with LiteRT-LM, and knock out a few of the common gotchas
+> - Leverage the new Compose and Lifecycle APIs to make contained changes to very busy screens
+
+**What this synopsis commits us to (scope, vs the dead v1):**
+- Two co-equal pillars: **(1)** on-device Gemma via LiteRT-LM that *understands* screenshots
+  (+ the accessibility angle, framed forward-looking: a11y info may matter *more* in an
+  LLM-agent world, not just "the tree betrayed me"), **(2)** the new Compose/Lifecycle APIs
+  (`retain`, `rememberViewModelStoreOwner`) restoring Fragment-style drop-in encapsulation —
+  **promoted from v1's short aside to a headliner**.
+- Framing: "a lot changed on Android recently — this got *easier* than expected" (optimistic),
+  not v1's "everything betrayed me" (grievance).
+- The two audience takeaways are the contract: ship an on-device LLM + gotchas; contained
+  changes to busy screens. Every slide should serve one of them.
+- The privacy close and the Pangram/detection plumbing are not in the synopsis — they can
+  appear as connective tissue/color but don't headline.
+
 ## Status log
 
+- **2026-07-07** — Title + synopsis locked (above). Scope reframed vs v1: Compose/Lifecycle
+  APIs promoted to co-headliner; accessibility angle turned forward-looking; optimistic
+  framing. Title slide updated in `slides.md`.
 - **2026-07-07** — Slidev scaffolded in `talk/` (seriph theme, 2 placeholder slides in
   `slides.md`), dev server verified on `:3030`. Folder structure + this living doc created.
   Costa's blog style guide added (`blog_writing_style.md`). v1 skeleton recovered from git
@@ -26,10 +65,12 @@ slide count first, Costa trims.
 | 2026-07-07 | Slidev for the deck, everything lives in `talk/`. |
 | 2026-07-07 | Audience: Android devs. 15–20 min. ~15–20 slides, err on more. |
 | 2026-07-07 | Tone: Costa's blog voice (`blog_writing_style.md`), adapted for spoken/slide format. |
+| 2026-07-07 | Title: *Fighting AI slop with anti-slop*. Synopsis locked verbatim (see top of this file). |
+| 2026-07-07 | Two co-equal pillars: LiteRT-LM/Gemma screenshot understanding (+ a11y forward-look), and `retain`/`rememberViewModelStoreOwner` encapsulation. Privacy/Pangram demoted to connective tissue. |
 
 ## Open questions (for Costa)
 
-- [ ] Title — v1's working title was *"Fighting AI slop with anti-slop"*; keep, rework, or new?
+- [x] Title — locked: *"Fighting AI slop with anti-slop"* (2026-07-07).
 - [ ] Live demo on device vs recorded GIF fallback (or both)?
 - [ ] Which sections of the story get the minutes — the screen-reading war stories, the
       on-device LLM, the Compose-without-an-Activity material, the privacy close?
