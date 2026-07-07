@@ -48,6 +48,34 @@ slide count first, Costa trims.
 
 ## Status log
 
+- **2026-07-07** — Screenshot/LLM section completed after a material audit: added the
+  irony beat (a11y service is still the only screenshot door), screenshot pipeline snippet
+  (downscale→JPEG), prompt-as-code hero slide (`extractMainContent()` vs the regex wall),
+  version-pin war story (0.12.0 regression, diffed AI Edge Gallery), hardware floor ("same
+  symptom, two causes"), and cheap laughs (ignore-the-mascot, `clean()` strips quotes,
+  keyboard-era `suggestion/llm/` package). All in `skeleton.md` §4–6, cuttable in trim pass.
+- **2026-07-07** — Dead-end beat gets a two-snippet code build: the innocent
+  `ScreenContentExtractor` interface + package dispatcher, then the X regex wall as the
+  "pure hell" reveal (exact `file:line` refs in `skeleton.md` §3).
+- **2026-07-07** — Middle fully shaped: a11y attempt ends in an explicit **dead end** (per-app
+  extractors/browser handling can't scale) → a11y forward-look aside (agents will drive apps
+  via the tree — placement tentative, recommended at the dead end) → the pivot idea ("maybe
+  the model can just look at a screenshot") → privacy bridge → LiteRT-LM pillar, ending on
+  the "understands, not OCRs" payoff + verbatim rule. Still open: Compose/retain weave point,
+  close.
+- **2026-07-07** — Body arc agreed: naive a11y attempt first ("just read the
+  contentDescription — harder than it seems": AccessibilityService, dangerous permissions,
+  tree war stories) → **privacy as the bridge** (can't ship screen access to a remote LLM →
+  must be local) → LiteRT-LM pillar. Privacy is spent mid-talk, NOT the close. Compose/retain
+  weaves in later, exact point parked. Close still TBD.
+- **2026-07-07** — Skeleton v2 sections 2–3 agreed: architecture-at-a-glance beat after the
+  cold open, then Pillar 1 = LiteRT-LM (model → library → GPU war story: "loaded on CPU,
+  basically unusable"). Demo assets = `🎬 [PLACEHOLDER]` markers, Costa records later.
+- **2026-07-07** — Skeleton v2 started in `skeleton.md` (new file — the working structure
+  doc; PLAN.md stays the state/decisions doc). Cold open agreed: humorous "internet is full
+  of slop" → hero GIF of Deckard judging a real LinkedIn slop post ("This is slop, son.") →
+  pivot to "how is this done". Deck-wide rule: real code but tiny elided snippets, never
+  walls. Body/close still TBD — being worked out in live Q&A with Costa.
 - **2026-07-07** — Title + synopsis locked (above). Scope reframed vs v1: Compose/Lifecycle
   APIs promoted to co-headliner; accessibility angle turned forward-looking; optimistic
   framing. Title slide updated in `slides.md`.
