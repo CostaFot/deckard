@@ -359,30 +359,41 @@ We're getting <span class="underline">more</span> text than expected. 💢
 
 <div class="pt-2 opacity-80">On the timeline, a tweet exposes <b>no per-element text at all</b> — the entire card is <b>one string</b>.</div>
 
-<div class="mt-4 flex items-center justify-center border-2 border-dashed rounded-xl opacity-70" style="height: 290px">
-  <div class="text-center px-8">
-    🖼️ <b>PLACEHOLDER</b><br>
-    <span class="text-sm">annotated captures of what the a11y tree hands you for a
-    <b>normal tweet</b>, a <b>quote tweet</b> and a <b>reply</b> — name, handle, body,
-    timestamp and counts fused into one <code>contentDescription</code> blob per card.
-    A mess.</span>
-  </div>
+<div class="mt-8 mx-auto" style="max-width: 52rem">
+
+<div class="text-xs uppercase tracking-widest opacity-50 mb-2">the whole tweet card · one <code>contentDescription</code></div>
+
+<div class="border-2 rounded-xl p-5 text-xl leading-relaxed">
+<span class="opacity-40">bobby @bobby Verified. </span><span class="font-semibold bg-green-400/30 rounded px-1 box-decoration-clone">Clavicular ran into a frat leader at ASU and got brutally frame mogged by him👀😂</span><span class="opacity-40"> 14 replies. 92 reposts. 1,203 likes. 88,417 views. 3h</span>
 </div>
 
-<v-click>
+<v-click at="1">
+<div class="flex justify-between text-sm mt-3 px-1 opacity-70">
+  <span>← byline to strip</span>
+  <span class="text-green-500 font-semibold">the only bit you actually want</span>
+  <span>metrics + timestamp to strip →</span>
+</div>
+</v-click>
 
-<div class="pt-6 text-center text-xl">
-To get the tweet out… you parse it back apart. With regexes. 🫠
+</div>
+
+<v-click at="2">
+
+<div class="pt-8 text-center text-xl">
+No child node holds just the body. To get it out… you have to hammer it away with regex. 🫠
 </div>
 
 </v-click>
 
 <!--
-The hostile case. X concatenates the whole card into a single contentDescription so a
-screen reader reads it as one unit. There is no child TextView holding just the body.
+The hostile case — opposite of LinkedIn. X fuses the WHOLE card into one contentDescription
+so a screen reader reads it as a single unit. No child node holds just the body.
 
-The only way to get the tweet body is to strip the byline off the front and the
-metrics/timestamp off the back of one giant string.
+Walk the coloured string: name, @handle, "Verified", then the actual tweet (green), then
+replies/reposts/likes/views and the timestamp — all one string.
+- Click 1: the body lights up + the "strip the front / strip the back" labels.
+- Click 2: the only way out is to regex the byline off the front and the metrics off the
+  back. And that's before quote-tweets and replies, which fuse TWO cards into one string.
 -->
 
 ---
