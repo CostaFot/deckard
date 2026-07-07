@@ -514,42 +514,44 @@ There is no way to handle everything for every app. Full stop.
 -->
 
 ---
+---
 
-# Aside: that tree is about to matter *more*
+# What if..
 
-<div class="pt-4 text-xl leading-relaxed mx-auto" style="max-width: 36rem">
-
-The accessibility tree failed <i>me</i>…
-
-<v-click>
-
-…but in an **agent future**, that tree is how assistants will **drive your app**.
-
-</v-click>
-
-<v-click>
-
-Write your app accessibly and you're not just serving screen readers —
-you're exposing an **API for whatever agent your user runs**.
-
-</v-click>
-
+<div class="pt-8 text-2xl leading-relaxed">
+…<b>agents</b> become the de facto way of using a device,
 </div>
 
 <v-click>
 
-<div class="pt-8 text-center text-xl opacity-90">
-Accessibility is becoming your app's API. Maybe treat it like one. 🤷‍♂️
+<div class="pt-6 text-2xl leading-relaxed">
+and that same tree is how they'll <b>read and drive every app</b>?
+</div>
+
+<div class="pt-10 flex items-center gap-8 opacity-80">
+  <img src="./assets/chagpt_logo.png" class="rounded-lg" style="height: 44px" alt="ChatGPT" />
+  <img src="./assets/gemini_logo.png" class="rounded-lg" style="height: 44px" alt="Gemini" />
+  <img src="./assets/claude_computer_use.png" class="rounded-lg" style="height: 44px" alt="Claude computer use" />
+  <img src="./assets/siri.jpg" class="rounded-lg" style="height: 44px" alt="Siri" />
+</div>
+
+</v-click>
+
+<v-click>
+
+<div class="pt-10 text-3xl opacity-90">
+Reading the view tree might matter <b>a lot more in the future</b>
 </div>
 
 </v-click>
 
 <!--
-30-second aside, right while the wound is fresh — the irony is the point.
+Food-for-thought beat, right while the wound is fresh — the irony is the point.
 
 X's hostile single-blob tree isn't just bad for me, it's bad for every future agent
 trying to use X on the user's behalf. The apps that expose a clean tree will be the apps
-agents can actually operate.
+agents can actually operate. Write your app accessibly and you're not just serving screen
+readers — you're exposing an API for whatever agent your user runs.
 
 Then pivot: "anyway. Back to my problem. The tree was a dead end, so…"
 -->
