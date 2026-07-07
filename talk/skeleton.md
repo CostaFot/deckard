@@ -158,11 +158,11 @@ How I actually went about it, in build order:
 AndroidX APIs** that make composables genuinely self-contained: *"I knew about these APIs
 and they made my job so much easier."*
 
-- **The bridge (one beat only):** "I've talked services and API calls — but everything you
-  just saw on screen is Compose. And there is no Activity anywhere in this app. Compose in
-  an overlay `Service` is possible — turns out **an Activity is just three registries in a
-  trench coat**, and I became one. But that's MY weird problem. Here's the part that's
-  YOURS…"
+- **The bridge (one beat only):** "everything you just saw is a **real app** — pure
+  Compose UI, ViewModels, repositories, API calls, DI, the whole boring stack — and there
+  is **no Activity anywhere**. Normally we have the *luxury* of an Activity quietly handing
+  us all that (turns out **an Activity is just three registries in a trench coat**, so I
+  became one 🥸). But that's MY weird problem. Here's the part that's YOURS…"
 - **The problem statement (its own slide, before any API):** a very busy screen.
   🖼️ `[PLACEHOLDER: a genuinely busy production screen — Costa will use a Just Eat
   Takeaway screen, he works on that app]`

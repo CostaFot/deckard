@@ -48,6 +48,54 @@ slide count first, Costa trims.
 
 ## Status log
 
+- **2026-07-07** — **Close built — FULL DECK COMPLETE, 40 slides** (skeleton §9): takeaway
+  #1 "local LLMs are ready. I was surprised too." (easy/small/capable → "the worst they'll
+  ever be 🔮"), takeaway #2 "Compose finally feels… complete" (the gossip: VM-scoping never
+  had an answer, core APIs years late 🙊 → "this is the year Compose is really ready"),
+  sign-off slide ("That's the talk" + agents-are-coming echo + QR placeholder + repo +
+  @markasduplicate + "Hope you found this somewhat useful."). Deck now needs: Costa's
+  assets for all placeholders, then the trim pass (40 → ~20).
+- **2026-07-07** — Two Costa-requested splits: bridge slide → "real app / no Activity 😳"
+  reveal + "How did I even go about this?" (luxury line, trench coat); retain slide →
+  plain-API slide (`retain { }` vs `remember`, benefits, `RetainObserver` teaser) + "…so I
+  built a ViewModel out of it 🧪" (RetainedViewModel + DIY DI). Deck at 37 slides.
+- **2026-07-07** — Callback + pillar 2 built (slides 29–35, skeleton §7–§8): demo-zoom
+  callback (🎬 placeholder + share-sheet third-door line) → "everything you just saw is
+  Compose / no Activity / trench coat 🥸 / here's the part that's yours" → busy-JET-screen
+  problem slide (🖼️ placeholder) → "what we actually want" checklist → `retain` slide
+  (REAL snippets from the old keyboard build: `RetainedViewModel`/`rememberRetainedViewModel`
+  + EntryPoint DIY-DI) → `rememberViewModelStoreOwner` slide (repo's
+  `ComponentViewModelScope`) → Nav 3 bonus slide (real snippet from notes doc, ⚠️ CUTTABLE
+  marked in speaker note, 🎬 GIF placeholder) → "Fragment-shaped hole: filled 🧩" WIIFM
+  lander. Deck at 35 slides. Remaining: §9 close (2–3 slides).
+- **2026-07-07** — LiteRT-LM act built (slides 20–28, skeleton §6): "doesn't Android just
+  give you this?" (Gemini Nano gated — ⚠️ speaker note: verify current state before the
+  talk) → "bring your own brain" (adb 🧌 vs Play delivery + keyboard-era color) → engine
+  snippet (`EngineConfig`, warm-up, `engineOrNull()`) → "first run" CPU-fallback war story
+  (fake-logcat INTERNAL error) → four-XML-lines hero slide ("Four lines. Two weeks. 🫠")
+  → fine-print slide (0.11.0 pin, AI Edge Gallery diffing, fallback ladder) → hardware
+  floor two-causes cards + fragility-trade synthesis line → prompt-vs-regex-wall hero
+  (greyed regexes | the English paragraph) → "understands, not OCRs" (verbatim rule,
+  ignore-the-mascot + clean() gags, 🎬 long-press demo placeholder). Deck at 28 slides.
+  Remaining: §7 callback, §8 pillar 2, §9 close.
+- **2026-07-07** — Pivot + privacy built (slides 16–19, skeleton §4–§5): "maybe the model
+  can just look at it" (screenshot → model → the post), "step one: get the pixels" (irony
+  beat — takeScreenshot is a11y-service-only — + downscale/JPEG pipeline snippet), "One
+  problem." privacy slide (sees everything → remote LLM → "No. 🙅", callback to the scary
+  dialog), "the brain has to live on the phone → can you even run an LLM on a phone?"
+  divider into the LiteRT-LM act. Next: skeleton §6.
+- **2026-07-07** — A11y act built (slides 8–15, skeleton §3+§3b): naive-read snippet →
+  scary-permissions slide (🖼️ placeholder: the "full control of your device" dialog) →
+  LinkedIn war story (`bestText()` snippet + 🖼️ tree-dump placeholder) → X blob slide
+  (typographic colored-highlight rendition of the one-string card — can swap for a real
+  dump screenshot) → innocent interface/dispatcher snippets → regex-wall slide + the three
+  gags on v-clicks → "one app / treadmill" dead-end slide → a11y-forward-look aside
+  ("accessibility is becoming your app's API"). Speaker notes carry the privacy-bridge
+  plant ("remember how scary these permissions are").
+- **2026-07-07** — Architecture slide built (slide 7, skeleton §2): face→eyes→brain cards
+  on v-clicks (built as styled divs, swappable for a drawn diagram later), Pangram +
+  50-word one-liner, lands on "the eyes are where the story is" as the descent hook. Next:
+  §3 naive a11y attempt.
 - **2026-07-07** — **Slides started.** Cold open built in `slides.md` (skeleton §1 → 6
   slides): title, "internet is drowning in slop" + real-slop screenshot placeholder #1
   (flash slide), real-slop placeholder #2 → "I got sick of it" (Costa provides two real
@@ -155,12 +203,16 @@ slide count first, Costa trims.
 ## Next steps
 
 1. ~~Structure the new skeleton with Costa~~ — done 2026-07-07, complete in `skeleton.md`.
-2. Turn the skeleton into slides in `slides.md` — section by section with Costa, not one
-   shot. Snippets: tiny + elided, pulled from the real files (`file:line` refs in skeleton).
-3. Costa records/provides the 🎬🖼️ placeholder assets (into `assets/`); prerequisites
-   tracked in Open questions (mocked flag, Nav3 POC resurrection, JET screen).
-4. Rehearsal pass: count minutes against slides; trim (Nav3 slide is first cut candidate;
-   overshoot on slides is intentional).
+2. ~~Turn the skeleton into slides~~ — done 2026-07-07: full 40-slide deck in `slides.md`,
+   all sections, real snippets, speaker notes throughout.
+3. Costa records/provides the placeholder assets (into `assets/`, then wire into slides).
+   The list: 2 real-slop screenshots · hero demo GIF · scary-permissions dialog ·
+   LinkedIn tree-dump excerpt · long-press demo GIF · demo-zoom GIF · busy JET screen ·
+   Nav3-in-overlay GIF (needs POC resurrection) · repo QR code. Prerequisites: flip
+   `isMocked` + API key for real verdicts; optionally the persona line on the report card
+   for "This is slop, son" on screen.
+4. Rehearsal pass: count minutes against slides; trim 40 → ~20 (Nav3 slide is first cut
+   candidate; overshoot is intentional; use skeleton's keep/cut markers).
 
 ## Raw-material index (verified against the codebase, 2026-07-07)
 
