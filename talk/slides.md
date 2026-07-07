@@ -243,12 +243,13 @@ Say the title straight, then click the meme in for the punchline.
 
 ---
 
-# Attempt #1: just read the screen
+# Attempt #1: just read the screen!
 
-<div class="pt-2 opacity-80">How hard can it be? Android hands you the whole UI tree — you just walk it.</div>
+<div class="pt-6 opacity-80">Accessibility service hands you the whole UI tree — just walk it.</div>
+
+<div class="mt-8">
 
 ```kotlin
-// only an AccessibilityService can see other apps' UI
 class DeckardAccessibilityService : AccessibilityService() {
 
     fun readScreen(): String? {
@@ -258,10 +259,12 @@ class DeckardAccessibilityService : AccessibilityService() {
 }
 ```
 
+</div>
+
 <v-click>
 
-<div class="pt-4 text-center text-xl">
-Structured. Free. Returns in <b>milliseconds</b>. No model needed. 😎
+<div class="pt-12 text-center text-xl">
+Structured. Fast. No AI needed.
 </div>
 
 </v-click>
