@@ -477,14 +477,6 @@ val QUOTE_LEAD     = Regex("^.*?Quoted\\.\\s+[^.\\n]*?@\\w+\\b(?:\\s+Verified)?\
 val QUOTER_COMMENT = Regex("@\\w+\\b(?:\\s+Verified)?\\.\\s+Added\\s+(.+)$")
 ```
 
-<v-clicks>
-
-- Quote tweets pack **two posts into one string** — we judge the text after the word *"Added"*
-- `"Promoted."` cards are skipped — Deckard refuses to judge ads
-- A display name containing a `"."` defeats the byline parser — **one guy named "Dr. Smith" breaks everything**
-
-</v-clicks>
-
 <!--
 This slide is allowed to hurt — that's the point. Let it sit for a moment before the gags.
 
@@ -493,38 +485,26 @@ fix reveals a new special case."
 -->
 
 ---
-layout: center
 ---
 
-# That was <span v-mark.red="1">one</span> app
+<div class="pt-16">
+
+# That was <span v-mark.red="1">one</span> app not even done well
 
 <div class="pt-6 text-xl text-center leading-relaxed">
 
 <v-clicks at="2">
 
-- LinkedIn ✅ <span class="opacity-60">(mostly)</span>
-- X ✅ <span class="opacity-60">(frozen at "good-enough")</span>
 - Reddit? The browser? <b>Every app you've never seen?</b>
+- Obviously this isn't scalable — so let's <b>pivot</b>.
 
 </v-clicks>
 
 </div>
 
-<v-click>
-
-<div class="pt-8 text-center text-2xl">
-A per-app parser isn't a roadmap. It's a <b>treadmill</b>. 🏃‍♂️
 </div>
 
-</v-click>
-
-<v-click>
-
-<div class="mt-6 mx-auto flex items-center justify-center border-2 border-dashed rounded-xl opacity-70" style="width: 280px; height: 160px">
-  <span class="text-sm px-4 text-center">🖼️ PLACEHOLDER — "sweating guy" meme</span>
-</div>
-
-</v-click>
+<img src="./assets/sweating.gif" class="fixed bottom-6 right-6 rounded-xl shadow-lg" style="max-height: 130px" alt="'Sweating guy deciding between two buttons' meme — the panic of trying to handle every app" />
 
 <!--
 The dead end, said plainly: I really tried. Interfaces and implementations per app,
