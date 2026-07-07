@@ -48,6 +48,22 @@ slide count first, Costa trims.
 
 ## Status log
 
+- **2026-07-08** — **Slide 5 reworked into the "AI-flag gotcha" + new Pangram slide.**
+  Costa retitled slide 5 "Astute observers might have noticed" — it now zooms the slop post
+  on its 🤖 AI badge (🖼️ placeholder, Costa crops from `linkedin_slop_post.png`), landing
+  "that flag *is* the whole app — where does it come from?" New **slide 6 "So — what's
+  Pangram?"** answers: a specialist AI-text-detection API (submit → poll → verdict), rendered
+  as a report card; on-tone with the cold open (no code, a submit→Pangram☁️→verdict flow
+  diagram). Speaker note plants the privacy distinction (just the text, never the screen)
+  without spoiling. The two-pillar roadmap idea is **dropped**. Deck: **43 slides**.
+- **2026-07-08** — **Slide 5 "Why Deckard?" replaced** with a two-promise roadmap ("That's
+  the product. Here's what's inside it.") — two v-click cards: (1) teaching a phone to read a
+  screen (on-device Gemma/LiteRT-LM, nothing leaves the device), (2) Compose without an
+  Activity (`retain` / `rememberViewModelStoreOwner`, the Fragment drop-in back). Framed as
+  two promises, not an agenda. **The Blade Runner + Diablo-Cain name beat is dropped** (Costa's
+  call) — reverses the 2026-07-07 "millennial double reference" decision; one-liner survives in
+  the speaker note. Softened the title-slide note that said "no agenda slide" (roadmap now
+  lands after the hero demo). Deck still 42 slides.
 - **2026-07-07 (evening)** — Slide-by-slide refinement started. **Slide 2** ("Drowning in
   slop") reworked to a `two-cols-header` **side-by-side** layout — heading on top, the
   "can't tell anymore" beat on the left, the real-slop screenshot on the right (real asset
@@ -255,15 +271,16 @@ slide count first, Costa trims.
 5. Rehearsal pass: count minutes against the trimmed deck; export
    (`npm run export`) as the backup copy.
 
-## Deck map (slides.md as of 2026-07-07 evening, 42 slides)
+## Deck map (slides.md as of 2026-07-08, 43 slides)
 
 | Slides | Section (skeleton §) |
 |---|---|
 | 1 | Title |
 | 2 | "Drowning in slop" — side-by-side: beat text ∥ real-slop screenshot ✅ `assets/linkedin_slop_post.png` (§1) |
 | 3 | Victoria Beckham meme — ✅ `assets/victoria_meme.jpg` (§1) |
-| 5 | "So I built a thing" — hero demo 🎬 (§1) |
-| 6 | Why "Deckard" — double reference (§1) |
+| 4 | "So I built a thing" — hero demo 🎬 (§1) |
+| 5 | "Astute observers might have noticed" — slop post zoomed on 🤖 AI flag ✅ `assets/linkedin_slop_post_zoomed_in.png` (§1) |
+| 6 | "AI is very good at detecting other AI" — Pangram: Chrome extension, auto-tags AI posts (the badge reveal) (§2) |
 | 7 | 🖼️ "glad you asked" meme — the pivot (§1) |
 | 8 | The machine at a glance (cards only, no explanation text) (§2) |
 | 9 | 🖼️ Interstellar meme — weekend project joke (§3) |

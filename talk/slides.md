@@ -22,7 +22,9 @@ Costa Fotiadis · <code>@markasduplicate</code>
 </div>
 
 <!--
-Cold open, before advancing: no agenda slide, no "about me" slide. Straight into the bit.
+Cold open, before advancing: no agenda up front, no "about me" slide. Straight into the
+bit. (The roadmap waits until after the hero demo — slide 5 — so it lands as "here's what's
+inside," not as ceremony.)
 -->
 
 ---
@@ -81,38 +83,58 @@ product. The rest of this talk is what's inside it."
 -->
 
 ---
+layout: center
+class: text-center
+---
 
-# Why "Deckard"?
+# Astute observers might have noticed
 
-<div class="grid grid-cols-2 gap-8 pt-4">
+<img src="./assets/linkedin_slop_post_zoomed_in.png" class="mx-auto mt-6 rounded-xl shadow-lg" style="max-height: 400px" alt="The slop post zoomed on the '🤖 AI' badge next to Costa's name — the verdict in plain sight" />
 
-<div>
+<!--
+Callback gag: the slop post a few slides ago already wore an "AI" badge and nobody said a
+word about it. Zoom in on it now — "astute observers might have noticed." Say nothing on
+the slide; land the beat out loud: that flag IS the whole app — where does it come from?
 
-<div class="flex items-center justify-center border-2 border-dashed rounded-xl opacity-70 mb-4" style="height: 180px">
-  🖼️ PLACEHOLDER — Blade Runner Deckard
-</div>
+That flag is the verdict. Deckard reads the screen, then something has to actually decide
+"is this AI?" Hand off to the next slide: that something is an API called Pangram.
+-->
 
-**Blade Runner** — the guy whose job is testing what's *human* vs *artificial*.
+---
 
-</div>
+# AI is very good at detecting other AI
 
-<div>
+<div class="pt-10 text-2xl leading-loose">
 
-<div class="flex items-center justify-center border-2 border-dashed rounded-xl opacity-70 mb-4" style="height: 180px">
-  🖼️ PLACEHOLDER — Deckard Cain (Diablo)
-</div>
+<v-clicks>
 
-**Deckard Cain** — the wise old man who *identifies your unidentified items*.
+- This is **Pangram**
+- Available as a **Chrome extension**
+- Automatically tags AI posts on a **select few websites**
+- …and it has an **API** we can use
 
-</div>
+</v-clicks>
 
 </div>
 
 <!--
-~10 seconds, millennial double reference — both halves are intended.
+Say up front: I'm NOT affiliated with Pangram in any way — just a happy user. This isn't a
+plug.
 
-Blade Runner: detects what's human. Diablo: you bring Cain an unidentified item, he tells
-you what it is. That's literally the UX — and it's why the verdict talks like that.
+The reveal behind the badge: that "🤖 AI" flag on the slop post wasn't something I drew —
+it's Pangram's Chrome extension, which auto-tags AI-generated posts on a handful of sites
+(LinkedIn among them). Pangram is an AI-text detector, and it's genuinely good. AI catching
+AI.
+
+How it works (the intuition, say it out loud): AI writes with a very particular
+fingerprint. No matter how hard you prompt a model to "write like a human" / "don't sound
+like AI," it can't fully escape it — it's baked in by the nature of the training it went
+through. A detector trained on that signal picks it up even when a human can't. That's why
+this works at all.
+
+Seed for the descent: if there's a detector this good behind that badge, I can point it at
+anything I can read off the screen — which is the whole app. (That Deckard calls Pangram's
+API is spelled out on the machine-at-a-glance slide; here it's just "meet the detector.")
 -->
 
 ---
