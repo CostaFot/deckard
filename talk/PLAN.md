@@ -48,6 +48,13 @@ slide count first, Costa trims.
 
 ## Status log
 
+- **2026-07-07** — **Slides started.** Cold open built in `slides.md` (skeleton §1 → 6
+  slides): title, "internet is drowning in slop" + real-slop screenshot placeholder #1
+  (flash slide), real-slop placeholder #2 → "I got sick of it" (Costa provides two real
+  sloppy-post screenshots), hero-demo slide (dashed-box 🎬 placeholder), "Why Deckard?"
+  two-panel name beat (image placeholders), "So… how is this done?" pivot divider. Speaker
+  notes on every slide. Renders clean on the dev server. Next slides: §2 architecture
+  glance.
 - **2026-07-07** — Review picks placed (Costa chose 1, 2, 6, 7, 10): trench-coat line →
   §8 bridge; app-vs-device-fragility synthesis → §6 hardware floor; share-sheet third door
   → §7 callback; X garnish gags (quote tweets, Promoted skip, fatal ".") → §3 regex-wall

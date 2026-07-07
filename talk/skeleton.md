@@ -11,6 +11,8 @@ snippets** — a few lines each, heavily elided, never a 100-line wall.
 
 - Start humorous, zero setup: *the internet is full of slop and I really got sick of it.*
   Audience has seen the title; land the joke fast.
+- 🖼️ `[PLACEHOLDER ×2: real screenshots of extremely sloppy posts — two quick flash
+  slides, passed through fast for the laugh; second one lands "and I got sick of it."]`
 - 🎬 `[PLACEHOLDER: hero demo — scrolling LinkedIn, maximum-slop post (🚀 rocket emojis,
   "I'm humbled to announce…") → summon Deckard → verdict: "This is slop, son."]`
   The app proves itself before a single word of engineering.
