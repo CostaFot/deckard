@@ -48,6 +48,44 @@ slide count first, Costa trims.
 
 ## Status log
 
+- **2026-07-07** — Review picks placed (Costa chose 1, 2, 6, 7, 10): trench-coat line →
+  §8 bridge; app-vs-device-fragility synthesis → §6 hardware floor; share-sheet third door
+  → §7 callback; X garnish gags (quote tweets, Promoted skip, fatal ".") → §3 regex-wall
+  slide; 50-word gate → §2 architecture glance. Declined: airplane-mode flourish,
+  exclusion-rects story, error-copy-on-slides, 5¢/isMocked confession.
+- **2026-07-07** — Name beat added to cold open: Deckard = Blade Runner (tests
+  human-vs-artificial) + Deckard Cain from Diablo (wise elder, identifies your items) —
+  deliberate millennial double reference, overriding v1's don't-cross-the-streams note.
+  Full review vs v1 done; strong adds 1–5 and garnish 6–10 offered, Costa picking.
+- **2026-07-07** — LiteRT-LM section gains two real-world beats (skeleton §6): opener
+  "doesn't Android just give you this?" (Gemini Nano/on-device models exist but are
+  device-gated + quota'd — so BYO model; verify current state before the talk) and the
+  adb-push honesty aside (real apps use Play delivery for runtime model download).
+- **2026-07-07** — **Close locked; skeleton v2 complete end to end.** Two takeaways:
+  (1) local LLMs surprised me — ~2 GB, easy, capable enough, and they'll only get better;
+  (2) Compose finally feels mature — the gossipy-but-fair editorial that VM-scoping in a
+  composable never had a clear-cut answer (hacks, nav libraries, Activity-tied) and these
+  core APIs arguably shipped years late, but `retain` + `rememberViewModelStoreOwner` are
+  the real answer now. a11y forward-look stays at §3b. Next: turn skeleton into Slidev
+  slides.
+- **2026-07-07** — Nav 3 gets its own slide, last in pillar 2, ⚠️ explicitly cuttable
+  (Costa decides in trim): pure-Compose nav, Activity-free, multiplatform-friendly,
+  per-entry VM scoping; wow beat = ran it completely outside an Activity. Snippet + GIF
+  placeholders. NOTE for asset production: the Nav3 overlay POC was deleted — rebuild from
+  `notes/nav3-viewmodels-in-a-service-overlay.md` (or `git show 933f0a`-era `poc/` files)
+  before recording the GIF.
+- **2026-07-07** — Pillar 2 content detailed: problem-statement slide first (busy JET
+  screen 🖼️ placeholder — hundred-parameter composables, one small change breaks
+  everything), sharpened into "how does a composable own its deps + VM, scoped to the
+  composition?" (nav-library scoping → where Nav3 slots in), then one full slide each for
+  `retain` (composition-scoped, DIY DI via app component + own factory) and
+  `rememberViewModelStoreOwner` (composable owns its VM store). WIIFM: change the small
+  component in place.
+- **2026-07-07** — Pillar 2 framed and drafted (skeleton §7–8): re-show the demo zoomed
+  ("this works!") as the callback, then the Compose pillar with the no-Activity situation
+  *mentioned only* — the draw is the new AndroidX APIs (`rememberViewModelStoreOwner`,
+  `retain`) making composables self-contained/slot-in-anywhere; WIIFM = contained changes
+  to busy screens (the lost Fragment encapsulation). Only the close remains TBD.
 - **2026-07-07** — Screenshot/LLM section completed after a material audit: added the
   irony beat (a11y service is still the only screenshot door), screenshot pipeline snippet
   (downscale→JPEG), prompt-as-code hero slide (`extractMainContent()` vs the regex wall),
@@ -99,17 +137,23 @@ slide count first, Costa trims.
 ## Open questions (for Costa)
 
 - [x] Title — locked: *"Fighting AI slop with anti-slop"* (2026-07-07).
-- [ ] Live demo on device vs recorded GIF fallback (or both)?
-- [ ] Which sections of the story get the minutes — the screen-reading war stories, the
-      on-device LLM, the Compose-without-an-Activity material, the privacy close?
+- [x] Structure — skeleton v2 complete end to end (2026-07-07, see `skeleton.md`).
+- [ ] Demos: placeholders agreed; all assets recorded/provided by Costa later. Before the
+      hero GIF: flip `isMocked` + real API key. Before the Nav3 GIF: resurrect the POC.
+- [ ] Nav 3 slide (§8, last of pillar 2): keep or cut — Costa decides in the trim pass.
+- [ ] a11y forward-look placement: currently §3b at the dead end (recommended); revisit in
+      rehearsal.
 - [ ] Exact GDG event/date and any CFP abstract deadline?
 
 ## Next steps
 
-1. Structure the new skeleton **with Costa, interactively** — pitch a running order, iterate.
-2. Turn the agreed structure into section-header slides in `slides.md` (placeholders first).
-3. Fill slides one by one; produce assets as each slide needs them (into `assets/`).
-4. Rehearsal pass: count minutes against slides, cut.
+1. ~~Structure the new skeleton with Costa~~ — done 2026-07-07, complete in `skeleton.md`.
+2. Turn the skeleton into slides in `slides.md` — section by section with Costa, not one
+   shot. Snippets: tiny + elided, pulled from the real files (`file:line` refs in skeleton).
+3. Costa records/provides the 🎬🖼️ placeholder assets (into `assets/`); prerequisites
+   tracked in Open questions (mocked flag, Nav3 POC resurrection, JET screen).
+4. Rehearsal pass: count minutes against slides; trim (Nav3 slide is first cut candidate;
+   overshoot on slides is intentional).
 
 ## Raw-material index (verified against the codebase, 2026-07-07)
 
