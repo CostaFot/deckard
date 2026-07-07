@@ -561,7 +561,7 @@ layout: center
 class: text-center
 ---
 
-# Wait. Maybe the model can just… <i>look</i> at it?
+# Wait. Maybe an AI model can just… <i>look</i> at it?
 
 <v-click>
 
@@ -586,28 +586,35 @@ Don't oversell yet — the payoff proof comes after we get the model running.
 
 # Step one: get the pixels
 
-<div class="pt-2 opacity-80">Small irony: guess which class is the <b>only</b> one allowed to take a screenshot…</div>
+<div class="pt-6">
 
 ```kotlin
-// yep. still the AccessibilityService. you never escape it. 🙃
+// yep. still using the AccessibilityService
 takeScreenshot(Display.DEFAULT_DISPLAY, executor, callback)
 ```
 
+</div>
+
 <v-click>
 
+<div class="pt-8 text-lg opacity-80">Capture, then downscale.</div>
+
+<div class="pt-4">
+
 ```kotlin
-// hardware buffer → bitmap → shrink → JPEG (the model doesn't need your 4K screen)
 val bitmap = Bitmap.wrapHardwareBuffer(screenshot.hardwareBuffer, screenshot.colorSpace)
 val scaled = bitmap.downscale(maxDimension = 1024)
 val jpeg   = scaled.compress(JPEG, quality = 85)
 ```
 
+</div>
+
 </v-click>
 
 <v-click>
 
-<div class="pt-4 opacity-80 text-center">
-Feed the model a shrunken JPEG, not a raw screen — a vision model's time is <b>expensive</b>.
+<div class="pt-10 opacity-80 text-center">
+Feed the model a shrunken JPEG — a vision model's time is <b>expensive</b>.
 </div>
 
 </v-click>
