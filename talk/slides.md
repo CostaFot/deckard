@@ -489,11 +489,11 @@ fix reveals a new special case."
 
 <div class="pt-16">
 
-# That was <span v-mark.red="1">one</span> app not even done well
+# That was <span v-mark.red="0">one</span> app not even done well
 
 <div class="pt-6 text-xl text-center leading-relaxed">
 
-<v-clicks at="2">
+<v-clicks at="1">
 
 - Reddit? The browser? <b>Every app you've never seen?</b>
 - Obviously this isn't scalable — so let's <b>pivot</b>.
