@@ -282,29 +282,22 @@ readers use. Every view, its text, its bounds. It's RIGHT THERE.
 
 # Not so fast
 
-<div class="grid grid-cols-2 gap-8 pt-4">
+<div class="grid grid-cols-5 gap-6 pt-4 items-center">
 
-<div>
+<div class="col-span-2 text-lg leading-relaxed">
 
-<v-clicks>
-
-- You need an **`AccessibilityService`** — be honest, have *you* ever written one?
-- You need the **scariest permissions on the platform**:
-  - accessibility — <i>"full control of your device"</i> ⚠️
-  - `SYSTEM_ALERT_WINDOW` — draw over every app
-  - screenshots — also via the accessibility service
-- And the **user** has to be walked through granting all of it
-
-</v-clicks>
+<ul class="list-disc pl-5 space-y-5">
+  <li v-click="1">You need an <b><code>AccessibilityService</code></b> — be honest, have <i>you</i> ever written one?</li>
+  <li v-click="2">Two of the <b>scariest permissions</b> on the platform:</li>
+  <li v-click="3" class="ml-6"><b>Accessibility</b> — <i>observe your actions · read window content · perform gestures · take screenshots</i> ⚠️</li>
+  <li v-click="4" class="ml-6"><b>Display over other apps</b> (<code>SYSTEM_ALERT_WINDOW</code>)</li>
+</ul>
 
 </div>
 
-<div class="flex items-center justify-center border-2 border-dashed rounded-xl opacity-70" style="height: 280px">
-  <div class="text-center px-6">
-    🖼️ <b>PLACEHOLDER</b><br>
-    <span class="text-sm">screenshot of Android's scary
-    "Allow Deckard full control of your device?" accessibility dialog</span>
-  </div>
+<div class="col-span-3 flex items-center justify-center gap-4">
+  <img v-click="3" src="./assets/scary_permission.png" class="rounded-xl shadow-lg" style="max-height: 340px" alt="Android's accessibility consent dialog — Deckard screen context needs to observe your actions, retrieve window content, perform gestures, take a screenshot" />
+  <img v-click="4" src="./assets/draw_over_other_apps.png" class="rounded-xl shadow-lg" style="max-height: 340px" alt="Android's 'Display over other apps' permission toggle for Deckard Debug" />
 </div>
 
 </div>
