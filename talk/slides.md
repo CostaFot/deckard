@@ -29,19 +29,23 @@ Cold open, before advancing: no agenda slide, no "about me" slide. Straight into
 layout: center
 ---
 
-# The internet is drowning in slop
+# The internet is drowning in slop 🚀
 
-<div class="mt-6 mx-auto flex items-center justify-center border-2 border-dashed rounded-xl opacity-70" style="width: 420px; height: 320px">
-  <div class="text-center px-6">
-    🖼️ <b>PLACEHOLDER — real slop post #1</b><br>
-    <span class="text-sm">actual screenshot of a maximally sloppy LinkedIn post —
-    🚀 emojis, "I'm humbled to announce…", the works</span>
+<div class="relative mt-6 mx-auto" style="width: 420px">
+  <span class="absolute text-4xl" style="top: -20px; left: -56px; transform: rotate(-20deg)">🚀</span>
+  <span class="absolute text-3xl" style="top: 90px; right: -52px; transform: rotate(25deg)">🚀</span>
+  <span class="absolute text-3xl" style="bottom: 70px; left: -50px; transform: rotate(15deg)">🚀</span>
+  <span class="absolute text-4xl" style="bottom: -16px; right: -58px; transform: rotate(-10deg)">🚀</span>
+  <div class="flex items-center justify-center border-2 border-dashed rounded-xl opacity-70" style="width: 420px; height: 320px">
+    <div class="text-center px-6">
+      🖼️ <b>PLACEHOLDER — real slop post #1</b><br>
+      <span class="text-sm">actual screenshot of a maximally sloppy LinkedIn post —
+      🚀 emojis, "I'm humbled to announce…", the works</span>
+    </div>
   </div>
 </div>
 
 <!--
-TODO need rocketemojis interspersed
-
 Flash slide — a couple of seconds, let the room read it, move on. Real content gets the
 laugh that a parody can't.
 -->
@@ -69,8 +73,21 @@ And I got <b>sick</b> of it.
 <!--
 Second flash — pass through quickly, then land the line: "did a person write this, or did
 they paste it out of ChatGPT? I genuinely can't tell anymore — and it's everywhere. And I got sick of it."
+-->
 
-TODO add another slide next with placeholder for my Victoria Beckham meme
+---
+layout: center
+---
+
+<div class="mx-auto flex items-center justify-center border-2 border-dashed rounded-xl opacity-70" style="width: 480px; height: 340px">
+  <div class="text-center px-6">
+    🖼️ <b>PLACEHOLDER — Costa's Victoria Beckham meme</b><br>
+    <span class="text-sm">(Costa provides — his own meme, drops in as-is)</span>
+  </div>
+</div>
+
+<!--
+Meme beat — let it land, say nothing. Then next slide.
 -->
 
 ---
@@ -122,17 +139,7 @@ product. The rest of this talk is what's inside it."
 
 </div>
 
-<v-click>
-
-<div class="pt-6 text-center text-xl">
-You bring him your loot. He tells you what it's worth. — <i>"This is slop, son."</i>
-</div>
-
-</v-click>
-
 <!--
-TODO remove "you bring him your loot.. son" thing
-
 ~10 seconds, millennial double reference — both halves are intended.
 
 Blade Runner: detects what's human. Diablo: you bring Cain an unidentified item, he tells
@@ -144,11 +151,15 @@ layout: center
 class: text-center
 ---
 
-# So… how is this done?
+<div class="mx-auto flex items-center justify-center border-2 border-dashed rounded-xl opacity-70" style="width: 480px; height: 340px">
+  <div class="text-center px-6">
+    🖼️ <b>PLACEHOLDER — "glad you asked" meme</b><br>
+    <span class="text-sm">two-panel: "wow Costa, you are SO cool — how did you do this?" /
+    "glad you asked" — the pivot out of the cold open</span>
+  </div>
+</div>
 
 <!--
-TODO replace with "wow Costa you are so cool how did you do this" and "glad you asked" meme
-
 The pivot out of the cold open. Next: the machine at a glance, then we descend.
 -->
 
@@ -188,35 +199,30 @@ The pivot out of the cold open. Next: the machine at a glance, then we descend.
 
 </div>
 
-<v-click>
-
-<div class="pt-10 text-center opacity-80">
-The brain is the easy part — it's an HTTP call.<br>
-<span class="text-sm opacity-70">(and it refuses to judge fewer than ~50 words — short text can't be classified reliably)</span>
-</div>
-
-</v-click>
-
-<v-click>
-
-<div class="pt-4 text-center text-xl">
-The <b>eyes</b> are where the story is. 👀
-</div>
-
-</v-click>
-
 <!--
-TODO I do not like the exaplanation "the brain is the easy part... the story is" etc let's skip all that
-
 "Let's look at this thing at a glance — then we go into detail."
 
 One beat only — this is the map for the descent, not a lecture. Three pieces:
 - the face: the floating mascot, a system overlay, no Activity anywhere (that lands later)
 - the eyes: reading the screen — the whole middle of the talk
 - the brain: the slop verdict is literally an API call. Won't even bother under ~50 words.
+(Say the brain/50-words bit out loud if it fits — nothing more on the slide.)
 
-Land the last line and descend: "so let's talk about the eyes. How hard can reading a
-screen be?"
+Then descend: "so let's talk about the eyes. How hard can reading a screen be?"
+-->
+
+---
+
+<div class="mx-auto flex items-center justify-center border-2 border-dashed rounded-xl opacity-70" style="width: 520px; height: 320px">
+  <div class="text-center px-6">
+    🖼️ <b>PLACEHOLDER — Interstellar meme</b><br>
+    <span class="text-sm">"this is going to take us 10 years" — the weekend project that
+    becomes a month, as they always do</span>
+  </div>
+</div>
+
+<!--
+The classic: "I'll build this in a weekend." Narrator: he did not build it in a weekend.
 -->
 
 ---
@@ -245,8 +251,6 @@ Structured. Free. Returns in <b>milliseconds</b>. No model needed. 😎
 </v-click>
 
 <!--
-TODO: add slide before this with "interstellar" meme this is going to take us 10 years making a joke about a weekend project typically turning itself into a 1 month long project
-
 (Heavily elided, like every snippet in this deck.)
 
 The naive plan: I started by just reading the accessibility tree — the thing screen
@@ -298,65 +302,63 @@ the privacy bridge setup.)
 
 # War story #1: LinkedIn lies to you
 
-<div class="pt-2 opacity-80">A collapsed post's <i>visible</i> text ends in "…more". Where's the rest?</div>
+<div class="grid grid-cols-2 gap-6 pt-4 items-center">
 
-```kotlin
-// the FULL post hides in contentDescription — the visible text is truncated
-fun ScreenNode.bestText(): String {
-    val text = text?.trim().orEmpty()
-    val description = contentDescription?.trim().orEmpty()
-    return if (description.length > text.length) description else text
-}
-```
+<div class="flex items-center justify-center border-2 border-dashed rounded-xl opacity-70" style="height: 300px">
+  <div class="text-center px-6">
+    🖼️ <b>PLACEHOLDER</b><br>
+    <span class="text-sm">screenshot of a collapsed LinkedIn post —
+    the visible text ends in <b>"…more"</b></span>
+  </div>
+</div>
+
+<div>
+
+The post you can *see* ends in **"…more"**.
 
 <v-click>
 
-<div class="pt-3 opacity-80">
-…and the feed is Compose: anonymous <code>android.view.View</code>s, no IDs, and the post body
-node is sometimes a <code>TextView</code>, sometimes a <code>Button</code>. You match on <b>content, not class</b>.
+<div class="pt-2">
+
+The **full** post hides in `contentDescription`:
+
+```kotlin
+// read the fuller of the two
+fun ScreenNode.bestText() =
+    if (description.length > text.length)
+        description else text
+```
+
 </div>
 
 </v-click>
 
-<div class="mt-4 flex items-center justify-center border-2 border-dashed rounded-xl opacity-70" style="height: 130px">
-  <div class="text-center px-6">
-    🖼️ <b>PLACEHOLDER</b> — annotated tree-dump excerpt: <code>text="…more"</code> vs
-    the full post sitting in <code>contentDescription</code>
-  </div>
+</div>
+
 </div>
 
 <!--
-TODO make this simpler. People just need to see a small snippet and an image with a post with "..more". Can we do side by side? 
-
 First contact with reality: the tree is only as good as the app developer made it — and
 you don't control LinkedIn.
 
-So you write LinkedIn-specific logic just to FIND the post body. Note the foreshadowing:
-this is already one bespoke parser.
+You're writing LinkedIn-specific logic just to FIND the post body. Foreshadowing: this is
+already one bespoke parser.
 -->
 
 ---
 
 # War story #2: X declares war
 
-<div class="pt-2 opacity-80">On the timeline, a tweet exposes <b>no per-element text at all</b>. The entire card is ONE string:</div>
+<div class="pt-2 opacity-80">On the timeline, a tweet exposes <b>no per-element text at all</b> — the entire card is <b>one string</b>.</div>
 
-<div class="mt-4 p-4 border rounded-xl text-sm leading-relaxed font-mono">
-<span class="bg-blue-500 bg-opacity-30 rounded px-1">molson 🧠⚙️ @Molson_Hart Verified.</span>
-<span class="bg-green-500 bg-opacity-30 rounded px-1">The tariffs are going to hit small businesses first, and here's the part nobody is talking about…</span>
-<span class="bg-red-500 bg-opacity-30 rounded px-1">2 hours ago.</span>
-<span class="bg-red-500 bg-opacity-30 rounded px-1">2 replies.</span>
-<span class="bg-red-500 bg-opacity-30 rounded px-1">3 reposts.</span>
-<span class="bg-red-500 bg-opacity-30 rounded px-1">34 likes.</span>
-<span class="bg-red-500 bg-opacity-30 rounded px-1">2569 verified views.</span>
-</div>
-
-<div class="pt-2 text-sm opacity-70">
-<span class="bg-blue-500 bg-opacity-30 rounded px-1">byline</span>
-<span class="bg-green-500 bg-opacity-30 rounded px-1">the actual tweet</span>
-<span class="bg-red-500 bg-opacity-30 rounded px-1">chrome you don't want</span>
-— name, handle, body, timestamp and engagement counts, all fused into one
-<code>contentDescription</code>.
+<div class="mt-4 flex items-center justify-center border-2 border-dashed rounded-xl opacity-70" style="height: 290px">
+  <div class="text-center px-8">
+    🖼️ <b>PLACEHOLDER</b><br>
+    <span class="text-sm">annotated captures of what the a11y tree hands you for a
+    <b>normal tweet</b>, a <b>quote tweet</b> and a <b>reply</b> — name, handle, body,
+    timestamp and counts fused into one <code>contentDescription</code> blob per card.
+    A mess.</span>
+  </div>
 </div>
 
 <v-click>
@@ -368,13 +370,26 @@ To get the tweet out… you parse it back apart. With regexes. 🫠
 </v-click>
 
 <!--
-TODO in this case I think it's better to get a placeholder image with a few examples or quote tweets, reply tweets etc. reading the accesibility with those is a mess
-
 The hostile case. X concatenates the whole card into a single contentDescription so a
 screen reader reads it as one unit. There is no child TextView holding just the body.
 
 The only way to get the tweet body is to strip the byline off the front and the
 metrics/timestamp off the back of one giant string.
+-->
+
+---
+
+<div class="mx-auto flex items-center justify-center border-2 border-dashed rounded-xl opacity-70" style="width: 480px; height: 320px">
+  <div class="text-center px-6">
+    🖼️ <b>PLACEHOLDER — "challenge accepted" meme</b><br>
+    <span class="text-sm">the moment before writing a parser per app seemed like a
+    good idea</span>
+  </div>
+</div>
+
+<!--
+Beat between the war stories and the architecture: I saw the mess and thought "fine.
+I'll just handle every app myself."
 -->
 
 ---
@@ -401,8 +416,6 @@ class ScreenContentExtractors @Inject constructor(
 ```
 
 <!--
-TODO probably need a slide previously with a "challenge accepted" meme. put placeholder
-
 This looks GREAT in a design doc. Clean seam, Hilt multibinding, add an app = one class +
 one binding. I was very proud of it.
 
@@ -471,9 +484,15 @@ A per-app parser isn't a roadmap. It's a <b>treadmill</b>. 🏃‍♂️
 
 </v-click>
 
-<!--
-TODO placeholder meme "sweating guy"
+<v-click>
 
+<div class="mt-6 mx-auto flex items-center justify-center border-2 border-dashed rounded-xl opacity-70" style="width: 280px; height: 160px">
+  <span class="text-sm px-4 text-center">🖼️ PLACEHOLDER — "sweating guy" meme</span>
+</div>
+
+</v-click>
+
+<!--
 The dead end, said plainly: I really tried. Interfaces and implementations per app,
 special-casing the browser, content-vs-class matching, centre-of-screen heuristics.
 
@@ -709,10 +728,14 @@ The point survives any update: the platform path is rationed; BYO gives you full
 
 </div>
 
+<v-click>
+
 ```bash
 # the caveman delivery pipeline 🧌
 adb push gemma-3n.litertlm /sdcard/Android/data/<pkg>/files/models/
 ```
+
+</v-click>
 
 <v-click>
 
@@ -733,8 +756,6 @@ We're hacking around with adb, and I'm not sorry.
 </v-click>
 
 <!--
-TODO thhe ADB snippet should show up as transition when going forward 
-
 Get the "you're not seriously shipping over adb" question out of the way before anyone
 asks it — Play Asset Delivery / Play's on-device AI delivery is the production path.
 
@@ -799,21 +820,35 @@ layout: center
 
 <v-click>
 
-<div class="mt-8 p-4 border rounded-xl font-mono text-sm text-left mx-auto" style="max-width: 32rem">
+<div class="grid grid-cols-2 gap-6 mt-8 items-center text-left">
+
+<div>
+
+<div class="p-4 border rounded-xl font-mono text-sm">
 E/litert: GPU backend initialization failed: INTERNAL<br>
 I/litert: falling back to CPU
 </div>
 
-<div class="pt-4 text-center opacity-80">
-The GPU init fails with an opaque <code>INTERNAL</code> error…<br>
-then it <b>silently</b> falls back to CPU — <b>~10× slower</b>. Basically unusable.
+<div class="pt-4 opacity-80">
+An opaque <code>INTERNAL</code> error… then a <b>silent</b> fallback to CPU —
+<b>~10× slower</b>. Basically unusable.
+</div>
+
+</div>
+
+<div class="flex items-center justify-center border-2 border-dashed rounded-xl opacity-70" style="height: 240px">
+  <div class="text-center px-6">
+    🎬 <b>PLACEHOLDER</b><br>
+    <span class="text-sm">screen recording of the CPU run — Deckard thinking…
+    and thinking… one word at a time</span>
+  </div>
+</div>
+
 </div>
 
 </v-click>
 
 <!--
-TODO probably need to show it here with a gif/video. side by side with  the text.
-
 The war story, spend time here. The model loaded, generated text, everything "worked" —
 except a summon took the better part of a minute. It was shit.
 
@@ -837,8 +872,9 @@ in logcat. What would YOU google for "INTERNAL"?
 
 <div class="pt-4 text-lg leading-relaxed">
 
-**Why:** the GPU delegate is OpenCL. On Android 12+, your app **cannot `dlopen` a vendor
-library it hasn't declared.** No declaration → no OpenCL → that `INTERNAL` error → CPU.
+**In plain words:** the GPU "driver" is a native library that ships **with the phone**,
+not with your app. Since Android 12, an app can only load native libraries it has
+**declared in its manifest**. Didn't declare → can't load → no GPU → CPU.
 
 </div>
 
@@ -853,52 +889,13 @@ Four lines. Two weeks. 🫠
 </v-click>
 
 <!--
-TODO explanation not good here. we need simple stuff. noone is familiar with what OpenCL is.
-
 This is the slide the LiteRT half of the talk exists for. The single most useful thing an
 audience member ships next week.
 
-Android 12 locked down native library loading; anything not on the app's declared list is
-invisible at runtime. The GPU delegate needs the VENDOR's OpenCL — so you must declare
-it, required="false" so you still install on devices without it.
--->
-
----
-
-# More fine print from the trenches
-
-<div class="pt-2 text-lg leading-relaxed">
-
-<v-clicks>
-
-- **Pin your runtime.** `litertlm = "0.11.0"` — 0.12.0 regressed GPU for these Gemma builds
-- **How do you even debug that?** Diff your app against **Google's AI Edge Gallery** sample
-  until the configs match. <i>The reference app is the real documentation</i> 🤷‍♂️
-- **Have a fallback ladder** — keep the first backend that survives:
-
-</v-clicks>
-
-</div>
-
-<v-click>
-
-```kotlin
-for (backend in listOf(Backend.GPU(), Backend.CPU(numOfThreads = 4), Backend.NPU(…))) {
-    runCatching { return initialized(backend) }   // GPU → CPU → NPU, first one wins
-}
-```
-
-</v-click>
-
-<!--
-TODO remove this slide. not useful
-
-The 0.12.0 regression cost days: same code, new version, GPU gone. Downgrade → works.
-There was no changelog entry that would tell you.
-
-AI Edge Gallery is Google's open-source showcase app for on-device models — when the docs
-run out, you read its source and diff against your own config. That's how the manifest
-fix was found too.
+Keep it jargon-free on the slide. For the curious in Q&A: the GPU delegate runs on
+OpenCL, and Android 12's native-library lockdown means anything not on the app's declared
+list is invisible to dlopen at runtime. required="false" keeps the app installable on
+devices that don't have the library.
 -->
 
 ---
@@ -1072,21 +1069,29 @@ layout: center
 
 # Everything you just saw is a real app
 
-<div class="pt-6 text-xl text-center opacity-90">
-Pure Compose UI · ViewModels · repositories · API calls · DI<br>
-<span class="opacity-70">— the whole boring stack.</span>
+<div class="pt-4 text-xl mx-auto text-left" style="max-width: 20rem">
+
+<v-clicks>
+
+- pure **Compose** UI
+- **ViewModels**
+- **repositories**, API calls
+- **DI** everywhere
+
+</v-clicks>
+
 </div>
 
 <v-click>
 
-<div class="pt-10 text-3xl text-center">
+<div class="pt-8 text-3xl text-center">
 And there is <b>no Activity anywhere</b>. 😳
 </div>
 
 </v-click>
 
 <!--
-TODO probably put these as bullet points animating in on every transition
+The whole boring stack, one piece per click.
 
 Hammer the point: this isn't "some Compose in an overlay" — it's a complete app
 architecture (ViewModels talking to repositories doing API calls, all DI'd) running in a
@@ -1102,17 +1107,21 @@ layout: center
 <v-click>
 
 <div class="pt-4 text-xl text-center opacity-90 leading-relaxed">
-Normally we have the <i>luxury</i> of an Activity quietly handing us everything —<br>
-lifecycle, ViewModel store, saved state. Here: nothing.
+Turns out an Activity is just <b>three registries in a trench coat</b>: 🥸
 </div>
 
 </v-click>
 
 <v-click>
 
-<div class="pt-8 text-xl text-center leading-relaxed">
-Turns out an Activity is just <b>three registries in a trench coat</b>…<br>
-so I became one. 🥸
+<div class="pt-6 flex items-center justify-center gap-4">
+  <div class="border-2 rounded-xl px-4 py-3 font-mono text-sm">LifecycleOwner</div>
+  <div class="border-2 rounded-xl px-4 py-3 font-mono text-sm">ViewModelStoreOwner</div>
+  <div class="border-2 rounded-xl px-4 py-3 font-mono text-sm">SavedStateRegistryOwner</div>
+</div>
+
+<div class="pt-6 text-xl text-center">
+Hand Compose those three, and it runs <b>anywhere</b>. So I became them.
 </div>
 
 </v-click>
@@ -1126,7 +1135,9 @@ But that's <i>my</i> weird problem. Here's the part that's <b>yours</b>…
 </v-click>
 
 <!--
-TODO we should show these 3 registries and basically hammer home that as long as compose is handed those, everything works  fine. Keep short and simple
+Short and simple: Compose doesn't need an Activity — it needs these THREE things, which
+an Activity normally provides invisibly. Supply them yourself and Compose runs anywhere:
+a Service, an IME, an overlay.
 
 One beat only — do NOT descend into overlay plumbing. The Service implements the three
 owner interfaces and sets them as view-tree owners; that's the whole story, and it's in
@@ -1251,14 +1262,22 @@ RetainObserver is the hook for anything that needs a lifecycle: onRetired is you
 
 ---
 
-# …so I built a ViewModel out of it 🧪
+# You don't even need a `ViewModel` anymore 🧪
+
+<div class="text-sm">
 
 ```kotlin
+// 1. a "ViewModel": just a scope + cleanup, driven by RetainObserver
 abstract class RetainedViewModel : RetainObserver {
     val viewModelScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     override fun onRetired() { onCleared(); viewModelScope.cancel() }   // 🧹
 }
+```
 
+<v-click>
+
+```kotlin
+// 2. a one-liner to fetch-or-create it — scoped to the composition
 @Composable
 inline fun <reified T : RetainedViewModel> rememberRetainedViewModel(
     noinline factory: (Context) -> T,
@@ -1268,10 +1287,12 @@ inline fun <reified T : RetainedViewModel> rememberRetainedViewModel(
 }
 ```
 
+</v-click>
+
 <v-click>
 
 ```kotlin
-// DIY dependency injection — the factory reaches straight into the DI graph:
+// 3. DIY dependency injection — the factory reaches straight into the DI graph
 val viewModel = rememberRetainedViewModel { context ->
     EntryPoints.get(context, SampleEntryPoint::class.java).sampleRetainedViewModel()
 }
@@ -1279,25 +1300,24 @@ val viewModel = rememberRetainedViewModel { context ->
 
 </v-click>
 
+</div>
+
 <v-click>
 
-<div class="pt-3 text-center opacity-90">
-Scope ✅ cleanup ✅ DI ✅ — a ViewModel that works in an Activity, a Service, an IME, an
-overlay. <b>The sky's the limit.</b> 💸
+<div class="pt-2 text-center opacity-90">
+Scope ✅ cleanup ✅ DI ✅ — no androidx <code>ViewModel</code>, no owners, no factories. <b>The sky's the limit.</b> 💸
 </div>
 
 </v-click>
 
 <!--
-TODO "you dont even need a ViewModel anymore" and make it 3 code snippets. animate every transition in so I can do through them without overloading the audience
+Three snippets, one per click — walk them slowly, don't overload the room.
 
-The complex solution, built on the plain API: ~15 lines and you have the full ViewModel
-experience with none of the owner machinery.
-
-- RetainedViewModel: a coroutine scope + onCleared, driven by RetainObserver
-- rememberRetainedViewModel: fetch-or-create via retain{}
-- DI: the factory lambda is YOURS — grab a Hilt entry point / your application component
-  and inject whatever you want. No @HiltViewModel, no ViewModelProvider.Factory.
+1. RetainedViewModel: a coroutine scope + onCleared, driven by RetainObserver — the whole
+   "ViewModel contract" in five lines, no androidx.lifecycle.ViewModel anywhere
+2. rememberRetainedViewModel: fetch-or-create via retain{}
+3. DI: the factory lambda is YOURS — grab a Hilt entry point / your application component
+   and inject whatever you want. No @HiltViewModel, no ViewModelProvider.Factory.
 
 This is real code from the keyboard era of this very app.
 -->

@@ -48,6 +48,23 @@ slide count first, Costa trims.
 
 ## Status log
 
+- **2026-07-07 (evening)** — **Costa's 16 slide-note TODOs all addressed.** Added 4 meme
+  placeholder slides (Victoria Beckham after slop #2, "glad you asked" replacing the plain
+  pivot divider, Interstellar before Attempt #1, "challenge accepted" before the
+  architecture slide) + sweating-guy meme on the treadmill slide + 🚀 rockets interspersed
+  on slop slide. Removed: the loot/"slop, son" line from Why-Deckard, the "brain is easy /
+  eyes are the story" explanation from the glance slide (moved to speaker notes), and the
+  ENTIRE "More fine print" slide (version pin / AI Edge Gallery / fallback ladder — Costa:
+  not useful). Reworked: LinkedIn war story to side-by-side image+snippet; X war story to a
+  placeholder image (annotated normal/quote/reply captures) instead of the typographic
+  blob; four-XML-lines explanation de-jargoned (no OpenCL/dlopen on the slide); first-run
+  slide to log ∥ 🎬 recording side-by-side; adb snippet now on a v-click; "real app" stack
+  as animated bullets; trench-coat slide shows the 3 registry chips + "hand Compose those
+  three and it runs anywhere"; retain-VM slide retitled "You don't even need a ViewModel
+  anymore" with 3 snippets on separate clicks. **Deck: 43 slides**, map updated below.
+  New assets added to the list: Victoria Beckham meme, glad-you-asked meme, Interstellar
+  meme, challenge-accepted meme, sweating-guy meme, slow-CPU-run recording 🎬, X
+  normal/quote/reply annotated captures, LinkedIn "…more" screenshot.
 - **2026-07-07** — **Close built — FULL DECK COMPLETE, 41 slides** (skeleton §9): takeaway
   #1 "local LLMs are ready. I was surprised too." (easy/small/capable → "the worst they'll
   ever be 🔮"), takeaway #2 "Compose finally feels… complete" (the gossip: VM-scoping never
@@ -215,58 +232,64 @@ slide count first, Costa trims.
      prompt-vs-regexes, four-XML-lines, busy-screen problem.
    Slide numbers below in the deck map. Update this file as decisions land.
 4. Costa records/provides the placeholder assets (into `assets/`, then wire into slides).
-   The list: 2 real-slop screenshots · hero demo GIF · scary-permissions dialog ·
-   LinkedIn tree-dump excerpt · long-press demo GIF · demo-zoom GIF · busy JET screen ·
-   Nav3-in-overlay GIF (needs POC resurrection) · repo QR code. Prerequisites: flip
-   `isMocked` + API key for real verdicts; optionally the persona line on the report card
-   for "This is slop, son" on screen.
+   **Screenshots/recordings:** 2 real-slop screenshots · hero demo GIF · scary-permissions
+   dialog · LinkedIn collapsed-post "…more" screenshot · X annotated captures
+   (normal/quote/reply blobs) · slow-CPU-run recording · long-press demo GIF · demo-zoom
+   GIF · busy JET screen · Nav3-in-overlay GIF (needs POC resurrection) · repo QR code.
+   **Memes (Costa's own / to make):** Victoria Beckham · "glad you asked" · Interstellar ·
+   "challenge accepted" · "sweating guy". Prerequisites: flip `isMocked` + API key for
+   real verdicts; optionally the persona line on the report card for "This is slop, son"
+   on screen.
 5. Rehearsal pass: count minutes against the trimmed deck; export
    (`npm run export`) as the backup copy.
 
-## Deck map (slides.md as of 2026-07-07, 41 slides)
+## Deck map (slides.md as of 2026-07-07 evening, 43 slides)
 
 | Slides | Section (skeleton §) |
 |---|---|
 | 1 | Title |
-| 2–3 | Cold open: slop screenshots ×2 (§1) |
-| 4 | "So I built a thing" — hero demo 🎬 (§1) |
-| 5 | Why "Deckard" — double reference (§1) |
-| 6 | Pivot divider "how is this done?" (§1) |
-| 7 | The machine at a glance (§2) |
-| 8 | Attempt #1: read the tree (§3) |
-| 9 | Harder than it seems — scary permissions 🖼️ (§3) |
-| 10 | War story #1: LinkedIn (§3) |
-| 11 | War story #2: X one-string card (§3) |
-| 12 | The "scalable architecture" interface (§3) |
-| 13 | The regex wall + gags (§3) |
-| 14 | "That was one app" / treadmill (§3) |
-| 15 | Aside: a11y is your API (§3b) |
-| 16 | "Maybe the model can just look at it" (§4) |
-| 17 | Step one: get the pixels — irony + pipeline (§4) |
-| 18 | "One problem." — privacy (§5) |
-| 19 | "Brain has to live on the phone" divider (§5) |
-| 20 | "Doesn't Android give you this?" — Gemini Nano ⚠️verify (§6) |
-| 21 | Bring your own brain — adb 🧌 / Play delivery (§6) |
-| 22 | The engine: LiteRT-LM (§6) |
-| 23 | First run: CPU fallback war story (§6) |
-| 24 | Four lines of XML (§6) |
-| 25 | Fine print: version pin / AI Edge Gallery / fallback ladder (§6) |
-| 26 | Hardware floor + fragility-trade synthesis (§6) |
-| 27 | Prompt vs regex wall — hero (§6) |
-| 28 | Understands, not OCRs + verbatim + gags + 🎬 (§6) |
-| 29 | Callback: demo zoom 🎬 + share-sheet door (§7) |
-| 30 | "Everything you just saw is a real app" (§8) |
-| 31 | "How did I even go about this?" — trench coat (§8) |
-| 32 | Your problem: the busy JET screen 🖼️ (§8) |
-| 33 | What we actually want — checklist (§8) |
-| 34 | `retain` — the plain API (§8) |
-| 35 | "…so I built a ViewModel out of it" (§8) |
-| 36 | `rememberViewModelStoreOwner` (§8) |
-| 37 | Navigation 3 — ⚠️ CUTTABLE (§8) |
-| 38 | "Fragment-shaped hole: filled" (§8) |
-| 39 | Takeaway #1: local LLMs (§9) |
-| 40 | Takeaway #2: Compose mature (§9) |
-| 41 | "That's the talk" — QR 🖼️ / repo / sign-off (§9) |
+| 2 | "Drowning in slop" + slop screenshot #1, 🚀 interspersed (§1) |
+| 3 | Slop screenshot #2 → "I got sick of it" (§1) |
+| 4 | 🖼️ Victoria Beckham meme (Costa provides) (§1) |
+| 5 | "So I built a thing" — hero demo 🎬 (§1) |
+| 6 | Why "Deckard" — double reference (§1) |
+| 7 | 🖼️ "glad you asked" meme — the pivot (§1) |
+| 8 | The machine at a glance (cards only, no explanation text) (§2) |
+| 9 | 🖼️ Interstellar meme — weekend project joke (§3) |
+| 10 | Attempt #1: read the tree (§3) |
+| 11 | Harder than it seems — scary permissions 🖼️ (§3) |
+| 12 | War story #1: LinkedIn — side-by-side 🖼️ + snippet (§3) |
+| 13 | War story #2: X — 🖼️ annotated captures (normal/quote/reply) (§3) |
+| 14 | 🖼️ "challenge accepted" meme (§3) |
+| 15 | The "scalable architecture" interface (§3) |
+| 16 | The regex wall + gags (§3) |
+| 17 | "That was one app" / treadmill + 🖼️ sweating-guy meme (§3) |
+| 18 | Aside: a11y is your API (§3b) |
+| 19 | "Maybe the model can just look at it" (§4) |
+| 20 | Step one: get the pixels — irony + pipeline (§4) |
+| 21 | "One problem." — privacy (§5) |
+| 22 | "Brain has to live on the phone" divider (§5) |
+| 23 | "Doesn't Android give you this?" — Gemini Nano ⚠️verify (§6) |
+| 24 | Bring your own brain — adb 🧌 on click / Play delivery (§6) |
+| 25 | The engine: LiteRT-LM (§6) |
+| 26 | First run: CPU war story — log ∥ 🎬 slow-run recording (§6) |
+| 27 | Four lines of XML — jargon-free explanation (§6) |
+| 28 | Hardware floor + fragility-trade synthesis (§6) |
+| 29 | Prompt vs regex wall — hero (§6) |
+| 30 | Understands, not OCRs + verbatim + gags + 🎬 (§6) |
+| 31 | Callback: demo zoom 🎬 + share-sheet door (§7) |
+| 32 | "Real app" — stack as animated bullets (§8) |
+| 33 | "How did I even go about this?" — 3 registry chips + trench coat (§8) |
+| 34 | Your problem: the busy JET screen 🖼️ (§8) |
+| 35 | What we actually want — checklist (§8) |
+| 36 | `retain` — the plain API (§8) |
+| 37 | "You don't even need a ViewModel anymore" — 3 snippets on clicks (§8) |
+| 38 | `rememberViewModelStoreOwner` (§8) |
+| 39 | Navigation 3 — ⚠️ CUTTABLE (§8) |
+| 40 | "Fragment-shaped hole: filled" (§8) |
+| 41 | Takeaway #1: local LLMs (§9) |
+| 42 | Takeaway #2: Compose mature (§9) |
+| 43 | "That's the talk" — QR 🖼️ / repo / sign-off (§9) |
 
 (Numbering will drift as slides get cut in the trim — the section order is the stable
 reference; re-verify numbers against the overview at http://localhost:3030/overview/.)
