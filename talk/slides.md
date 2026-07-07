@@ -561,26 +561,17 @@ layout: center
 class: text-center
 ---
 
-# Wait. Maybe the model can just… <i>look</i> at it? 🤔
+# Wait. Maybe the model can just… <i>look</i> at it?
 
 <v-click>
 
 <div class="pt-6 text-xl opacity-90">
-These vision models are getting good.<br>
-Take a <b>screenshot</b> — let the model figure out what the relevant text is. <i>Itself.</i>
+Let's take a <b>screenshot</b> and let the model figure out what the relevant text is. <i>Itself.</i>
 </div>
 
 </v-click>
 
 <v-click>
-
-<div class="pt-8 text-2xl">
-screenshot → model → the post
-</div>
-
-<div class="pt-4 opacity-70">
-One idea. Replaces the entire treadmill.
-</div>
 
 </v-click>
 
