@@ -459,7 +459,7 @@ every app on Earth."
 
 ---
 
-# The reality: one extractor's worth of "handling X"
+# The reality: Regex wars
 
 ```kotlin
 /** "… 2 replies.  3 reposts.  34 likes.  2569 verified views." */
