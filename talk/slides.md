@@ -245,7 +245,7 @@ Say the title straight, then click the meme in for the punchline.
 
 # Attempt #1: just read the screen!
 
-<div class="pt-6 opacity-80">Accessibility service hands you the whole UI tree — just walk it.</div>
+<div class="pt-6 opacity-80">Android hands you the whole UI tree — just walk it.</div>
 
 <div class="mt-8">
 
@@ -280,7 +280,7 @@ readers use. Every view, its text, its bounds. It's RIGHT THERE.
 
 ---
 
-# Small print: it's harder than it seems
+# Not so fast
 
 <div class="grid grid-cols-2 gap-8 pt-4">
 
