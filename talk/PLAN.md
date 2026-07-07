@@ -271,7 +271,7 @@ slide count first, Costa trims.
 5. Rehearsal pass: count minutes against the trimmed deck; export
    (`npm run export`) as the backup copy.
 
-## Deck map (slides.md as of 2026-07-08, 43 slides)
+## Deck map (slides.md as of 2026-07-08, 44 slides)
 
 | Slides | Section (skeleton §) |
 |---|---|
@@ -280,10 +280,11 @@ slide count first, Costa trims.
 | 3 | Victoria Beckham meme — ✅ `assets/victoria_meme.jpg` (§1) |
 | 4 | "So I built a thing" — hero demo 🎬 (§1) |
 | 5 | "Astute observers might have noticed" — slop post zoomed on 🤖 AI flag ✅ `assets/linkedin_slop_post_zoomed_in.png` (§1) |
-| 6 | "AI is very good at detecting other AI" — Pangram: Chrome extension, auto-tags AI posts (the badge reveal) (§2) |
-| 7 | 🖼️ "glad you asked" meme — the pivot (§1) |
-| 8 | The machine at a glance (cards only, no explanation text) (§2) |
-| 9 | 🖼️ Interstellar meme — weekend project joke (§3) |
+| 6 | "AI is very good at detecting other AI" — Pangram: Chrome extension, auto-tags AI posts (the badge reveal; notes: not affiliated + the AI-fingerprint intuition) (§2) |
+| 7 | "So here's what I wanted" — that extension, but system-wide on Android (§2) |
+| 8 | "How do we go about that?" — ✅ `assets/glad_you_asked_meme.png` — the pivot (§1) |
+| 9 | The machine at a glance (cards only, no explanation text) (§2) |
+| 10 | Interstellar meme — ✅ `assets/insterstellar_maneuvere_meme.png` — weekend project joke (§3) |
 | 10 | Attempt #1: read the tree (§3) |
 | 11 | Harder than it seems — scary permissions 🖼️ (§3) |
 | 12 | War story #1: LinkedIn — side-by-side 🖼️ + snippet (§3) |

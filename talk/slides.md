@@ -142,13 +142,37 @@ layout: center
 class: text-center
 ---
 
-<div class="mx-auto flex items-center justify-center border-2 border-dashed rounded-xl opacity-70" style="width: 480px; height: 340px">
-  <div class="text-center px-6">
-    🖼️ <b>PLACEHOLDER — "glad you asked" meme</b><br>
-    <span class="text-sm">two-panel: "wow Costa, you are SO cool — how did you do this?" /
-    "glad you asked" — the pivot out of the cold open</span>
-  </div>
+# What do I want?
+
+<v-click>
+
+<div class="pt-6 text-2xl leading-relaxed opacity-90">
+That exact functionality — <b>but not just in Chrome.</b><br>
 </div>
+
+</v-click>
+
+<v-click>
+
+<div class="pt-10 text-4xl font-bold">
+Every app. System-wide, on my phone. 📱
+</div>
+
+</v-click>
+
+<!--
+The one-line pitch, fast — don't linger. Pangram already solved "is this AI?" for a browser
+on a handful of sites. I wanted that same verdict everywhere: any app, anything on screen,
+system-wide on Android. That gap — browser-extension → phone-wide overlay — is the entire
+engineering project the rest of the talk is about.
+-->
+
+---
+layout: center
+class: text-center
+---
+
+<img src="./assets/glad_you_asked_meme.png" class="mx-auto mt-8 rounded-xl shadow-lg" style="max-height: 340px" alt="'wow Costa how did you do that' / 'im glad you asked' voice-message meme" />
 
 <!--
 The pivot out of the cold open. Next: the machine at a glance, then we descend.
@@ -156,7 +180,7 @@ The pivot out of the cold open. Next: the machine at a glance, then we descend.
 
 ---
 
-# The machine, at a glance
+# At a glance
 
 <div class="grid grid-cols-5 items-center gap-2 pt-10">
 
@@ -164,7 +188,7 @@ The pivot out of the cold open. Next: the machine at a glance, then we descend.
 <div class="col-span-1 border-2 rounded-xl p-4 text-center">
   <div class="text-4xl">🧙</div>
   <div class="font-bold pt-2">The face</div>
-  <div class="text-sm opacity-70 pt-1">an overlay <code>Service</code> — floats over <b>every</b> app</div>
+  <div class="text-sm opacity-70 pt-1">A system-wide overlay</div>
 </div>
 </v-click>
 
@@ -174,7 +198,7 @@ The pivot out of the cold open. Next: the machine at a glance, then we descend.
 <div class="col-span-1 border-2 rounded-xl p-4 text-center">
   <div class="text-4xl">👀</div>
   <div class="font-bold pt-2">The eyes</div>
-  <div class="text-sm opacity-70 pt-1">reads the screen — a11y tree <i>or</i> screenshot + model</div>
+  <div class="text-sm opacity-70 pt-1">To read the screen</div>
 </div>
 </v-click>
 
@@ -182,9 +206,9 @@ The pivot out of the cold open. Next: the machine at a glance, then we descend.
 
 <v-click>
 <div class="col-span-1 border-2 rounded-xl p-4 text-center">
-  <div class="text-4xl">🧠</div>
-  <div class="font-bold pt-2">The brain</div>
-  <div class="text-sm opacity-70 pt-1">the verdict — an API call (Pangram)</div>
+  <div class="text-4xl">⚖️</div>
+  <div class="font-bold pt-2">The judge</div>
+  <div class="text-sm opacity-70 pt-1">An API call</div>
 </div>
 </v-click>
 
@@ -204,16 +228,17 @@ Then descend: "so let's talk about the eyes. How hard can reading a screen be?"
 
 ---
 
-<div class="mx-auto flex items-center justify-center border-2 border-dashed rounded-xl opacity-70" style="width: 520px; height: 320px">
-  <div class="text-center px-6">
-    🖼️ <b>PLACEHOLDER — Interstellar meme</b><br>
-    <span class="text-sm">"this is going to take us 10 years" — the weekend project that
-    becomes a month, as they always do</span>
-  </div>
-</div>
+# Another easy weekend project
+
+<v-click>
+
+<img src="./assets/insterstellar_maneuvere_meme.png" class="mx-auto mt-8 rounded-xl shadow-lg" style="max-height: 400px" alt="Interstellar docking-maneuver meme — the weekend project that becomes a month" />
+
+</v-click>
 
 <!--
 The classic: "I'll build this in a weekend." Narrator: he did not build it in a weekend.
+Say the title straight, then click the meme in for the punchline.
 -->
 
 ---
