@@ -65,6 +65,15 @@
   padding: 0.9em 1.1em;
 }
 
+/* Opt-in larger code blocks: wrap a fence in <div class="big-code"> */
+.slidev-layout .big-code .slidev-code,
+.slidev-layout .big-code pre.shiki,
+.slidev-layout .big-code .shiki,
+.slidev-layout .big-code code {
+  font-size: 1.15rem !important;
+  line-height: 1.6 !important;
+}
+
 /* Placeholder / card borders pick up the island border colour */
 .slidev-layout .border-dashed,
 .slidev-layout .border-2 {

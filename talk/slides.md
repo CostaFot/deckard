@@ -718,39 +718,37 @@ The point survives any update: the platform path is rationed; BYO gives you full
 
 # Bring your own brain 🧠
 
-<div class="pt-2 text-lg leading-relaxed">
-
-- A multimodal **Gemma**, one `.litertlm` file, **~3 GB**
-  <span class="opacity-70">— but any model works; the loading story is the same</span>
-
-</div>
+<div class="text-lg leading-relaxed pt-4">
 
 <v-click>
 
+**1.** Grab a model off Hugging Face — **Gemma 4** for example!
+
+<div class="flex items-center justify-center pt-4">
+  <img src="./assets/download_gemma_huggingface.png" class="rounded-xl shadow-lg border" style="max-height: 180px" alt="Hugging Face model card for google/gemma-4-E4B" />
+</div>
+
+</v-click>
+
+<v-click>
+
+<div class="pt-6">
+
+**2.** Push it onto the phone via ADB:
+
+<div class="big-code">
+
 ```bash
-# the caveman delivery pipeline 🧌
 adb push gemma-3n.litertlm /sdcard/Android/data/<pkg>/files/models/
 ```
 
-</v-click>
+</div>
 
-<v-click>
-
-<div class="pt-4 opacity-80">
-Real apps do this properly: the user downloads the model at runtime via <b>Play delivery</b>.
-We're hacking around with adb, and I'm not sorry.
 </div>
 
 </v-click>
 
-<v-click>
-
-<div class="pt-4 text-sm opacity-60">
-(The engine class still lives in a package called <code>suggestion/llm/</code> — this app used to be a
-<i>keyboard</i>. The LLM is the sole survivor of the pivot.)
 </div>
-
-</v-click>
 
 <!--
 Get the "you're not seriously shipping over adb" question out of the way before anyone
