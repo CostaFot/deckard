@@ -950,9 +950,33 @@ val reply = conversation.sendMessage(prompt, screenshot)
 
 </div>
 
-<v-click>
+<div class="grid mt-6">
 
-<div class="med-code pt-6">
+<div class="col-start-1 row-start-1" v-click="[1,2]">
+
+<div class="text-sm uppercase tracking-widest font-bold mb-1" style="color: #ef4444">From this..</div>
+
+<div class="med-code">
+
+```kotlin
+val TRAILING_METRICS   = Regex("(?:\\s*[\\d,]+\\s+(?:repl(?:y|ies)|reposts?…")
+val TRAILING_TIMESTAMP = Regex("\\s*\\d+\\s+\\w+\\s+ago…")
+val TRAILING_REPOST    = Regex("\\s*Reposted by .*$")
+val LEADING_BYLINE     = Regex("^.*?@\\w+\\b(?:\\s+Verif…")
+val QUOTE_LEAD         = Regex("^.*?Quoted\\.\\s+[^.\\n]…")
+val QUOTER_COMMENT     = Regex("@\\w+\\b(?:\\s+Verified)…")
+// × every app on Earth
+```
+
+</div>
+
+</div>
+
+<div class="col-start-1 row-start-1" v-click="2">
+
+<div class="text-sm uppercase tracking-widest font-bold mb-1" style="color: #22c55e">To this</div>
+
+<div class="med-code">
 
 ```kotlin
 val prompt = """
@@ -965,15 +989,19 @@ val prompt = """
 
 </div>
 
-</v-click>
+</div>
+
+</div>
 
 <!--
-The API is dead simple: open a conversation, hand it the screenshot AND the prompt, get a
-string back. The model is multimodal, so this one call is the whole OCR path.
+The three-beat "from this, to this":
+1. The call itself — open a conversation, hand it the screenshot AND the prompt, get a string
+   back. It's multimodal, so this one call is the whole OCR path.
+2. Click: what does that `prompt` used to be? The regex wall — one brittle set per app, forever.
+3. Click: it dissolves into a paragraph of plain English. Same variable, entirely different world.
 
-The prompt block is the payoff to show: no per-app code, no regex — the "which text matters"
-logic is a paragraph of English. The verbatim rule is load-bearing (rewriting would bias the
-detector toward "AI"), and yes, it literally has to be told to ignore Deckard's own face.
+The verbatim rule is load-bearing (rewriting would bias the detector toward "AI"), and yes,
+it literally has to be told to ignore Deckard's own face.
 -->
 
 ---
