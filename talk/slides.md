@@ -716,7 +716,7 @@ The point survives any update: the platform path is rationed; BYO gives you full
 
 ---
 
-# Bring your own brain 🧠
+# Modelling
 
 <div class="text-lg leading-relaxed pt-4">
 
@@ -759,33 +759,33 @@ The keyboard line is a throwaway — one beat, move on.
 
 ---
 
-# The engine: LiteRT-LM
+# Using LiteRT-LM
+
+<div class="big-code pt-2">
+
+```kotlin
+// build.gradle.kts
+implementation("com.google.ai.edge.litertlm:litertlm-android:0.11.0")
+```
+
+</div>
+
+<v-click>
+
+<div class="big-code pt-4">
 
 ```kotlin
 val engine = Engine(
     EngineConfig(
         modelPath     = modelFile.absolutePath,
-        backend       = Backend.GPU(),      // ← the whole war is over this line
-        visionBackend = Backend.GPU(),      // multimodal: images go to the GPU too
+        backend       = Backend.GPU(),      // GPU is faster!
+        visionBackend = Backend.GPU(),   
         maxNumTokens  = 1024,
     ),
 )
-engine.initialize()   // takes SECONDS — warm up early, off the main thread
+engine.initialize()   // takes a while
 ```
 
-<v-click>
-
-```kotlin
-fun engineOrNull(): Engine?   // non-blocking: null while loading, never freezes the UI
-```
-
-</v-click>
-
-<v-click>
-
-<div class="pt-4 opacity-80 text-center">
-Warm up once per process on an app-scoped coroutine; callers degrade gracefully until the
-brain is online.
 </div>
 
 </v-click>
