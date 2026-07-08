@@ -649,16 +649,8 @@ This thing sees <b>everything on the screen</b>.<br>
 Now imagine shipping all of that to a remote LLM ⚠️
 </div>
 
-</v-click>
-
-<v-click>
-
-<div class="pt-8 text-3xl">
-No. 🙅
-</div>
-
-<div class="pt-3 opacity-70">
-No user would accept that. No user <i>should</i> accept that.
+<div class="pt-8 flex justify-center">
+  <img src="./assets/side_eye_meme.png" class="rounded-xl shadow-lg" style="max-height: 200px" alt="Side-eye meme" />
 </div>
 
 </v-click>
