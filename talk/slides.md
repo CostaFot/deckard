@@ -805,33 +805,21 @@ layout: center
 
 # First run: it worked! 🎉
 
+<div class="grid grid-cols-2 gap-8 mt-6 items-center">
+
+<div class="text-left">
+
 <v-click>
 
-<div class="pt-4 text-2xl text-center">
-…at roughly <b>one token per geological era</b>. 🐌
+<div class="text-2xl">
+…but it was so <b>slow</b>. 🐌
 </div>
 
 </v-click>
 
-<v-click>
-
-<div class="grid grid-cols-2 gap-6 mt-8 items-center text-left">
-
-<div>
-
-<div class="p-4 border rounded-xl font-mono text-sm">
-E/litert: GPU backend initialization failed: INTERNAL<br>
-I/litert: falling back to CPU
 </div>
 
-<div class="pt-4 opacity-80">
-An opaque <code>INTERNAL</code> error… then a <b>silent</b> fallback to CPU —
-<b>~10× slower</b>. Basically unusable.
-</div>
-
-</div>
-
-<div class="flex items-center justify-center border-2 border-dashed rounded-xl opacity-70" style="height: 240px">
+<div class="flex items-center justify-center border-2 border-dashed rounded-xl opacity-70" style="height: 280px">
   <div class="text-center px-6">
     🎬 <b>PLACEHOLDER</b><br>
     <span class="text-sm">screen recording of the CPU run — Deckard thinking…
@@ -841,14 +829,30 @@ An opaque <code>INTERNAL</code> error… then a <b>silent</b> fallback to CPU �
 
 </div>
 
-</v-click>
+<!--
+Spend a beat here. It "worked" — that's the trap. A summon took the better part of a
+minute. It was shit. Let the slow-run recording sell how bad it was.
+-->
+
+---
+layout: center
+---
+
+# Why?
+
+<div class="mt-8 mx-auto p-5 border rounded-xl font-mono text-lg" style="max-width: 40rem">
+E/litert: GPU backend initialization failed: INTERNAL<br>
+I/litert: falling back to CPU
+</div>
+
+<div class="pt-8 text-xl text-center leading-relaxed">
+An opaque <code>INTERNAL</code> error… then a <b>silent</b> fallback to CPU
+</div>
 
 <!--
-The war story, spend time here. The model loaded, generated text, everything "worked" —
-except a summon took the better part of a minute. It was shit.
-
 Nothing crashes. No exception reaches you. You just get a slow app and one cryptic line
-in logcat. What would YOU google for "INTERNAL"?
+in logcat. What would YOU google for "INTERNAL"? This is the setup for the fix — four lines
+of XML.
 -->
 
 ---
