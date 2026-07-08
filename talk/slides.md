@@ -63,17 +63,19 @@ Meme beat — let it land, say nothing. Then next slide.
 -->
 
 ---
-layout: center
+layout: two-cols
 ---
+
+<div class="h-full flex flex-col justify-center pr-8">
 
 # So I built a thing that tells me
 
-<div class="mt-6 mx-auto flex items-center justify-center border-2 border-dashed rounded-xl opacity-70" style="width: 640px; height: 300px">
-  <div class="text-center px-8">
-    🎬 <b>PLACEHOLDER — hero demo GIF</b><br>
-    <span class="text-sm">scrolling LinkedIn → maximum-slop post (🚀 "I'm humbled to announce…")
-    → summon Deckard → verdict: <i>"This is slop, son."</i></span>
-  </div>
+</div>
+
+::right::
+
+<div class="h-full flex items-center justify-center">
+  <img src="./assets/demo_fast.gif" class="rounded-xl shadow-lg" style="max-height: 490px" alt="Demo: summoning Deckard over a LinkedIn post and getting the AI-slop verdict" />
 </div>
 
 <!--
