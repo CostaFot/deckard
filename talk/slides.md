@@ -94,12 +94,12 @@ layout: center
 <div class="flex justify-center items-center gap-4 mt-4">
   <figure class="text-center m-0">
     <img src="./assets/start_post.png" class="rounded-xl shadow-lg" style="max-height: 370px" alt="A suspiciously inspirational LinkedIn post" />
-    <figcaption class="mt-3 text-sm opacity-70">Slop, suspected</figcaption>
+    <figcaption class="mt-3 text-sm opacity-70">Slop alert!</figcaption>
   </figure>
   <div v-click="1" class="text-3xl opacity-40 pb-8">→</div>
   <figure v-click="1" class="text-center m-0">
     <img src="./assets/summon_in_progress.png" class="rounded-xl shadow-lg" style="max-height: 370px" alt="Deckard summoned over the post, thinking" />
-    <figcaption class="mt-3 text-sm opacity-70">Deckard, summoned</figcaption>
+    <figcaption class="mt-3 text-sm opacity-70">Investigating..</figcaption>
   </figure>
   <div v-click="2" class="text-3xl opacity-40 pb-8">→</div>
   <figure v-click="2" class="text-center m-0">
