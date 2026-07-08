@@ -1,6 +1,7 @@
 ---
 theme: seriph
-background: https://cover.sli.dev
+colorSchema: dark
+background: '#0F1114'
 title: Fighting AI slop with anti-slop
 info: |
   Fighting AI slop with anti-slop — GDG (Android circuit) talk about Deckard,

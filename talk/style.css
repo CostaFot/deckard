@@ -1,0 +1,75 @@
+/*
+ * Islands Dark — IntelliJ IDEA / Android Studio look, ported onto the seriph theme.
+ *
+ * The signature of the Islands theme is a dark *canvas* with slightly lighter, rounded
+ * "island" panels floating on it. We map that to slides like so:
+ *   - page / canvas background   #0F1114  (darkest)
+ *   - island panels (code, cards) #1E1F22  (the new-UI editor background)
+ *   - foreground text            #BCBEC4  (JetBrains default fg)
+ *   - accent                     #3574F0  (JetBrains accent blue)
+ *   - borders / dividers         #393B40  (new-UI border)
+ */
+
+:root {
+  --slidev-theme-primary: #3574F0;
+}
+
+/* ---- Canvas ---- */
+.slidev-layout {
+  background-color: #0F1114;
+  color: #BCBEC4;
+}
+
+/* Cover / title slide: same canvas, no photo background. */
+.slidev-layout.cover,
+.slidev-layout.intro {
+  background-color: #0F1114;
+  background-image: none;
+}
+
+/* ---- Headings ---- */
+.slidev-layout h1 {
+  color: #FFFFFF;
+}
+.slidev-layout h2,
+.slidev-layout h3,
+.slidev-layout h4,
+.slidev-layout h5,
+.slidev-layout h6 {
+  color: #DFE1E5;
+}
+
+/* ---- Links / accents ---- */
+.slidev-layout a {
+  color: #3574F0;
+}
+
+/* ---- Inline code ---- */
+.slidev-layout :not(pre) > code {
+  color: #C8CDD6;
+  background-color: #2B2D30;
+  border-radius: 5px;
+  padding: 0.1em 0.35em;
+}
+
+/* ---- Code blocks = the "islands" ---- */
+.slidev-layout .slidev-code,
+.slidev-layout pre.shiki,
+.slidev-layout .shiki {
+  background-color: #1E1F22 !important;
+  border: 1px solid #393B40;
+  border-radius: 12px;
+  padding: 0.9em 1.1em;
+}
+
+/* Placeholder / card borders pick up the island border colour */
+.slidev-layout .border-dashed,
+.slidev-layout .border-2 {
+  border-color: #393B40 !important;
+}
+
+/* Blockquotes */
+.slidev-layout blockquote {
+  border-left-color: #3574F0;
+  color: #A9ABB2;
+}
