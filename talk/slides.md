@@ -671,16 +671,7 @@ layout: center
 class: text-center
 ---
 
-# So the brain has to live <b>on the phone</b>
-
-<v-click>
-
-<div class="pt-8 text-2xl opacity-90">
-Which raises a question…<br>
-<span class="text-3xl"><b>can you even run an LLM on a phone?</b></span>
-</div>
-
-</v-click>
+# Running an LLM locally
 
 <!--
 The bridge lands. The screen never leaves the device — that's the deal that makes the
@@ -693,27 +684,28 @@ And now the talk owes the audience an answer: yes — and here's how. Into LiteR
 
 # "Doesn't Android just… give you this?"
 
-<div class="pt-4 text-lg leading-relaxed">
-
-<v-clicks>
-
-- Sort of! Google is turning Android into an intelligent system — **Gemini Nano** and
-  on-device models, exposed to any app, **for free**
-- The catch: **gated**. Limited devices, and **quotas** on who calls it and how much
-  <span class="opacity-70">(your battery says thanks)</span>
-- Fine for *a feature*. Not for an app whose whole job is **hammering a vision model**
-
-</v-clicks>
-
-</div>
+<div class="pt-8 text-3xl leading-loose">
 
 <v-click>
 
-<div class="pt-8 text-center text-2xl">
-So: bring your own model. 💪
+- Sort of! Google is making an effort lately to provide these out of the box
+
+</v-click>
+
+<v-click>
+
+<div class="pt-12 font-bold">The catch:</div>
+
+<div class="pl-8 pt-4 text-2xl leading-loose">
+
+- **Gated** — limited devices, **quotas** on who calls it and how much
+- Not really suitable for an app whose whole job is **hammering a vision model**
+
 </div>
 
 </v-click>
+
+</div>
 
 <!--
 VERIFY BEFORE THE TALK: current AICore / Gemini Nano availability, device list, quota
