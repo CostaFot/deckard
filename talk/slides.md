@@ -137,7 +137,7 @@ That flag is the verdict. Deckard reads the screen, then something has to actual
 
 # AI is very good at detecting other AI
 
-<div class="pt-10 text-2xl leading-loose">
+<div class="pt-6 text-2xl leading-loose">
 
 <v-clicks>
 
@@ -147,6 +147,34 @@ That flag is the verdict. Deckard reads the screen, then something has to actual
 - …and it has an **API** we can use
 
 </v-clicks>
+
+</div>
+
+<div class="grid grid-cols-2 gap-4 pt-2 text-sm">
+
+<v-click>
+
+```bash
+# send the text
+curl https://text.external-api.pangram.com/task \
+  -H "x-api-key: $PANGRAM_API_KEY" \
+  -d '{ "text": "🚀 3 days. Zero regrets. …" }'
+# → { "task_id": "…" }
+```
+
+</v-click>
+
+<v-click>
+
+```bash
+# poll for the verdict
+curl https://text.external-api.pangram.com/task/$TASK_ID \
+  -H "x-api-key: $PANGRAM_API_KEY"
+
+# → { "stage": "STAGE_SUCCESS", "fraction_ai": 1.0 }
+```
+
+</v-click>
 
 </div>
 
@@ -164,6 +192,11 @@ fingerprint. No matter how hard you prompt a model to "write like a human" / "do
 like AI," it can't fully escape it — it's baked in by the nature of the training it went
 through. A detector trained on that signal picks it up even when a human can't. That's why
 this works at all.
+
+Last two clicks — the snippets: that's the entire integration. Left, one POST with the text
+(note the payload: the very post from the demo) returning a task id. Right, poll that id for
+the verdict — async because detection takes a few seconds. `fraction_ai: 1.0` is the 100% on
+the report card. In the app it's a two-method Retrofit interface (`net/PangramService.kt`).
 
 Seed for the descent: if there's a detector this good behind that badge, I can point it at
 anything I can read off the screen — which is the whole app. (That Deckard calls Pangram's
