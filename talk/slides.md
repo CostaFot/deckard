@@ -939,6 +939,45 @@ not a "works on Android" feature. Some floors software can't lift.
 
 ---
 
+# Asking it something
+
+<div class="big-code pt-2">
+
+```kotlin
+val conversation = engine.createConversation()
+val reply = conversation.sendMessage(prompt, screenshot)
+```
+
+</div>
+
+<v-click>
+
+<div class="med-code pt-6">
+
+```kotlin
+val prompt = """
+    This is a screenshot of a social-media feed or article.
+    Find the one thing the user is reading and copy its body
+    text out, word for word. Leave out names, handles, buttons,
+    like counts, ads, and the mascot. Output only that text.
+""".trimIndent()
+```
+
+</div>
+
+</v-click>
+
+<!--
+The API is dead simple: open a conversation, hand it the screenshot AND the prompt, get a
+string back. The model is multimodal, so this one call is the whole OCR path.
+
+The prompt block is the payoff to show: no per-app code, no regex — the "which text matters"
+logic is a paragraph of English. The verbatim rule is load-bearing (rewriting would bias the
+detector toward "AI"), and yes, it literally has to be told to ignore Deckard's own face.
+-->
+
+---
+
 # The code that replaced the regex wall
 
 <div class="grid grid-cols-2 gap-4 pt-2">
