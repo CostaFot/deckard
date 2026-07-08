@@ -414,7 +414,7 @@ I'll just handle every app myself."
 
 <v-click>
 
-<div class="pt-4 opacity-80">One interface per app. What could go wrong?</div>
+<div class="pt-4 opacity-80">One interface per package name. What could go wrong?</div>
 
 <div class="pt-8">
 
@@ -632,14 +632,14 @@ reading text.
 layout: center
 ---
 
-# One problem.
+# Houston, we have a problem.
 
 <div class="pt-6 text-xl text-center leading-relaxed">
 
 <v-click>
 
-This thing sees <b>everything on your screen</b>.<br>
-<span class="opacity-80">Your bank. Your chats. Your email. Your questionable 2am searches.</span>
+This thing sees <b>everything on the screen</b>.<br>
+<span class="opacity-80">I don't know about you, but Google knows a bit too much about me already</span>
 
 </v-click>
 
