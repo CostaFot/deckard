@@ -857,7 +857,9 @@ of XML.
 
 ---
 
-# The hardest bug in the project: four lines of XML
+# Four lines of XML
+
+<div class="med-code pt-6">
 
 ```xml
 <!-- AndroidManifest.xml -->
@@ -867,22 +869,16 @@ of XML.
 <uses-native-library android:name="libedgetpu_litert.so" android:required="false" />
 ```
 
-<v-click>
-
-<div class="pt-4 text-lg leading-relaxed">
-
-**In plain words:** the GPU "driver" is a native library that ships **with the phone**,
-not with your app. Since Android 12, an app can only load native libraries it has
-**declared in its manifest**. Didn't declare → can't load → no GPU → CPU.
-
 </div>
 
-</v-click>
-
 <v-click>
 
-<div class="pt-4 text-center text-xl">
-Four lines. Two weeks. 🫠
+<div class="pt-12 text-2xl leading-relaxed space-y-6">
+
+<div>The GPU delegate is a native lib that lives <b>on the phone</b> — if you're lucky.</div>
+
+<div>Since Android 12, you can only <b>load</b> native libs you <b>declare</b> in the manifest.</div>
+
 </div>
 
 </v-click>
@@ -895,49 +891,65 @@ Keep it jargon-free on the slide. For the curious in Q&A: the GPU delegate runs 
 OpenCL, and Android 12's native-library lockdown means anything not on the app's declared
 list is invisible to dlopen at runtime. required="false" keeps the app installable on
 devices that don't have the library.
+
+How I actually found it (worth saying out loud): I did NOT reason this out from first
+principles. There was nothing to google — an opaque INTERNAL error and a silent CPU
+fallback. So I diffed against Google's own AI Edge Gallery app: the official sample runs
+the same Gemma on GPU, so what's different? Two things fell out of that diff — these four
+manifest lines, AND the litertlm 0.11.0 pin (0.12.0 regressed GPU for these builds). The
+meta-lesson beats the specific fix: when the platform hands you an opaque error, find the
+first-party sample that works and diff it.
 -->
 
 ---
 
-# The honest cost: there's a hardware floor
+# Why the old phone chokes
 
-<div class="pt-2 opacity-80">Same symptom — everything lands on the CPU. <b>Two</b> very different causes:</div>
-
-<div class="grid grid-cols-2 gap-6 pt-6">
+<div class="pt-4 text-2xl leading-relaxed">
+Before it writes a single word, the phone has to <b>load the entire 3 GB model</b> —
+into memory, and onto the GPU.
+</div>
 
 <v-click>
+
+<div class="mt-10 grid grid-cols-2 gap-6" style="max-width: 46rem; margin-inline:auto">
+
 <div class="border-2 rounded-xl p-5">
-  <div class="text-xl font-bold">Your fault 🔧</div>
-  <div class="pt-2 opacity-80">Missing <code>&lt;uses-native-library&gt;</code> lines.</div>
-  <div class="pt-2 text-green-500 font-bold">Fixable — four lines of XML.</div>
+  <div class="text-xl font-bold">Not enough RAM 🧠</div>
+  <div class="pt-2 opacity-80">A 3 GB model doesn't fit on a phone with 4 GB total. It gets killed before it starts.</div>
 </div>
+
+<div class="border-2 rounded-xl p-5">
+  <div class="text-xl font-bold">GPU can't take it 🎮</div>
+  <div class="pt-2 opacity-80">No usable GPU → the <code>INTERNAL</code> error → crawls on the CPU instead.</div>
+</div>
+
+</div>
+
 </v-click>
 
 <v-click>
-<div class="border-2 rounded-xl p-5">
-  <div class="text-xl font-bold">The phone's fault 📱</div>
-  <div class="pt-2 opacity-80">A ~2-year-old device: no usable GPU delegate. Falls to CPU with a <i>perfect</i> manifest.</div>
-  <div class="pt-2 text-red-500 font-bold">Not fixable. A 3 GB model on CPU is a paperweight.</div>
-</div>
-</v-click>
 
-</div>
-
-<v-click>
-
-<div class="pt-8 text-center text-xl leading-relaxed">
-The a11y tree was fragile across <b>apps</b>. The model is fragile across <b>devices</b>.<br>
-<span class="text-2xl">I traded app-fragility for device-fragility — and for this problem, that's the right trade.</span>
+<div class="pt-10 text-center text-2xl">
+It falls at the <b>first hurdle</b> — loading. No code fixes that. 👵📱
 </div>
 
 </v-click>
 
 <!--
-Be honest here — it's the counterweight to all the enthusiasm: an on-device LLM is a
-"works on a recent flagship" feature, not a "works on Android" feature.
+This matches the symptom I actually hit: it chokes at engine.initialize(), before any text
+is generated. Two ways loading fails on an old device:
+- Capacity: the whole model has to be resident in RAM. A 3 GB model on a 4 GB phone doesn't
+  fit alongside Android + the app — OOM-killed or thrashing.
+- GPU: init uploads all the weights to the GPU. A weak/unsupported GPU fails here (the
+  INTERNAL error) and silently falls back to CPU, which is unusably slow.
 
-The synthesis line is the intellectual summary of the entire middle of the talk. Land it
-slowly.
+Deeper "why it's also slow once loaded" (Q&A): generation is memory-bandwidth-bound — every
+token re-reads all the weights — so throughput ≈ bandwidth ÷ model size. But an old phone
+usually never gets that far; it dies at loading.
+
+The honest counterweight to the enthusiasm: an on-device LLM is a "recent flagship" feature,
+not a "works on Android" feature. Some floors software can't lift.
 -->
 
 ---

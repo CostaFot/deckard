@@ -74,6 +74,15 @@
   line-height: 1.6 !important;
 }
 
+/* Slightly smaller than big-code, for wide fences that must fit the width */
+.slidev-layout .med-code .slidev-code,
+.slidev-layout .med-code pre.shiki,
+.slidev-layout .med-code .shiki,
+.slidev-layout .med-code code {
+  font-size: 1rem !important;
+  line-height: 1.55 !important;
+}
+
 /* Placeholder / card borders pick up the island border colour */
 .slidev-layout .border-dashed,
 .slidev-layout .border-2 {
