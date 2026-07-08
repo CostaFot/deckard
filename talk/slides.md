@@ -615,7 +615,7 @@ val jpeg   = scaled.compress(JPEG, quality = 85)
 <v-click>
 
 <div class="pt-10 opacity-80 text-center">
-Feed the model a shrunken JPEG — a vision model's time is <b>expensive</b>.
+A vision model's time is <b>expensive</b>.
 </div>
 
 </v-click>
@@ -640,15 +640,13 @@ layout: center
 <v-click>
 
 This thing sees <b>everything on the screen</b>.<br>
-<span class="opacity-80">I don't know about you, but Google knows a bit too much about me already</span>
 
 </v-click>
 
 <v-click>
 
 <div class="pt-6">
-Now imagine shipping all of that, screen by screen,<br>
-to a remote LLM <b>owned by somebody else</b>. ☁️
+Now imagine shipping all of that to a remote LLM ⚠️
 </div>
 
 </v-click>
