@@ -365,14 +365,14 @@ We're getting <span class="underline">more</span> text than expected. 💢
 <div class="text-xs uppercase tracking-widest opacity-50 mb-2">the whole tweet card · one <code>contentDescription</code></div>
 
 <div class="border-2 rounded-xl p-5 text-xl leading-relaxed">
-<span class="opacity-40">bobby @bobby Verified. </span><span class="font-semibold rounded px-1 box-decoration-clone transition-colors duration-500" :class="$clicks >= 1 ? 'bg-green-400/30' : 'bg-transparent'">Clavicular ran into a frat leader at ASU and got brutally frame mogged by him👀😂</span><span class="opacity-40"> 14 replies. 92 reposts. 1,203 likes. 88,417 views. 3h</span>
+<span class="rounded px-1 box-decoration-clone transition-all duration-500" :class="$clicks >= 1 ? 'line-through decoration-red-400 decoration-2 opacity-70' : 'opacity-40'">bobby @bobby Verified. </span><span class="font-semibold rounded px-1 box-decoration-clone transition-colors duration-500" :class="$clicks >= 1 ? 'bg-green-400/50' : 'bg-transparent'">Clavicular ran into a frat leader at ASU and got brutally frame mogged by him👀😂</span><span class="rounded px-1 box-decoration-clone transition-all duration-500" :class="$clicks >= 1 ? 'line-through decoration-red-400 decoration-2 opacity-70' : 'opacity-40'"> 14 replies. 92 reposts. 1,203 likes. 88,417 views. 3h</span>
 </div>
 
 <v-click at="1">
 <div class="flex justify-between text-sm mt-3 px-1 opacity-70">
-  <span>← byline to strip</span>
-  <span class="text-green-500 font-semibold">the only bit you actually want</span>
-  <span>metrics + timestamp to strip →</span>
+  <span class="text-red-300 font-semibold">← byline to strip</span>
+  <span class="text-green-300 font-semibold">the only bit you actually want</span>
+  <span class="text-red-300 font-semibold">metrics + timestamp to strip →</span>
 </div>
 </v-click>
 

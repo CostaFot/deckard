@@ -17,7 +17,7 @@
 /* ---- Canvas ---- */
 .slidev-layout {
   background-color: #0F1114;
-  color: #BCBEC4;
+  color: #E6E8EC;
 }
 
 /* Cover / title slide: same canvas, no photo background. */
@@ -29,7 +29,10 @@
 
 /* ---- Headings ---- */
 .slidev-layout h1 {
-  color: #FFFFFF;
+  font-weight: 800 !important;
+  color: #6BA5FF !important;
+  background: none !important;
+  -webkit-text-fill-color: #6BA5FF !important;
 }
 .slidev-layout h2,
 .slidev-layout h3,
