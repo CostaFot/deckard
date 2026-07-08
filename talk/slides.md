@@ -1005,58 +1005,34 @@ it literally has to be told to ignore Deckard's own face.
 -->
 
 ---
+layout: center
+---
 
-# The code that replaced the regex wall
+# Remember what we were building?
 
-<div class="grid grid-cols-2 gap-4 pt-2">
-
-<div class="opacity-40 text-xs">
-
-```kotlin
-val TRAILING_METRICS = Regex(
-  "(?:\\s*[\\d,]+\\s+(?:repl(?:y|ies)|reposts?|…")
-val TRAILING_TIMESTAMP = Regex("\\s*\\d+\\s+\\w+\\s+ago…")
-val TRAILING_REPOST    = Regex("\\s*Reposted by .*$")
-val LEADING_BYLINE     = Regex("^.*?@\\w+\\b(?:\\s+Verif…")
-val QUOTE_LEAD         = Regex("^.*?Quoted\\.\\s+[^.\\n]…")
-val QUOTER_COMMENT     = Regex("@\\w+\\b(?:\\s+Verified)…")
-// × every app on Earth
-```
-
+<div class="mt-6 mx-auto flex items-center justify-center border-2 border-dashed rounded-xl opacity-70" style="width: 560px; height: 260px">
+  <div class="text-center px-8">
+    🎬 <b>PLACEHOLDER — the demo again, zoomed in</b><br>
+    <span class="text-sm">mascot + report card, close up. "Hey look — this works!"</span>
+  </div>
 </div>
 
 <v-click>
 
-<div class="border-2 rounded-xl p-4 text-sm leading-relaxed">
-
-*"Exactly **one** main piece of writing is what the user is reading — find it and copy out
-its body text, **word for word**.*
-
-*Do not summarize, paraphrase, shorten, correct, or translate.*
-
-*Leave everything else out: names, @handles, timestamps, buttons, like counts, ads,
-'Suggested for you', the keyboard…"*
-
-</div>
-
-</v-click>
-
-</div>
-
-<v-click>
-
-<div class="pt-6 text-center text-xl">
-It's not Kotlin. It's <b>a paragraph of English</b>. And it works on apps I've never seen. 🤯
+<div class="pt-6 text-center opacity-80">
+(There's even a third door: <b>share</b> any text from any app straight to Deckard —<br>
+share sheet → verdict. No screen reading involved at all.)
 </div>
 
 </v-click>
 
 <!--
-The hero slide of the whole LLM act. Left: the treadmill (greyed out, already suffered
-through). Right: the entire replacement.
+The audience has been in the engine room for ten minutes — resurface. This is the same
+hero demo, zoomed on the verdict.
 
-One prompt. Zero per-app code. The model does the "which text matters" reasoning — it
-UNDERSTANDS the screen layout; it doesn't just transcribe pixels.
+Then the turn into the second movement: "I've talked services, models, API calls. But
+everything you just SAW — the mascot, the bubble, the report card — is Compose. And
+here's the thing…"
 -->
 
 ---
@@ -1093,37 +1069,6 @@ a summarizer. Any rewriting biases Pangram toward "AI" — the whole pipeline de
 model resisting its own urge to be helpful.
 
 The demo GIF should be an app never handled in the a11y era — that's the proof.
--->
-
----
-layout: center
----
-
-# Remember what we were building?
-
-<div class="mt-6 mx-auto flex items-center justify-center border-2 border-dashed rounded-xl opacity-70" style="width: 560px; height: 260px">
-  <div class="text-center px-8">
-    🎬 <b>PLACEHOLDER — the demo again, zoomed in</b><br>
-    <span class="text-sm">mascot + report card, close up. "Hey look — this works!"</span>
-  </div>
-</div>
-
-<v-click>
-
-<div class="pt-6 text-center opacity-80">
-(There's even a third door: <b>share</b> any text from any app straight to Deckard —<br>
-share sheet → verdict. No screen reading involved at all.)
-</div>
-
-</v-click>
-
-<!--
-The audience has been in the engine room for ten minutes — resurface. This is the same
-hero demo, zoomed on the verdict.
-
-Then the turn into the second movement: "I've talked services, models, API calls. But
-everything you just SAW — the mascot, the bubble, the report card — is Compose. And
-here's the thing…"
 -->
 
 ---
