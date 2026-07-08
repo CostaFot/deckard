@@ -76,3 +76,24 @@
   border-left-color: #3574F0;
   color: #A9ABB2;
 }
+
+/* ---- Presenter notes: keep them legible against the dark UI ---- */
+.slidev-note,
+.slidev-note p,
+.slidev-note li {
+  color: #E6E8EC !important;
+  opacity: 1 !important;
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+.slidev-note strong,
+.slidev-note b {
+  color: #FFFFFF !important;
+}
+.slidev-note code {
+  color: #E8BF6A !important;
+  background-color: #2B2D30 !important;
+}
+.slidev-note a {
+  color: #6BA5FF !important;
+}
