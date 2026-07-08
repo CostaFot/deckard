@@ -903,38 +903,23 @@ first-party sample that works and diff it.
 
 ---
 
-# Why the old phone chokes
+# Old phones will still choke
 
-<div class="pt-4 text-2xl leading-relaxed">
-Before it writes a single word, the phone has to <b>load the entire 3 GB model</b> —
-into memory, and onto the GPU.
+<div class="pt-8 text-3xl leading-relaxed">
+Loading the entire <b>3 GB model</b> into memory, and onto the GPU requires a powerful phone
 </div>
 
-<v-click>
+<div class="mt-20 grid grid-cols-2 gap-12" style="max-width: 52rem; margin-inline:auto">
 
-<div class="mt-10 grid grid-cols-2 gap-6" style="max-width: 46rem; margin-inline:auto">
-
-<div class="border-2 rounded-xl p-5">
-  <div class="text-xl font-bold">Not enough RAM 🧠</div>
-  <div class="pt-2 opacity-80">A 3 GB model doesn't fit on a phone with 4 GB total. It gets killed before it starts.</div>
+<div class="border-2 rounded-xl p-10 text-center">
+  <div class="text-3xl font-bold">Not enough RAM</div>
 </div>
 
-<div class="border-2 rounded-xl p-5">
-  <div class="text-xl font-bold">GPU can't take it 🎮</div>
-  <div class="pt-2 opacity-80">No usable GPU → the <code>INTERNAL</code> error → crawls on the CPU instead.</div>
+<div class="border-2 rounded-xl p-10 text-center">
+  <div class="text-3xl font-bold">GPU can't take it 🫪</div>
 </div>
 
 </div>
-
-</v-click>
-
-<v-click>
-
-<div class="pt-10 text-center text-2xl">
-It falls at the <b>first hurdle</b> — loading. No code fixes that. 👵📱
-</div>
-
-</v-click>
 
 <!--
 This matches the symptom I actually hit: it chokes at engine.initialize(), before any text
