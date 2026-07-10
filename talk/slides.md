@@ -516,13 +516,13 @@ I'll just handle every app myself."
 
 ---
 
-# Let's write some Java from 1998
+# Let's write some Java 1998
+
+<div class="pt-2 opacity-80">One interface. One parser per app.</div>
 
 <v-click>
 
-<div class="pt-4 opacity-80">One interface per package name. What could go wrong?</div>
-
-<div class="pt-8">
+<div class="pt-10 big-code">
 
 ```kotlin
 interface ScreenContentExtractor {
@@ -535,11 +535,21 @@ interface ScreenContentExtractor {
 
 </v-click>
 
+<!--
+This looks GREAT in a design doc. Clean seam: one interface, one implementation per app.
+I was very proud of it.
+
+Say the title straight. Click the interface in — then hand off: "and then you just wire
+them all up." Next slide is the wiring.
+-->
+
+---
+
+# …then wire them all up
+
 <v-click>
 
-<div class="pt-4 opacity-80">Then wire them all up</div>
-
-<div class="pt-4">
+<div class="pt-10 big-code">
 
 ```kotlin
 class ScreenContentExtractors @Inject constructor(
@@ -556,8 +566,8 @@ class ScreenContentExtractors @Inject constructor(
 </v-click>
 
 <!--
-This looks GREAT in a design doc. Clean seam, Hilt multibinding, add an app = one class +
-one binding. I was very proud of it.
+The Hilt multibinding: add an app = one class + one @IntoSet binding, fall back to a generic
+extractor for the unknown app.
 
 Deadpan: "I was building a beautiful, extensible system… for hand-writing a parser for
 every app on Earth."
