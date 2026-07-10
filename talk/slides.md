@@ -673,17 +673,13 @@ layout: center
 class: text-center
 ---
 
-# Wait. Maybe an AI model can just… <i>look</i> at it?
+# Maybe an AI model can just… <i>look</i> at it
 
 <v-click>
 
-<div class="pt-6 text-xl opacity-90">
-Let's take a <b>screenshot</b> and let the model figure out what the relevant text is. <i>Itself.</i>
+<div class="pt-12 text-3xl leading-relaxed opacity-100">
+Let's take a <b>screenshot</b> and let the model figure out what the relevant text is
 </div>
-
-</v-click>
-
-<v-click>
 
 </v-click>
 
