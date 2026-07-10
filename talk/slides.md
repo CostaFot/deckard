@@ -116,6 +116,48 @@ these three frames works."
 -->
 
 ---
+layout: two-cols
+---
+
+<div class="h-full flex items-center justify-center pr-8">
+  <img src="./assets/start_post.png" class="rounded-xl shadow-lg" style="max-height: 400px" alt="A suspiciously inspirational LinkedIn post" />
+</div>
+
+::right::
+
+<div class="pl-4">
+
+# What this talk is about
+
+<div class="pt-6 text-xl leading-loose">
+
+<v-clicks>
+
+- AGI is coming and you dont need to read the code anymore
+- jk getting an LLM to help with a slightly non-deterministic problem
+- New-ish useful compose APIs and how to apply 
+
+</v-clicks>
+
+</div>
+
+</div>
+
+<div class="absolute bottom-6 left-0 right-0 text-center text-base">
+  <a href="https://github.com/costa/deckard">github.com/costa/deckard</a>
+</div>
+
+<!--
+The roadmap beat, right after the demo proves the product — modelled on Zac's "SLIDES"
+preamble slide (image left, agenda right, link at the bottom). Say it plainly: the detector
+is the excuse, not the subject. Two takeaways, and they're the contract — every remaining
+slide serves one of them. Pillar 1 = on-device Gemma via LiteRT-LM (+ the accessibility
+angle). Pillar 2 = the new Compose/Lifecycle APIs restoring Fragment-style drop-in
+encapsulation. Last bullet sets the optimistic frame: not "everything betrayed me," but
+"this got easier." Then straight into the Pangram detour.
+-->
+
+---
 layout: center
 class: text-center
 ---
@@ -313,7 +355,7 @@ Say the title straight, then click the meme in for the punchline.
 
 <div class="pt-6 opacity-80">Android hands you the whole UI tree — just walk it.</div>
 
-<div class="mt-8">
+<div class="mt-8 big-code">
 
 ```kotlin
 class DeckardAccessibilityService : AccessibilityService() {
