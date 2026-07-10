@@ -577,6 +577,8 @@ every app on Earth."
 
 # The reality: Regex wars
 
+<div class="pt-8">
+
 ```kotlin
 /** "… 2 replies.  3 reposts.  34 likes.  2569 verified views." */
 val TRAILING_METRICS = Regex(
@@ -592,6 +594,8 @@ val LEADING_BYLINE = Regex("^.*?@\\w+\\b(?:\\s+Verified)?\\.\\s*")
 val QUOTE_LEAD     = Regex("^.*?Quoted\\.\\s+[^.\\n]*?@\\w+\\b(?:\\s+Verified)?\\.\\s+")
 val QUOTER_COMMENT = Regex("@\\w+\\b(?:\\s+Verified)?\\.\\s+Added\\s+(.+)$")
 ```
+
+</div>
 
 <!--
 This slide is allowed to hurt — that's the point. Let it sit for a moment before the gags.
