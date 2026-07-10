@@ -395,8 +395,8 @@ readers use. Every view, its text, its bounds. It's RIGHT THERE.
 <div class="col-span-2 text-lg leading-relaxed">
 
 <ul class="list-disc pl-5 space-y-5">
-  <li v-click="1">You need an <b><code>AccessibilityService</code></b> — be honest, have <i>you</i> ever written one?</li>
-  <li v-click="2">Two of the <b>scariest permissions</b> on the platform:</li>
+  <li v-click="1">You need an <b><code>AccessibilityService</code></b></li>
+  <li v-click="2">Two <b>scary permissions</b>:</li>
   <li v-click="3" class="ml-6"><b>Accessibility</b> — <i>observe your actions · read window content · perform gestures · take screenshots</i> ⚠️</li>
   <li v-click="4" class="ml-6"><b>Display over other apps</b> (<code>SYSTEM_ALERT_WINDOW</code>)</li>
 </ul>
