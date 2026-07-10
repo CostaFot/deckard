@@ -463,23 +463,19 @@ We're getting <span class="underline">more</span> text than expected. 💢
 
 ---
 
-# WTF #2: Twitter
+# WTF #2: Twitter/X
 
-<div class="pt-2 opacity-80">On the timeline, a tweet exposes <b>no per-element text at all</b> — the entire card is <b>one string</b>.</div>
+<div class="pt-2 text-lg opacity-80">On the timeline, the entire card is <b>one contentDescription</b>.</div>
 
-<div class="mt-8 mx-auto" style="max-width: 52rem">
+<div class="mt-8 mx-auto" style="max-width: 58rem">
 
-<div class="text-xs uppercase tracking-widest opacity-50 mb-2">the whole tweet card · one <code>contentDescription</code></div>
-
-<div class="border-2 rounded-xl p-5 text-xl leading-relaxed">
+<div class="border-2 rounded-xl p-6 text-2xl leading-relaxed">
 <span class="rounded px-1 box-decoration-clone transition-all duration-500" :class="$clicks >= 1 ? 'line-through decoration-red-400 decoration-2 opacity-70' : 'opacity-40'">bobby @bobby Verified. </span><span class="font-semibold rounded px-1 box-decoration-clone transition-colors duration-500" :class="$clicks >= 1 ? 'bg-green-400/50' : 'bg-transparent'">Clavicular ran into a frat leader at ASU and got brutally frame mogged by him👀😂</span><span class="rounded px-1 box-decoration-clone transition-all duration-500" :class="$clicks >= 1 ? 'line-through decoration-red-400 decoration-2 opacity-70' : 'opacity-40'"> 14 replies. 92 reposts. 1,203 likes. 88,417 views. 3h</span>
 </div>
 
 <v-click at="1">
-<div class="flex justify-between text-sm mt-3 px-1 opacity-70">
-  <span class="text-red-300 font-semibold">← byline to strip</span>
+<div class="flex justify-between text-base mt-3 px-1 opacity-70">
   <span class="text-green-300 font-semibold">the only bit you actually want</span>
-  <span class="text-red-300 font-semibold">metrics + timestamp to strip →</span>
 </div>
 </v-click>
 
@@ -487,8 +483,10 @@ We're getting <span class="underline">more</span> text than expected. 💢
 
 <v-click at="2">
 
-<div class="pt-8 text-center text-xl">
-No child node holds just the body. To get it out… you have to hammer it away with regex. 🫠
+<div class="pt-10 mx-auto text-2xl leading-relaxed" style="max-width: 48rem">
+
+- The solution? Hammer it away with regex 🫠
+
 </div>
 
 </v-click>
