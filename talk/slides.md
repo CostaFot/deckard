@@ -609,14 +609,14 @@ fix reveals a new special case."
 
 <div class="pt-16">
 
-# That was <span v-mark.red="0">one</span> app not even done well
+# That was <span v-mark.red="0">one</span> app, not even done well
 
-<div class="pt-6 text-xl text-center leading-relaxed">
+<div class="pt-10 text-3xl text-center leading-loose">
 
 <v-clicks at="1">
 
-- Reddit? The browser? <b>Every app you've never seen?</b>
-- Obviously this isn't scalable — so let's <b>pivot</b>.
+- What about Reddit/Medium/Chrome/AnyOtherApp? 
+- Obviously this isn't scalable 🙃
 
 </v-clicks>
 
@@ -645,7 +645,7 @@ There is no way to handle everything for every app. Full stop.
 <v-click>
 
 <div class="pt-6 text-2xl leading-relaxed">
-and that same tree is how they'll <b>read and drive every app</b>?
+and that same accesibility tree grows even more important?
 </div>
 
 <div class="pt-10 flex items-center gap-8 opacity-80">
@@ -653,14 +653,6 @@ and that same tree is how they'll <b>read and drive every app</b>?
   <img src="./assets/gemini_logo.png" class="rounded-lg" style="height: 44px" alt="Gemini" />
   <img src="./assets/claude_computer_use.png" class="rounded-lg" style="height: 44px" alt="Claude computer use" />
   <img src="./assets/siri.jpg" class="rounded-lg" style="height: 44px" alt="Siri" />
-</div>
-
-</v-click>
-
-<v-click>
-
-<div class="pt-10 text-3xl opacity-90">
-Reading the view tree might matter <b>a lot more in the future</b>
 </div>
 
 </v-click>
