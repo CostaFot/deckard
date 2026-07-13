@@ -1305,21 +1305,17 @@ never small.
 
 <div class="grid grid-cols-2 gap-8 pt-4 items-center">
 
-<div class="flex items-center justify-center border-2 border-dashed rounded-xl opacity-70" style="height: 320px">
-  <div class="text-center px-6">
-    🖼️ <b>PLACEHOLDER</b><br>
-    <span class="text-sm">zoomed into one component of the busy screen</span>
-  </div>
+<div class="flex items-center justify-center">
+  <img src="./assets/menu_default_screen.jpg" class="rounded-xl shadow-lg" style="max-height: 440px" alt="A busy restaurant menu screen — header, offers carousel, popular items, categories" />
 </div>
 
 <div class="text-lg leading-relaxed">
 
 <v-clicks>
 
-- You're asked to change **one small component** in there
-- In Compose that means: the **hundred-parameter composable** 😰
 - Thread your state, callbacks, and dependencies through **everything above it**…
 - …and break a hundred call sites on the way
+- and 100 screenshots and UI tests
 
 </v-clicks>
 
@@ -1348,29 +1344,19 @@ the host's owners, so everything gets threaded from the top.
 
 # What we actually want
 
-<div class="pt-4 text-xl leading-relaxed mx-auto" style="max-width: 36rem">
+<div class="pt-8 text-3xl leading-loose mx-auto" style="max-width: 40rem">
 
 A composable that:
 
 <v-clicks>
 
 - **makes its own dependencies** 🏗️
-- **owns its own ViewModel** — scoped *exactly to the composition*
-- survives **recomposition and rotation**
-- and **cleans up after itself** when it leaves 🧹
+- **owns its own ViewModel** — scoped to the composition
+- survives configuration changes
 
 </v-clicks>
 
 </div>
-
-<v-click>
-
-<div class="pt-8 text-center opacity-80 text-lg">
-Scoping a ViewModel used to be the <i>navigation library's</i> job — or an Activity's.<br>
-<b>Not anymore.</b> Two (new-ish) APIs:
-</div>
-
-</v-click>
 
 <!--
 Name the problem precisely before showing APIs: scoping + DI + cleanup, all local to the
