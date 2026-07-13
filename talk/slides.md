@@ -250,7 +250,7 @@ layout: center
 class: text-center
 ---
 
-# What do I want?
+# What do we want?
 
 <v-click>
 
@@ -263,7 +263,7 @@ That exact functionality — <b>but not just in Chrome.</b><br>
 <v-click>
 
 <div class="pt-10 text-4xl font-bold">
-Every app. System-wide, on my phone. 📱
+Every app. System-wide, on a phone. 📱
 </div>
 
 </v-click>
@@ -832,7 +832,7 @@ The point survives any update: the platform path is rationed; BYO gives you full
 **1.** Grab a model off Hugging Face — **Gemma 4** for example!
 
 <div class="flex items-center justify-center pt-4">
-  <img src="./assets/download_gemma_huggingface.png" class="rounded-xl shadow-lg border" style="max-height: 180px" alt="Hugging Face model card for google/gemma-4-E4B" />
+  <img src="./assets/download_gemma_4_huggingface.png" class="rounded-xl shadow-lg border" style="max-height: 180px" alt="Hugging Face model card for litert-community/gemma-4-E4B-it-litert-lm" />
 </div>
 
 </v-click>
@@ -846,7 +846,7 @@ The point survives any update: the platform path is rationed; BYO gives you full
 <div class="big-code">
 
 ```bash
-adb push gemma-3n.litertlm /sdcard/Android/data/<pkg>/files/models/
+adb push gemma-4-E4B-it.litertlm /sdcard/Android/data/<pkg>/files/models/
 ```
 
 </div>
