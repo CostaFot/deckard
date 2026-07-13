@@ -1155,30 +1155,32 @@ apps the a11y extractors can't parse.
 
 ---
 
-# It *understands* the screen — it doesn't just OCR it
+# Not just OCR
 
-<div class="pt-2 text-lg leading-relaxed">
+<div class="grid grid-cols-2 gap-10 pt-10 text-2xl leading-loose">
+
+<div>
+
+<div class="text-emerald-400 font-bold pb-4">👍 The good</div>
 
 <v-clicks>
 
-- The model **picks the post out of the noise itself** — layout comprehension, not
-  transcription. <span class="opacity-70">This is *recent* — you couldn't trust a local model with this a year ago.</span>
-- **The verbatim rule is load-bearing:** if the model rewrites the text even slightly, it
-  hands the detector *AI-written* text — and poisons the verdict ☠️
-- The prompt literally tells it to **ignore the floating mascot** — Deckard must be
-  instructed not to judge his own face 🧙
-- And there's a `clean()` function because the model *insists* on wrapping answers in
-  quotation marks. Peak LLM-era engineering.
+- **Finds the post itself** — strips out the noise
+- **Verbatim** — no rewriting ☠️
 
 </v-clicks>
 
 </div>
 
-<div class="mt-4 flex items-center justify-center border-2 border-dashed rounded-xl opacity-70" style="height: 120px">
-  <div class="text-center px-6">
-    🎬 <b>PLACEHOLDER</b> — long-press demo: the model isolates the post on an app
-    with <b>no extractor written for it</b>
-  </div>
+<div v-click>
+
+<div class="text-rose-400 font-bold pb-4">👎 The bad</div>
+
+- Not 100% — can grab the **wrong** text occasionally
+- Not instant
+
+</div>
+
 </div>
 
 <!--
