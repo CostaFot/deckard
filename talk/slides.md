@@ -1227,7 +1227,7 @@ layout: center
 <v-click>
 
 <div class="pt-4 text-xl text-center opacity-90 leading-relaxed">
-Turns out an Activity is just <b>three registries in a trench coat</b>: 🥸
+Turns out an Activity is just <b>three services in a trench coat</b>: 🥸
 </div>
 
 </v-click>
@@ -1240,8 +1240,20 @@ Turns out an Activity is just <b>three registries in a trench coat</b>: 🥸
   <div class="border-2 rounded-xl px-4 py-3 font-mono text-sm">SavedStateRegistryOwner</div>
 </div>
 
-<div class="pt-6 text-xl text-center">
-Hand Compose those three, and it runs <b>anywhere</b>.
+</v-click>
+
+<v-click>
+
+<div class="pt-6 med-code mx-auto" style="max-width: 46rem">
+
+```kotlin
+private fun attachOwners(view: View) {
+    view.setViewTreeLifecycleOwner(this)
+    view.setViewTreeViewModelStoreOwner(this)
+    view.setViewTreeSavedStateRegistryOwner(this)
+}
+```
+
 </div>
 
 </v-click>
@@ -1251,9 +1263,9 @@ Short and simple: Compose doesn't need an Activity — it needs these THREE thin
 an Activity normally provides invisibly. Supply them yourself and Compose runs anywhere:
 a Service, an IME, an overlay.
 
-One beat only — do NOT descend into overlay plumbing. The Service implements the three
-owner interfaces and sets them as view-tree owners; that's the whole story, and it's in
-the repo for anyone curious.
+One beat only — don't descend into overlay plumbing. The whole story is on the slide: the
+Service itself implements the three owner interfaces, and `attachOwners` sets it as each
+view's view-tree owner — that's what makes Compose feel at home. The rest is in the repo.
 
 The room doesn't build overlays. The next slide is about the screen they maintain at
 work.
@@ -1287,8 +1299,8 @@ Next slide zooms in and states the ask.
 - **God ViewModel(s)**
 - 100 API calls
 - 50 features
-- A **100-parameter "root" composable** 😵‍💫
 - **10 people** working on it
+- .. and the 3 different teams trying to catch the next release
 
 </v-clicks>
 
@@ -1331,7 +1343,7 @@ never small.
 
 ---
 
-# Now change one small thing
+# Now change one thing
 
 <div class="grid grid-cols-2 gap-8 pt-4 items-center">
 
@@ -1339,13 +1351,13 @@ never small.
   <img src="./assets/menu_default_screen.jpg" class="rounded-xl shadow-lg" style="max-height: 440px" alt="A busy restaurant menu screen — header, offers carousel, popular items, categories" />
 </div>
 
-<div class="text-lg leading-relaxed">
+<div class="text-2xl leading-loose">
 
 <v-clicks>
 
 - Thread your state, callbacks, and dependencies through **everything above it**…
-- …and break a hundred call sites on the way
-- and 100 screenshots and UI tests
+- Break a hundred call sites on the way
+- ...and 100 screenshots and UI tests
 
 </v-clicks>
 
@@ -1355,7 +1367,7 @@ never small.
 
 <v-click>
 
-<div class="pt-6 text-center text-xl">
+<div class="pt-8 text-center text-3xl">
 A composable is <b>really hard to make independent</b> on a busy screen.
 </div>
 
