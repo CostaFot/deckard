@@ -1199,24 +1199,16 @@ layout: center
 
 <div class="pt-4 text-xl mx-auto text-left" style="max-width: 20rem">
 
-<v-clicks>
-
 - pure **Compose** UI
 - **ViewModels**
-- **repositories**, API calls
-- **DI** everywhere
-
-</v-clicks>
+- **Repositories**
+- **DI** (dagger) everywhere
 
 </div>
-
-<v-click>
 
 <div class="pt-8 text-3xl text-center">
-And there is <b>no Activity anywhere</b>. 😳
+And there is <b>no Activity anywhere</b>. 🫠
 </div>
-
-</v-click>
 
 <!--
 The whole boring stack, one piece per click.
@@ -1230,7 +1222,7 @@ place where NONE of the usual machinery exists.
 layout: center
 ---
 
-# How did I even go about this?
+# How?
 
 <v-click>
 
@@ -1249,15 +1241,7 @@ Turns out an Activity is just <b>three registries in a trench coat</b>: 🥸
 </div>
 
 <div class="pt-6 text-xl text-center">
-Hand Compose those three, and it runs <b>anywhere</b>. So I became them.
-</div>
-
-</v-click>
-
-<v-click>
-
-<div class="pt-8 text-xl text-center">
-But that's <i>my</i> weird problem. Here's the part that's <b>yours</b>…
+Hand Compose those three, and it runs <b>anywhere</b>.
 </div>
 
 </v-click>
@@ -1277,7 +1261,7 @@ work.
 
 ---
 
-# Your problem: the very busy screen
+# What's in it for me?
 
 <div class="grid grid-cols-2 gap-8 pt-4">
 
