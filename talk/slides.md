@@ -910,31 +910,15 @@ Two design points worth saying out loud:
 layout: center
 ---
 
-# First run: it worked! 🎉
-
-<div class="grid grid-cols-2 gap-8 mt-6 items-center">
-
-<div class="text-left">
+# First run: everything worked! 
 
 <v-click>
 
-<div class="text-2xl">
-…but it was so <b>slow</b>. 🐌
+<div class="text-5xl text-center mt-16 leading-relaxed">
+…but it was so <b>slow</b>. 😡
 </div>
 
 </v-click>
-
-</div>
-
-<div class="flex items-center justify-center border-2 border-dashed rounded-xl opacity-70" style="height: 280px">
-  <div class="text-center px-6">
-    🎬 <b>PLACEHOLDER</b><br>
-    <span class="text-sm">screen recording of the CPU run — Deckard thinking…
-    and thinking… one word at a time</span>
-  </div>
-</div>
-
-</div>
 
 <!--
 Spend a beat here. It "worked" — that's the trap. A summon took the better part of a
@@ -1115,23 +1099,23 @@ it literally has to be told to ignore Deckard's own face.
 layout: center
 ---
 
-# Remember what we were building?
+# Throwback 📼
 
-<div class="mt-6 mx-auto flex items-center justify-center border-2 border-dashed rounded-xl opacity-70" style="width: 560px; height: 260px">
-  <div class="text-center px-8">
-    🎬 <b>PLACEHOLDER — the demo again, zoomed in</b><br>
-    <span class="text-sm">mascot + report card, close up. "Hey look — this works!"</span>
-  </div>
+<div class="grid grid-cols-3 gap-8 items-center justify-items-center mt-4">
+
+<div class="flex items-center justify-center">
+  <img src="./assets/demo_fast.gif" class="rounded-xl shadow-lg" style="max-height: 420px" alt="Demo again: summoning Deckard over a LinkedIn post and getting the AI-slop verdict" />
 </div>
 
-<v-click>
-
-<div class="pt-6 text-center opacity-80">
-(There's even a third door: <b>share</b> any text from any app straight to Deckard —<br>
-share sheet → verdict. No screen reading involved at all.)
+<div v-click class="flex items-center justify-center">
+  <img src="./assets/human_written.jpg" class="rounded-xl shadow-lg" style="max-height: 420px" alt="Deckard's verdict on a real human-written post: 100% Human Written, confidence high" />
 </div>
 
-</v-click>
+<div v-click class="flex items-center justify-center">
+  <img src="./assets/robot_written.png" class="rounded-xl shadow-lg" style="max-height: 420px" alt="Deckard's verdict on an AI-generated post: AI-written, confidence high" />
+</div>
+
+</div>
 
 <!--
 The audience has been in the engine room for ten minutes — resurface. This is the same
@@ -1140,6 +1124,33 @@ hero demo, zoomed on the verdict.
 Then the turn into the second movement: "I've talked services, models, API calls. But
 everything you just SAW — the mascot, the bubble, the report card — is Compose. And
 here's the thing…"
+-->
+
+---
+layout: center
+---
+
+# The third door: just share it
+
+<div class="grid grid-cols-2 gap-12 items-center justify-items-center mt-4">
+
+<figure class="text-center m-0">
+  <img src="./assets/select_text.jpg" class="rounded-xl shadow-lg" style="max-height: 430px" alt="Selecting text in a LinkedIn post — the selection toolbar shows AI writing, Copy, Share" />
+  <figcaption class="mt-3 text-sm opacity-70">Select any text · tap <b>Share</b></figcaption>
+</figure>
+
+<figure v-click class="text-center m-0">
+  <img src="./assets/share_improved.jpg" class="rounded-xl shadow-lg" style="max-height: 430px" alt="The Android share sheet with the 'Judge with Deckard' target circled" />
+  <figcaption class="mt-3 text-sm opacity-70">…<b>Judge with app</b></figcaption>
+</figure>
+
+</div>
+
+<!--
+The third summon path, no screen reading at all: highlight text in any app, hit the system
+share sheet, pick "Judge with Deckard" — text goes straight to the verdict. Free with a
+`ShareTextActivity` + an intent filter; Android does the plumbing. Good fallback for the
+apps the a11y extractors can't parse.
 -->
 
 ---
