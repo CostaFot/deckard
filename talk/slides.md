@@ -1278,7 +1278,9 @@ Next slide zooms in and states the ask.
 
 # Busy screens
 
-<div class="pt-10 text-3xl leading-loose mx-auto" style="max-width: 34rem">
+<div class="grid grid-cols-2 gap-8 pt-6 items-center">
+
+<div class="text-2xl leading-loose">
 
 <v-clicks>
 
@@ -1289,6 +1291,34 @@ Next slide zooms in and states the ask.
 - **10 people** working on it
 
 </v-clicks>
+
+</div>
+
+<div class="text-xs" style="max-height: 440px; overflow: hidden">
+
+```kotlin
+@Composable
+fun MenuScreen(
+    restaurant: Restaurant,
+    offers: List<Offer>,
+    popularItems: List<MenuItem>,
+    categories: List<Category>,
+    basket: Basket,
+    deliveryEta: Eta,
+    isGroupOrder: Boolean,
+    onItemClick: (MenuItem) -> Unit,
+    onAddToBasket: (MenuItem) -> Unit,
+    onOfferClick: (Offer) -> Unit,
+    onCategoryClick: (Category) -> Unit,
+    onSearchClick: () -> Unit,
+    onGroupOrderClick: () -> Unit,
+    onBasketClick: () -> Unit,
+    onBack: () -> Unit,
+    // …90 more
+) { /* … */ }
+```
+
+</div>
 
 </div>
 
