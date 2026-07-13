@@ -1263,13 +1263,52 @@ work.
 
 # What's in it for me?
 
-<div class="grid grid-cols-2 gap-8 pt-4">
+<div class="flex justify-center items-center gap-10 mt-6">
+  <img src="./assets/serp_default_screen.jpg" class="rounded-xl shadow-lg" style="max-height: 440px" alt="A busy food-delivery home screen — popular brands, promos, lunch carousel" />
+  <img src="./assets/menu_default_screen.jpg" class="rounded-xl shadow-lg" style="max-height: 440px" alt="A busy restaurant menu screen — header, offers carousel, popular items, categories" />
+</div>
 
-<div class="flex items-center justify-center border-2 border-dashed rounded-xl opacity-70" style="height: 300px">
+<!--
+These are real production screens I work on (the JET app). Let the room look — everyone
+maintains something this dense. No talking points yet; just "look how much is on here."
+Next slide zooms in and states the ask.
+-->
+
+---
+
+# Busy screens
+
+<div class="pt-10 text-3xl leading-loose mx-auto" style="max-width: 34rem">
+
+<v-clicks>
+
+- **God ViewModel(s)**
+- 100 API calls
+- 50 features
+- A **100-parameter "root" composable** 😵‍💫
+- **10 people** working on it
+
+</v-clicks>
+
+</div>
+
+<!--
+Set the scene before the ask. These screens aren't dense by accident — they're the seam
+where the whole org meets. One God ViewModel, a composable with a hundred params, ten
+people, five features, all in the same file. That's why changing "one small thing" is
+never small.
+-->
+
+---
+
+# Now change one small thing
+
+<div class="grid grid-cols-2 gap-8 pt-4 items-center">
+
+<div class="flex items-center justify-center border-2 border-dashed rounded-xl opacity-70" style="height: 320px">
   <div class="text-center px-6">
     🖼️ <b>PLACEHOLDER</b><br>
-    <span class="text-sm">a genuinely busy production screen —
-    Just Eat Takeaway home screen</span>
+    <span class="text-sm">zoomed into one component of the busy screen</span>
   </div>
 </div>
 
