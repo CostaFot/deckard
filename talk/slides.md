@@ -1302,6 +1302,7 @@ trailer; the real signature is the movie. Then the bullets, one per click (3–7
 - Thread your state, callbacks, and dependencies through **everything above it**
 - Break a hundred call sites on the way
 - …and 100 screenshots and UI tests
+- don't get me started on default parameters
 
 </v-clicks>
 
@@ -1324,7 +1325,7 @@ the host's owners, so everything gets threaded from the top.
 <!-- Slide 37 -->
 
 <div class="pt-1 text-lg opacity-80">
-First: a composable that <b>keeps its own state</b>, surviving rotation.
+First: a composable that <b>keeps its own state</b>
 </div>
 
 <v-click>
