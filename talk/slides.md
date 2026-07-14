@@ -114,6 +114,9 @@ layout: center
 </div>
 
 <!--
+SKIPPABLE ON STAGE: if the GIF already landed (room reacted, verdict was readable), jump
+straight past this one — it's insurance, not a beat of its own.
+
 The slow-motion replay of the GIF, one beat per click. Panel 1: the specimen, mid-doomscroll.
 Click — panel 2: swipe from the left edge, the wizard reads the screen (a11y tree, milliseconds).
 Click — panel 3: the report card. 100%, confidence high. "The rest of the talk is how each of
@@ -754,45 +757,15 @@ And now the talk owes the audience an answer: yes — and here's how. Into LiteR
 
 ---
 
-# "Doesn't Android just… give you this?"
+# Bring your own brain
 <!-- Slide 25 -->
 
-<div class="pt-8 text-3xl leading-loose">
-
-<v-click>
-
-- Sort of! Google is giving it a go
-
-</v-click>
-
-<v-click>
-
-<div class="pt-12 font-bold">The catch:</div>
-
-<div class="pl-8 pt-4 text-2xl leading-loose">
-
-- **Gated** — limited devices, **quotas** on who calls it and how much
-- ... where's the fun in that?
-
+<div class="pt-2 text-lg opacity-80">
+"Doesn't Android just… give you this?" — sort of (<b>Gemini Nano</b>), but it's
+<b>gated</b> and <b>quota'd</b>. Where's the fun in that?
 </div>
 
-</v-click>
-
-</div>
-
-<!--
-VERIFY BEFORE THE TALK: current AICore / Gemini Nano availability, device list, quota
-specifics, API names — this area moves fast. Don't quote stale details on stage.
-
-The point survives any update: the platform path is rationed; BYO gives you full control.
--->
-
----
-
-# Modelling
-<!-- Slide 26 -->
-
-<div class="text-lg leading-relaxed pt-4">
+<div class="text-lg leading-relaxed pt-2">
 
 <v-click>
 
@@ -825,6 +798,13 @@ adb push gemma-4-E4B-it.litertlm /sdcard/Android/data/<pkg>/files/models/
 </div>
 
 <!--
+The opening line is the old "Doesn't Android just give you this?" slide, compressed:
+Gemini Nano / AICore exists, but it's device-gated and quota'd — fine for a feature,
+useless for an app whose whole job is hammering a vision model. So: BYO.
+VERIFY BEFORE THE TALK if you elaborate beyond the on-slide line: current AICore / Gemini
+Nano availability, device list, quota specifics — this area moves fast. The on-slide
+wording ("gated and quota'd") is deliberately general so it can't go stale.
+
 Get the "you're not seriously shipping over adb" question out of the way before anyone
 asks it — Play Asset Delivery / Play's on-device AI delivery is the production path.
 
