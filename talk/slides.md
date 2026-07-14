@@ -104,7 +104,7 @@ layout: center
   <div v-click="1" class="text-3xl opacity-40 pb-8">→</div>
   <figure v-click="1" class="text-center m-0">
     <img src="./assets/summon_in_progress.png" class="rounded-xl shadow-lg" style="max-height: 370px" alt="Deckard summoned over the post, thinking" />
-    <figcaption class="mt-3 text-sm opacity-70">Investigating..</figcaption>
+    <figcaption class="mt-3 text-sm opacity-70">Investigating…</figcaption>
   </figure>
   <div v-click="2" class="text-3xl opacity-40 pb-8">→</div>
   <figure v-click="2" class="text-center m-0">
@@ -149,7 +149,7 @@ layout: two-cols
 <v-clicks at="3">
 
 - Getting an LLM to help with a slightly non-deterministic problem
-- New-ish useful compose APIs and how to apply 
+- New-ish useful Compose APIs — and how to apply them
 
 </v-clicks>
 
@@ -607,7 +607,7 @@ There is no way to handle everything for every app. Full stop.
 ---
 ---
 
-# What if..
+# What if…
 <!-- Slide 20 -->
 
 <div class="pt-8 text-2xl leading-relaxed">
@@ -944,25 +944,14 @@ first-party sample that works and diff it.
 
 <!-- Slide 31 -->
 
-<h1 class="flex items-center gap-3 m-0">
-  <span>Old phones will still choke</span>
-  <img src="./assets/peepoFine.gif" class="rounded-lg shadow-lg" style="height: 1.2em" alt="Peepo sweating — this is fine" />
-</h1>
+# Old phones will still choke
 
 <div class="pt-8 text-3xl leading-relaxed">
-Loading the entire <b>3 GB model</b> into memory, and onto the GPU requires a powerful phone
+Loading the entire <b>3 GB model</b> into memory — and onto the GPU — takes a powerful phone
 </div>
 
-<div class="mt-20 grid grid-cols-2 gap-12" style="max-width: 52rem; margin-inline:auto">
-
-<div class="border-2 rounded-xl p-10 text-center">
-  <div class="text-3xl font-bold">Not enough RAM</div>
-</div>
-
-<div class="border-2 rounded-xl p-10 text-center">
-  <div class="text-3xl font-bold">GPU can't take it</div>
-</div>
-
+<div class="mt-10 flex justify-center">
+  <img src="./assets/fail_simp.gif" class="rounded-xl shadow-lg" style="max-height: 280px" alt="Bart Simpson collapsing — the old phone giving up" />
 </div>
 
 <!--
@@ -999,7 +988,7 @@ val reply = conversation.sendMessage(prompt, screenshot)
 
 <div class="col-start-1 row-start-1" v-click="[1,2]">
 
-<div class="text-sm uppercase tracking-widest font-bold mb-1" style="color: #ef4444">From this..</div>
+<div class="text-sm uppercase tracking-widest font-bold mb-1" style="color: #ef4444">From this…</div>
 
 <div class="med-code">
 
@@ -1085,7 +1074,7 @@ OCR" (two slides ahead).
 layout: center
 ---
 
-# Or... just share it
+# Or… just share it
 <!-- Slide 34 -->
 
 <div class="grid grid-cols-2 gap-12 items-center justify-items-center mt-4">
@@ -1254,7 +1243,7 @@ work.
 - 100 API calls
 - 50 features
 - **10 people** working on it
-- .. and the 3 different teams trying to catch the next code cut
+- …and the 3 different teams trying to catch the next release
 
 </v-clicks>
 
@@ -1317,7 +1306,7 @@ composable with a hundred params, ten people, five features, all in the same fil
 
 - Thread your state, callbacks, and dependencies through **everything above it**
 - Break a hundred call sites on the way
-- ...and 100 screenshots and UI tests
+- …and 100 screenshots and UI tests
 
 </v-clicks>
 
