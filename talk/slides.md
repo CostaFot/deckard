@@ -1518,13 +1518,12 @@ RetainObserver, and where state actually lives. Land it self-deprecating, then m
 
 ---
 
-# API #2: `rememberViewModelStoreOwner` — real ViewModels, locally scoped
+# API #2: `rememberViewModelStoreOwner`
 <!-- Slide 45 -->
 
 ```kotlin
 @Composable
-fun ComponentViewModelScope(key: Any, content: @Composable () -> Unit) {
-    saveableStateHolder.SaveableStateProvider(key) {
+fun ComponentViewModelScope(content: @Composable () -> Unit) {
         val storeOwner = rememberViewModelStoreOwner()   // ← this composable OWNS a store
         CompositionLocalProvider(
             LocalViewModelStoreOwner provides storeOwner,
@@ -1536,20 +1535,24 @@ fun ComponentViewModelScope(key: Any, content: @Composable () -> Unit) {
 
 <v-click>
 
+<div class="pt-6">
+
 ```kotlin
-// inside: plain, boring viewModel() — but scoped to THIS subtree, not the Activity
-ComponentViewModelScope(key = "beer-counter") {
-    val vm: BeerCounterViewModel = viewModel(factory = factory)
+// inside: plain, boring viewModel() — but scoped to THIS subtree
+ComponentViewModelScope {
+    val vm: BeerCounterViewModel = viewModel()
 }
 ```
+
+</div>
 
 </v-click>
 
 <v-click>
 
-<div class="pt-3 text-center opacity-90">
+<div class="pt-8 text-center opacity-90">
 Everything below the provider sees <i>this</i> store — the VM lives and dies with the
-subtree. <b>No navigation library required.</b>
+subtree.
 </div>
 
 </v-click>
