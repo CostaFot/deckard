@@ -48,6 +48,19 @@ slide count first, Costa trims.
 
 ## Status log
 
+- **2026-07-15 (polish pass, slide-by-slide with Costa)** — **s1**: title forced one-line
+  (`!text-4xl` + nowrap), subtitle and `@markasduplicate` handle removed, pic+name+role
+  reveal together on one click. **s2**: left column text cut, image centered
+  (`layout: center`); the "can't tell anymore" beat moved to the speaker note. **s11**:
+  `{all|4}` highlight step focusing `rootInActiveWindow`. **s35**: snippet trimmed 16 → 8
+  params (`text-xs` → `text-sm`), comment now "…plus 90 more params"; click order = code
+  whole (1) → focus the comment line `{all|11}{at:2}` (2) → bullets (3–7). **s39**: the
+  redundant closing line cut (snippet comments carry it); new final click "Saved state
+  too? `rememberSaveableStateHolder()` — same trick, for `rememberSaveable`." **s40**:
+  collapsed to a one-beat punchline (the recap bullets repeated the previous slides):
+  title **"Wait a minute…"** alone, click → **"Yeah. We just rewrote Fragments in
+  Compose. 🧩"**; the sincere half + busy-screen payoff live in the speaker note. **Comment colour**: `setup/shiki.ts` comments `#7A7E85` grey → `#FFC66D` yellow
+  (comments are on-slide annotations; pops on dark, no token-colour collision).
 - **2026-07-14 (title slide)** — Slide 1 gained the speaker intro: `assets/profile_pic.jpg`
   as a round avatar next to "Costa Fotiadis · `@markasduplicate` / Senior Android dev ·
   Just Eat Takeaway.com". Deck map updated (s1 no longer asset-free).
@@ -400,7 +413,7 @@ lists what's wired; — = text/emoji only.
 | 37 | API #1: `retain` — state-only lead-in + snippet + ⚠️ no process death (merged) | — |
 | 38 | Do we even need `ViewModel` anymore? — line-by-line + "should you? not really 🧪" (merged) | `peepoHappy.png` 🐸 |
 | 39 | API #2: `rememberViewModelStoreOwner` | — |
-| 40 | The Fragment-shaped hole: filled 🧩 | — |
+| 40 | Wait a minute… → "Yeah. We just rewrote Fragments in Compose. 🧩" (one-beat punchline) | — |
 | 41 | Takeaway #1 — local LLMs are ready. I was surprised too. | — |
 | 42 | Takeaway #2 — Compose finally feels… complete (⚠️ still name-drops Nav3, deferred) | — |
 | 43 | That's the talk — sign-off | 🖼️ repo QR code placeholder |

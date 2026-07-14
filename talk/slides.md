@@ -1504,36 +1504,28 @@ composables in the overlay own their ViewModels.
 layout: center
 ---
 
-# The Fragment-shaped hole: filled 🧩
+# Wait a minute…
 <!-- Slide 40 -->
-
-<div class="pt-4 text-xl text-center leading-relaxed">
-
-<v-clicks>
-
-Any composable, anywhere in the tree, can now<br>
-**own its state, its ViewModel, and its dependencies** —<br>
-and tear them down correctly —<br>
-**without asking permission from anything above it.**
-
-</v-clicks>
-
-</div>
 
 <v-click>
 
-<div class="pt-8 text-center text-lg opacity-80">
-That busy screen? Change the small component <b>in place</b>. Nothing above it needs to know. 😌
+<div class="pt-12 text-center text-3xl leading-relaxed">
+Yeah. It's a <code>Fragment</code>.
 </div>
 
 </v-click>
 
 <!--
-Land the WIIFM: this is what Fragments used to give you — the self-contained drop-in —
-and what Compose quietly lost.
+One-beat punchline slide — the previous slides already listed the ingredients (own VM,
+own UI, own lifecycle), so don't re-list them. Title alone first: "wait a minute… a
+component that owns all its own stuff… this reminds me of something." Click: the
+punchline. Let it sit.
 
-Callback to the JET screen: surgery on a busy screen with a contained blast radius. This
-is the everyday value; the overlay was just the stress test.
+After the laugh, the sincere half (out loud): except this time it's pure Compose — no
+FragmentManager, no transactions, no XML — and the drop-in self-containment was the one
+thing genuinely worth missing. Payoff, still out loud: that busy JET screen — change the
+small component in place, nothing above it needs to know. The overlay was just the
+stress test.
 -->
 
 ---
