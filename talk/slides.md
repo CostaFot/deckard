@@ -1251,27 +1251,18 @@ work.
 # What's in it for me?
 <!-- Slide 38 -->
 
-<div class="flex justify-center items-center gap-10 mt-6">
+<div class="grid mt-6">
+
+<div class="col-start-1 row-start-1 flex justify-center items-center gap-10" v-click.hide="1">
   <img src="./assets/serp_default_screen.jpg" class="rounded-xl shadow-lg" style="max-height: 440px" alt="A busy food-delivery home screen — popular brands, promos, lunch carousel" />
   <img src="./assets/menu_default_screen.jpg" class="rounded-xl shadow-lg" style="max-height: 440px" alt="A busy restaurant menu screen — header, offers carousel, popular items, categories" />
 </div>
 
-<!--
-These are real production screens I work on (the JET app). Let the room look — everyone
-maintains something this dense. No talking points yet; just "look how much is on here."
-Next slide zooms in and states the ask.
--->
-
----
-
-# Busy screens
-<!-- Slide 39 -->
-
-<div class="grid grid-cols-2 gap-8 pt-6 items-center">
+<div class="col-start-1 row-start-1 grid grid-cols-2 gap-8 items-center" v-click="1">
 
 <div class="text-2xl leading-loose">
 
-<v-clicks>
+<v-clicks at="2">
 
 - **God ViewModel(s)**
 - 100 API calls
@@ -1311,11 +1302,16 @@ fun MenuScreen(
 
 </div>
 
+</div>
+
 <!--
-Set the scene before the ask. These screens aren't dense by accident — they're the seam
-where the whole org meets. One God ViewModel, a composable with a hundred params, ten
-people, five features, all in the same file. That's why changing "one small thing" is
-never small.
+These are real production screens I work on (the JET app). Let the room look — everyone
+maintains something this dense. No talking points yet; just "look how much is on here."
+
+Click: the screenshots give way to what they're like to MAINTAIN. These screens aren't
+dense by accident — they're the seam where the whole org meets. One God ViewModel, a
+composable with a hundred params, ten people, five features, all in the same file
+(bullets land one per click). That's why changing "one small thing" is never small.
 -->
 
 ---
@@ -1432,7 +1428,8 @@ abstract class RetainedViewModel : RetainObserver {
     val viewModelScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     
     override fun onRetired() { 
-        onCleared(); viewModelScope.cancel() 
+        viewModelScope.cancel() 
+        onCleared()
     } 
 }
 ```
