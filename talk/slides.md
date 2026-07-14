@@ -1386,27 +1386,32 @@ mean the composable depends on something far above it. The new APIs kill that de
 
 ---
 
-# API #1: `retain` — like `remember`, but tougher
+# API #1: `retain`
 <!-- Slide 42 -->
 
 ```kotlin
 @Composable
 fun BeerCounter() {
-    // like remember { } — but it ALSO survives configuration changes 💪
+    // like remember { } — but also survives configuration changes
     val counter = retain { Counter() }
 }
 ```
 
 <v-clicks>
 
-- Retention at the **Compose-runtime level** — scoped to the composition, not to an
-  Activity's `ViewModelStore`
+- Retention at the **Compose-runtime level** — scoped to the composition
 - Rotate the phone: `remember` → gone, **`retain` → still there**
-- Zero plumbing: no owners, no factories, no nav graph — works **anywhere a composition
-  exists**
-- Wants cleanup? Implement `RetainObserver` — you get `onRetained` / `onRetired` callbacks
+- Backed by `RetainedValuesStore`, so it's flexible enough
 
 </v-clicks>
+
+<v-click>
+
+<div class="mt-8 mx-auto p-5 border-2 border-red-500/60 rounded-xl text-xl text-center" style="max-width: 44rem">
+⚠️ No process death / saved state handling
+</div>
+
+</v-click>
 
 <!--
 The plain API first — androidx.compose.runtime.retain. One line to adopt: swap
