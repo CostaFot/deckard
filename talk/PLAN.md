@@ -414,8 +414,8 @@ lists what's wired; — = text/emoji only.
 | 38 | Do we even need `ViewModel` anymore? — line-by-line + "should you? not really 🧪" (merged) | `peepoHappy.png` 🐸 |
 | 39 | API #2: `rememberViewModelStoreOwner` | — |
 | 40 | Wait a minute… → "Yeah. We just rewrote Fragments in Compose. 🧩" (one-beat punchline) | — |
-| 41 | Takeaway #1 — local LLMs are ready. I was surprised too. | — |
-| 42 | Takeaway #2 — Compose finally feels… complete (⚠️ still name-drops Nav3, deferred) | — |
+| 41 | Closing #1 — local LLMs are actually quite good now | — |
+| 42 | Closing #2 — Compose finally feels… complete (⚠️ still name-drops Nav3, deferred) | — |
 | 43 | That's the talk — sign-off | 🖼️ repo QR code placeholder |
 
 **Only 1 placeholder left** (Costa's): the repo QR code (**s43**). **Still unwired:**

@@ -1530,30 +1530,21 @@ stress test.
 
 ---
 
-# Takeaway #1 — local LLMs are ready. I was surprised too.
+<h1 class="!text-4xl whitespace-nowrap">Closing #1 — local LLMs are actually quite good now</h1>
 <!-- Slide 41 -->
 
 <div class="pt-4 text-xl leading-relaxed">
 
 <v-clicks>
 
-- Getting one running is **quite easy** — a file, a library, four lines of XML
-  <span class="opacity-70">(you now know which four)</span>
-- They're **not that big** — a couple of GB gets you a *multimodal* model
-- And they're **capable enough** — capable enough to *understand a screen*, not just read it
+- Getting one running is not too hard
+- Couple of GB gets you a *multimodal* model
+- They're **capable enough**
+- …and will only get better
 
 </v-clicks>
 
 </div>
-
-<v-click>
-
-<div class="pt-8 text-center text-xl leading-relaxed">
-And this is the <b>worst</b> they'll ever be.<br>
-<span class="opacity-80">Imagine what we'll get out of them next year. 🔮</span>
-</div>
-
-</v-click>
 
 <!--
 Honest enthusiasm: I went in expecting a science project and came out with a working
@@ -1565,7 +1556,7 @@ today is the boring, stable part — the brains keep improving underneath it.
 
 ---
 
-# Takeaway #2 — Compose finally feels… complete
+<h1 class="!text-4xl whitespace-nowrap">Closing #2 — Compose finally feels… complete</h1>
 <!-- Slide 42 -->
 
 <div class="pt-4 text-lg leading-relaxed">
