@@ -1106,7 +1106,7 @@ here's the thing…"
 layout: center
 ---
 
-# The third door: just share it
+# Or... just share it
 <!-- Slide 34 -->
 
 <div class="grid grid-cols-2 gap-12 items-center justify-items-center mt-4">
