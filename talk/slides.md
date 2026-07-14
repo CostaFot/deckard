@@ -1368,8 +1368,8 @@ A composable that:
 
 <v-clicks>
 
-- **makes its own dependencies** 🏗️
-- **owns its own ViewModel** — scoped to the composition
+- **makes its own dependencies**
+- **owns its own ViewModel**— scoped to the composition
 - survives configuration changes
 
 </v-clicks>
