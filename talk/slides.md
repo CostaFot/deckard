@@ -1481,8 +1481,7 @@ ComponentViewModelScope {
 <v-click>
 
 <div class="pt-8 text-center opacity-90">
-Everything below the provider sees <i>this</i> store — the VM lives and dies with the
-subtree.
+Supports saved state out of the box via <code>rememberSaveableStateHolder()</code>.
 </div>
 
 </v-click>
@@ -1490,7 +1489,12 @@ subtree.
 <!--
 Where retain is the lightweight runtime-level answer, rememberViewModelStoreOwner gives
 you the REAL androidx ViewModel machinery — a store this composable owns, shadowing the
-host's via LocalViewModelStoreOwner.
+host's via LocalViewModelStoreOwner. Say the teardown beat out loud: the VM lives and
+dies with the subtree — leave the composition, store cleared, onCleared called.
+
+Last click — the saved-state leg of the tripod: SaveableStateHolder plays the same
+role for rememberSaveable state that the store owner plays for ViewModels — the subtree
+owns and restores its own saved state instead of leaning on the host's registry.
 
 This snippet is from THIS repo (ComponentViewModelScope.kt) — it's how independent
 composables in the overlay own their ViewModels.
