@@ -311,7 +311,7 @@ The pivot out of the cold open. Next: the machine at a glance, then we descend.
 
 <div class="mt-8 big-code">
 
-```kotlin
+```kotlin {all|4}
 class DeckardAccessibilityService : AccessibilityService() {
 
     fun readScreen(): String? {
@@ -336,6 +336,10 @@ Structured. Fast. No AI needed.
 
 The naive plan: I started by just reading the accessibility tree — the thing screen
 readers use. Every view, its text, its bounds. It's RIGHT THERE.
+
+Click 1: `rootInActiveWindow` lights up — the whole magic is that one property. The
+framework hands you the foreground app's tree; the rest is a tree walk. Click 2: the
+"Structured. Fast. No AI needed." line.
 
 "This is what I built first. And it works… sort of."
 -->
