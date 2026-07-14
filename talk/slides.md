@@ -504,7 +504,7 @@ interface ScreenContentExtractor {
 
 <div class="pt-1 med-code">
 
-```kotlin
+```kotlin {2|5-6|all}{at:2}
 class ScreenContentExtractors @Inject constructor(
     private val extractors: Set<ScreenContentExtractor>,
     private val generic: GenericContentExtractor,   // unknown-app fallback
@@ -522,9 +522,14 @@ class ScreenContentExtractors @Inject constructor(
 This looks GREAT in a design doc. Clean seam: one interface, one implementation per app.
 I was very proud of it.
 
-Say the title straight. Click 1: the interface. Click 2: the dispatcher — the Hilt
-multibinding: add an app = one class + one @IntoSet binding, fall back to a generic
-extractor for the unknown app.
+Say the title straight. Click 1: the interface. Click 2: the dispatcher appears, walked
+in highlight steps:
+
+1. (on appear) THE Set — every parser in the app, injected as one Set. Hilt multibinding:
+   add an app = one class + one @IntoSet binding. This line is the "extensible system"
+2. click: the dispatch line — first extractor that claims the package, else the generic
+   fallback (its comment explains itself)
+3. click: the full picture
 
 Deadpan: "I was building a beautiful, extensible system… for hand-writing a parser for
 every app on Earth."
