@@ -1282,7 +1282,7 @@ Next slide zooms in and states the ask.
 - 100 API calls
 - 50 features
 - **10 people** working on it
-- .. and the 3 different teams trying to catch the next release
+- .. and the 3 different teams trying to catch the next code cut
 
 </v-clicks>
 
