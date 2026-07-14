@@ -829,7 +829,7 @@ implementation("com.google.ai.edge.litertlm:litertlm-android:0.11.0")
 
 <div class="big-code pt-4">
 
-```kotlin
+```kotlin {all|4-5}{at:2}
 val engine = Engine(
     EngineConfig(
         modelPath     = modelFile.absolutePath,
@@ -846,12 +846,13 @@ engine.initialize()   // takes a while
 </v-click>
 
 <!--
-Two design points worth saying out loud:
+Click 1: the engine block, whole. Two design points worth saying out loud:
 - init takes seconds, so it runs on an application-scoped coroutine no caller can cancel
 - engineOrNull() returns null while loading — summon Deckard too early and he just tells
   you his brain isn't ready, nothing blocks
 
-"And see that Backend.GPU() line? Let me tell you about the two weeks that line cost me."
+Click 2: the two backend lines light up — the exit line into the war story:
+"And see those Backend.GPU() lines? Let me tell you about the two weeks they cost me."
 -->
 
 ---
