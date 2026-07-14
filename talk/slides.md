@@ -1599,34 +1599,19 @@ layout: center
 class: text-center
 ---
 
-# That's the talk
+<h1 class="flex items-center justify-center gap-4 m-0">
+  <span>Thank you</span>
+  <img src="./assets/peepoBeer.png" style="height: 1.4em" alt="Peepo raising a beer" />
+</h1>
 <!-- Slide 43 -->
 
-<div class="pt-4 text-xl opacity-90">
-Go build something. Accessibly, please — the agents are coming. 🤖
-</div>
-
-<div class="pt-10 flex items-center justify-center gap-8">
-
-<div class="flex items-center justify-center border-2 border-dashed rounded-xl opacity-70" style="width: 140px; height: 140px">
-  <span class="text-sm px-2">🖼️ QR →<br>repo link</span>
-</div>
-
-<div class="text-left text-lg">
-  <div>🧙 <b>Deckard</b> — code on GitHub</div>
-  <div class="pt-2 opacity-80"><code>@markasduplicate</code></div>
-  <div class="pt-2 opacity-60 text-sm">Hope you found this somewhat useful.</div>
-</div>
-
-</div>
-
-<div class="pt-10 opacity-70">
-Questions? <span class="opacity-60">(Deckard will judge them for slop.)</span>
+<div class="pt-12 mx-auto text-left text-lg inline-block">
+  <div>𝕏 <code>@markasduplicate</code></div>
+  <div class="pt-3">GitHub — <code>CostaFot</code></div>
+  <div class="pt-3">LinkedIn — <code>linkedin.com/in/costafotiadis</code></div>
 </div>
 
 <!--
-Short and out. The a11y line is the one-sentence echo of the §3b aside — last thing they
-hear that isn't a joke.
-
-Sign-off is the blog sign-off. "Later."
+Short and out. Say the sign-off, don't slide it: "Go build something — accessibly,
+please, the agents are coming. Questions? Deckard will judge them for slop."
 -->

@@ -369,8 +369,11 @@ slide count first, Costa trims.
    **closed 2026-07-15**: Costa deliberately kept a one-line Nav3 bullet in the s42 rework
    ("plays very nicely with Navigation 3"); the speaker note now carries a one-line
    explainer (built on these primitives, per-entry VM scoping) so the mention is covered;
-   (b) the repo **QR code placeholder, s43**; (c) decide whether `quote_tweet.png` replaces
-   the typographic X blob on **s14**. **Prerequisites for a live demo:** flip `isMocked` + real
+   (b) ~~the repo QR code placeholder, s43~~ — **dropped 2026-07-15** with the thank-you
+   rework (socials list instead); (c) decide whether `quote_tweet.png` replaces the
+   typographic X blob on **s14**; (d) ~~confirm the socials on s43~~ — **confirmed
+   2026-07-15**: 𝕏 `@markasduplicate`, GitHub `CostaFot`, LinkedIn
+   `linkedin.com/in/costafotiadis`. **Prerequisites for a live demo:** flip `isMocked` + real
    `AI_DETECTOR_API_KEY`; optionally the persona line on the report card for "This is slop,
    son" on screen.
 5. Rehearsal pass: count minutes against the trimmed deck; export
@@ -427,11 +430,12 @@ lists what's wired; — = text/emoji only.
 | 40 | Wait a minute… → "Yeah. We just rewrote Fragments in Compose. 🧩" (one-beat punchline) | — |
 | 41 | Recap — local LLMs are actually quite good now | — |
 | 42 | Recap — Compose is in a good place (retain welcome / plays nicely with Nav3 / better late than never) | — |
-| 43 | That's the talk — sign-off | 🖼️ repo QR code placeholder |
+| 43 | Thank you 🍻 — socials (𝕏 `@markasduplicate` · GitHub `CostaFot` · LinkedIn `/in/costafotiadis`) | `peepoBeer.png` 🐸 |
 
-**Only 1 placeholder left** (Costa's): the repo QR code (**s43**). **Still unwired:**
+**No placeholders left** — the s43 repo-QR placeholder was dropped in the 07-15 thank-you
+rework (socials list instead; re-add a QR if Costa wants one). **Still unwired:**
 `quote_tweet.png` (candidate for s14). Every other referenced image/GIF exists and is wired
-(verified on disk, including the new `fail_simp.gif`).
+(verified on disk, including `fail_simp.gif` and `peepoBeer.png`).
 
 ## Raw-material index (verified against the codebase, 2026-07-07)
 
