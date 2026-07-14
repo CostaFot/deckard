@@ -15,6 +15,7 @@ mdc: true
 ---
 
 # Fighting AI slop with anti-slop
+<!-- Slide 1 -->
 
 The on-device Android engineering behind a slop detector
 
@@ -33,6 +34,7 @@ layout: two-cols-header
 ---
 
 # The internet is drowning in slop 🚀
+<!-- Slide 2 -->
 
 ::left::
 
@@ -57,6 +59,7 @@ layout: center
 ---
 
 <img src="./assets/victoria_meme.jpg" class="mx-auto rounded-xl shadow-lg" style="max-height: 460px" alt="Victoria Beckham 'be honest' meme — 'OK I slopped it on Claude'" />
+<!-- Slide 3 -->
 
 <!--
 Meme beat — let it land, say nothing. Then next slide.
@@ -67,6 +70,7 @@ layout: two-cols
 ---
 
 <div class="h-full flex flex-col justify-center pr-8">
+<!-- Slide 4 -->
 
 # So I built a thing that tells me
 
@@ -90,6 +94,7 @@ layout: center
 ---
 
 # Once more, slowly
+<!-- Slide 5 -->
 
 <div class="flex justify-center items-center gap-4 mt-4">
   <figure class="text-center m-0">
@@ -120,6 +125,7 @@ layout: two-cols
 ---
 
 <div class="h-full flex items-center justify-center pr-8">
+<!-- Slide 6 -->
   <img src="./assets/start_post.png" class="rounded-xl shadow-lg" style="max-height: 400px" alt="A suspiciously inspirational LinkedIn post" />
 </div>
 
@@ -163,6 +169,7 @@ class: text-center
 ---
 
 # Astute observers might have noticed
+<!-- Slide 7 -->
 
 <img src="./assets/linkedin_slop_post_zoomed_in.png" class="mx-auto mt-6 rounded-xl shadow-lg" style="max-height: 400px" alt="The slop post zoomed on the '🤖 AI' badge next to Costa's name — the verdict in plain sight" />
 
@@ -178,6 +185,7 @@ That flag is the verdict. Deckard reads the screen, then something has to actual
 ---
 
 # AI is very good at detecting other AI
+<!-- Slide 8 -->
 
 <div class="pt-6 text-2xl leading-loose">
 
@@ -251,6 +259,7 @@ class: text-center
 ---
 
 # What do we want?
+<!-- Slide 9 -->
 
 <v-click>
 
@@ -281,6 +290,7 @@ class: text-center
 ---
 
 <img src="./assets/glad_you_asked_meme.png" class="mx-auto mt-8 rounded-xl shadow-lg" style="max-height: 340px" alt="'wow Costa how did you do that' / 'im glad you asked' voice-message meme" />
+<!-- Slide 10 -->
 
 <!--
 The pivot out of the cold open. Next: the machine at a glance, then we descend.
@@ -289,6 +299,7 @@ The pivot out of the cold open. Next: the machine at a glance, then we descend.
 ---
 
 # At a glance
+<!-- Slide 11 -->
 
 <div class="grid grid-cols-5 items-center gap-2 pt-10">
 
@@ -337,6 +348,7 @@ Then descend: "so let's talk about the eyes. How hard can reading a screen be?"
 ---
 
 # Another easy weekend project
+<!-- Slide 12 -->
 
 <v-click>
 
@@ -352,6 +364,7 @@ Say the title straight, then click the meme in for the punchline.
 ---
 
 # Attempt #1: just read the screen!
+<!-- Slide 13 -->
 
 <div class="pt-6 opacity-80">Android hands you the whole UI tree — just walk it.</div>
 
@@ -389,6 +402,7 @@ readers use. Every view, its text, its bounds. It's RIGHT THERE.
 ---
 
 # Not so fast
+<!-- Slide 14 -->
 
 <div class="grid grid-cols-5 gap-6 pt-4 items-center">
 
@@ -421,6 +435,7 @@ the privacy bridge setup.)
 ---
 
 # WTF #1: LinkedIn trips up the reader
+<!-- Slide 15 -->
 
 <div class="grid grid-cols-2 gap-6 pt-4 items-center">
 
@@ -464,6 +479,7 @@ We're getting <span class="underline">more</span> text than expected. 💢
 ---
 
 # WTF #2: Twitter/X
+<!-- Slide 16 -->
 
 <div class="pt-2 text-lg opacity-80">On the timeline, the entire card is <b>one contentDescription</b>.</div>
 
@@ -508,6 +524,7 @@ class: text-center
 ---
 
 <img src="./assets/challenge_accepted.png" class="mx-auto rounded-xl shadow-lg" style="max-height: 440px" alt="'Challenge accepted' meme — the moment before writing a parser per app seemed like a good idea" />
+<!-- Slide 17 -->
 
 <!--
 Beat between the war stories and the architecture: I saw the mess and thought "fine.
@@ -517,6 +534,7 @@ I'll just handle every app myself."
 ---
 
 # Let's write some Java 1998
+<!-- Slide 18 -->
 
 <div class="pt-2 opacity-80">One interface. One parser per app.</div>
 
@@ -546,6 +564,7 @@ them all up." Next slide is the wiring.
 ---
 
 # …then wire them all up
+<!-- Slide 19 -->
 
 <v-click>
 
@@ -576,6 +595,7 @@ every app on Earth."
 ---
 
 # The reality: Regex wars
+<!-- Slide 20 -->
 
 <div class="pt-8">
 
@@ -608,6 +628,7 @@ fix reveals a new special case."
 ---
 
 <div class="pt-16">
+<!-- Slide 21 -->
 
 # That was <span v-mark.red="0">one</span> app, not even done well
 
@@ -637,6 +658,7 @@ There is no way to handle everything for every app. Full stop.
 ---
 
 # What if..
+<!-- Slide 22 -->
 
 <div class="pt-8 text-2xl leading-relaxed">
 …<b>agents</b> become the de facto way of using a device,
@@ -674,6 +696,7 @@ class: text-center
 ---
 
 # Maybe an AI model can just… <i>look</i> at it
+<!-- Slide 23 -->
 
 <v-click>
 
@@ -693,6 +716,7 @@ Don't oversell yet — the payoff proof comes after we get the model running.
 ---
 
 # Step one: get the pixels
+<!-- Slide 24 -->
 
 <div class="pt-6">
 
@@ -741,6 +765,7 @@ layout: center
 ---
 
 # Houston, we have a problem.
+<!-- Slide 25 -->
 
 <div class="pt-6 text-xl text-center leading-relaxed">
 
@@ -779,6 +804,7 @@ class: text-center
 ---
 
 # Running an LLM locally
+<!-- Slide 26 -->
 
 <!--
 The bridge lands. The screen never leaves the device — that's the deal that makes the
@@ -790,6 +816,7 @@ And now the talk owes the audience an answer: yes — and here's how. Into LiteR
 ---
 
 # "Doesn't Android just… give you this?"
+<!-- Slide 27 -->
 
 <div class="pt-8 text-3xl leading-loose">
 
@@ -824,6 +851,7 @@ The point survives any update: the platform path is rationed; BYO gives you full
 ---
 
 # Modelling
+<!-- Slide 28 -->
 
 <div class="text-lg leading-relaxed pt-4">
 
@@ -867,6 +895,7 @@ The keyboard line is a throwaway — one beat, move on.
 ---
 
 # Using LiteRT-LM
+<!-- Slide 29 -->
 
 <div class="big-code pt-2">
 
@@ -911,6 +940,7 @@ layout: center
 ---
 
 # First run: everything worked! 
+<!-- Slide 30 -->
 
 <v-click>
 
@@ -930,6 +960,7 @@ layout: center
 ---
 
 # Why?
+<!-- Slide 31 -->
 
 <div class="mt-8 mx-auto p-5 border rounded-xl font-mono text-lg" style="max-width: 40rem">
 E/litert: GPU backend initialization failed: INTERNAL<br>
@@ -949,6 +980,7 @@ of XML.
 ---
 
 # Four lines of XML
+<!-- Slide 32 -->
 
 <div class="med-code pt-6">
 
@@ -995,6 +1027,7 @@ first-party sample that works and diff it.
 ---
 
 # Old phones will still choke
+<!-- Slide 33 -->
 
 <div class="pt-8 text-3xl leading-relaxed">
 Loading the entire <b>3 GB model</b> into memory, and onto the GPU requires a powerful phone
@@ -1031,6 +1064,7 @@ not a "works on Android" feature. Some floors software can't lift.
 ---
 
 # Asking it something
+<!-- Slide 34 -->
 
 <div class="big-code pt-2">
 
@@ -1100,6 +1134,7 @@ layout: center
 ---
 
 # Throwback 📼
+<!-- Slide 35 -->
 
 <div class="grid grid-cols-3 gap-8 items-center justify-items-center mt-4">
 
@@ -1131,6 +1166,7 @@ layout: center
 ---
 
 # The third door: just share it
+<!-- Slide 36 -->
 
 <div class="grid grid-cols-2 gap-12 items-center justify-items-center mt-4">
 
@@ -1156,6 +1192,7 @@ apps the a11y extractors can't parse.
 ---
 
 # Not just OCR
+<!-- Slide 37 -->
 
 <div class="grid grid-cols-2 gap-10 pt-10 text-2xl leading-loose">
 
@@ -1196,6 +1233,7 @@ layout: center
 ---
 
 # Everything you just saw is a real app
+<!-- Slide 38 -->
 
 <div class="pt-4 text-xl mx-auto text-left" style="max-width: 20rem">
 
@@ -1223,6 +1261,7 @@ layout: center
 ---
 
 # How?
+<!-- Slide 39 -->
 
 <v-click>
 
@@ -1274,6 +1313,7 @@ work.
 ---
 
 # What's in it for me?
+<!-- Slide 40 -->
 
 <div class="flex justify-center items-center gap-10 mt-6">
   <img src="./assets/serp_default_screen.jpg" class="rounded-xl shadow-lg" style="max-height: 440px" alt="A busy food-delivery home screen — popular brands, promos, lunch carousel" />
@@ -1289,6 +1329,7 @@ Next slide zooms in and states the ask.
 ---
 
 # Busy screens
+<!-- Slide 41 -->
 
 <div class="grid grid-cols-2 gap-8 pt-6 items-center">
 
@@ -1344,6 +1385,7 @@ never small.
 ---
 
 # Now change one thing
+<!-- Slide 42 -->
 
 <div class="grid grid-cols-2 gap-8 pt-4 items-center">
 
@@ -1385,6 +1427,7 @@ the host's owners, so everything gets threaded from the top.
 ---
 
 # What we actually want
+<!-- Slide 43 -->
 
 <div class="pt-8 text-3xl leading-loose mx-auto" style="max-width: 40rem">
 
@@ -1411,6 +1454,7 @@ mean the composable depends on something far above it. The new APIs kill that de
 ---
 
 # API #1: `retain` — like `remember`, but tougher
+<!-- Slide 44 -->
 
 ```kotlin
 @Composable
@@ -1442,6 +1486,7 @@ RetainObserver is the hook for anything that needs a lifecycle: onRetired is you
 ---
 
 # You don't even need a `ViewModel` anymore 🧪
+<!-- Slide 45 -->
 
 <div class="text-sm">
 
@@ -1504,6 +1549,7 @@ This is real code from the keyboard era of this very app.
 ---
 
 # API #2: `rememberViewModelStoreOwner` — real ViewModels, locally scoped
+<!-- Slide 46 -->
 
 ```kotlin
 @Composable
@@ -1550,6 +1596,7 @@ composables in the overlay own their ViewModels.
 ---
 
 # Bonus: Navigation 3 — nav that isn't chained to an Activity
+<!-- Slide 47 -->
 
 ```kotlin
 val backStack = rememberNavBackStack(ScreenA)     // a plain list. YOU own it.
@@ -1598,6 +1645,7 @@ layout: center
 ---
 
 # The Fragment-shaped hole: filled 🧩
+<!-- Slide 48 -->
 
 <div class="pt-4 text-xl text-center leading-relaxed">
 
@@ -1631,6 +1679,7 @@ is the everyday value; the overlay was just the stress test.
 ---
 
 # Takeaway #1 — local LLMs are ready. I was surprised too.
+<!-- Slide 49 -->
 
 <div class="pt-4 text-xl leading-relaxed">
 
@@ -1665,6 +1714,7 @@ today is the boring, stable part — the brains keep improving underneath it.
 ---
 
 # Takeaway #2 — Compose finally feels… complete
+<!-- Slide 50 -->
 
 <div class="pt-4 text-lg leading-relaxed">
 
@@ -1705,6 +1755,7 @@ class: text-center
 ---
 
 # That's the talk
+<!-- Slide 51 -->
 
 <div class="pt-4 text-xl opacity-90">
 Go build something. Accessibly, please — the agents are coming. 🤖

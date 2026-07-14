@@ -48,6 +48,18 @@ slide count first, Costa trims.
 
 ## Status log
 
+- **2026-07-14** — **Deck map refreshed against the live deck; slides numbered in-source.**
+  The map above was stale (dated 07-08, 45 slides) while commits ran through 07-13 ("slide 43");
+  the live deck is now **51 slides**, verified with `@slidev/parser`. Every slide got a
+  `<!-- Slide N -->` comment right under its heading/first element — non-rendering, greppable, so
+  Costa can reference a slide by number. (Gotcha found & avoided: a comment placed at the very
+  *top* of a slide, right after the `---`, collides with Slidev's note detection on image+note
+  slides and silently *merges* them — 51→37; placing it after the first content line is safe,
+  verified across all 51.) Placeholder count is down from 6 → **2** (Nav3 GIF s47, repo QR s51);
+  the hero-demo, CPU-run, demo-zoom, long-press and busy-JET boxes are all filled and wired. The
+  **trim pass (51 → ~20) has not started** — the deck grew, it hasn't been cut yet; still the
+  main outstanding task. Titles/section order drifted from the 07-08 map: the callback/pillar-2
+  region is now s35–48 (was s32–45).
 - **2026-07-08 (evening)** — **Slide-by-slide review advanced through the first act +
   pillar 1; paused at slide 32.** The review has walked the deck from the top; slides
   1–31 are reviewed, and it now resumes at **slide 32 "Remember what we were building?"**
@@ -263,85 +275,99 @@ slide count first, Costa trims.
 1. ~~Structure the new skeleton with Costa~~ — done 2026-07-07, complete in `skeleton.md`.
 2. ~~Turn the skeleton into slides~~ — done 2026-07-07: full 40-slide deck in `slides.md`,
    all sections, real snippets, speaker notes throughout.
-3. **← IN PROGRESS: slide-by-slide review with Costa. Resuming at slide 32.** Dev server
-   is already running (`npm run dev` in `talk/`, http://localhost:3030). Go through the
-   deck **one slide at a time, Costa driving** — for each slide he gives a verdict: keep /
-   cut / edit. Slides **1–31 done; 32→45 (pillar 2 + close) remain.** Two goals at once:
+3. **← THE MAIN GAP: the trim pass has not started.** The slide-by-slide review continued
+   past 07-08 and the deck **grew to 51 slides** (see the map below) — it has not been cut.
+   Dev server runs with `npm run dev` in `talk/` (http://localhost:3030); slides are numbered
+   in-source (`<!-- Slide N -->`). Two goals, still open:
+   - **Trim pass:** 51 slides → ~20 for the 15–20 min slot. Overshoot was intentional.
+     First cut candidate: Nav 3 (**slide 47**, already ⚠️CUTTABLE). Don't cut the heroes:
+     hero demo, regex wall, prompt-vs-regexes, four-XML-lines, busy-screen problem.
    - **Tone pass:** fix wording against `blog_writing_style.md` (adapted for slides — his
      words on a slide should sound like him, not like a deck template). Expect edits.
-   - **Trim pass:** 45 slides → ~20 for the 15–20 min slot. Overshoot was intentional.
-     First cut candidate: Nav 3 (slide 41, already ⚠️CUTTABLE). Don't cut the heroes: hero
-     demo, regex wall, prompt-vs-regexes, four-XML-lines, busy-screen problem.
-   Slide numbers in the refreshed deck map above. Update this file as decisions land.
+   Reference slides by number; they line up with the refreshed deck map below. Update this
+   file as decisions land.
 4. **Fill the remaining placeholders** (Costa's to record/provide, then wire into slides).
-   **Still open (6 dashed boxes):** hero demo GIF (s4) · slow-CPU-run recording (s27) ·
-   demo-zoom GIF (s32) · long-press demo GIF (s33) · busy JET screen 🖼️ (s36) ·
-   Nav3-in-overlay GIF (s41, needs POC resurrection). **Also unwired:** `quote_tweet.png`
-   is already in `assets/` but not used — decide in review whether it replaces the
-   typographic X blob (s14). **Already wired (done):** both real-slop screenshots, the
-   zoomed AI-flag crop, scary-permissions + draw-over dialogs, LinkedIn "…more", HF
-   download, agent logos, side-eye meme, and all memes (Victoria, glad-you-asked,
-   Interstellar, challenge-accepted, sweating). **Prerequisites for the demo GIFs:** flip
-   `isMocked` + real `AI_DETECTOR_API_KEY` for live verdicts; optionally the persona line
-   on the report card for "This is slop, son" on screen.
+   **Only 2 dashed boxes left:** Nav3-in-overlay GIF (**s47**, needs POC resurrection from
+   `notes/nav3-viewmodels-in-a-service-overlay.md`) and the repo QR code (**s51**). **Also
+   unwired:** `quote_tweet.png` sits in `assets/` unused — decide in the review whether it
+   replaces the typographic X blob (s16). **Everything else is wired:** hero demo
+   (`demo_fast.gif`), the 3-frame replay, share-sheet captures, human-vs-robot writing,
+   the busy-screen SERP/menu shots, zoomed AI-flag crop, permission dialogs, LinkedIn "…more",
+   HF download, agent logos, and all memes. **Prerequisites for a live demo:** flip `isMocked`
+   + real `AI_DETECTOR_API_KEY`; optionally the persona line on the report card for
+   "This is slop, son" on screen.
 5. Rehearsal pass: count minutes against the trimmed deck; export
    (`npm run export`) as the backup copy.
 
-## Deck map (slides.md as of 2026-07-08 evening, 45 slides — verified against live H1s)
+## Deck map (slides.md as of 2026-07-14, 51 slides — verified against `@slidev/parser`)
 
-Review resumes at **slide 32**. Asset column: ✅ = real asset wired · 🎬/🖼️ = dashed-box
-placeholder still to fill · — = text/emoji only, no asset needed.
+The slides are now numbered **in the source**: each carries a `<!-- Slide N -->` comment right
+under its heading/first element (non-rendering; greppable). Reference a slide by number and it
+lines up with this map. Asset column: ✅ = real asset wired · 🎬/🖼️ = dashed-box placeholder
+still to fill · — = text/emoji only, no asset needed.
 
 | # | Title / content | Asset |
 |---|---|---|
 | 1 | Title — *Fighting AI slop with anti-slop* | — |
 | 2 | The internet is drowning in slop — beat ∥ real slop screenshot | ✅ `linkedin_slop_post.png` |
 | 3 | Victoria Beckham meme | ✅ `victoria_meme.jpg` |
-| 4 | So I built a thing that tells me — hero demo | 🎬 hero demo GIF |
-| 5 | Astute observers might have noticed — slop post zoomed on 🤖 AI flag | ✅ `linkedin_slop_post_zoomed_in.png` |
-| 6 | AI is very good at detecting other AI — Pangram (Chrome ext, auto-tags AI) | — |
-| 7 | What do I want? — that extension, but system-wide on Android | — |
-| 8 | "glad you asked" meme — the pivot | ✅ `glad_you_asked_meme.png` |
-| 9 | At a glance — the machine (cards) | — |
-| 10 | Another easy weekend project — Interstellar meme | ✅ `insterstellar_maneuvere_meme.png` |
-| 11 | Attempt #1: just read the screen! | — |
-| 12 | Not so fast — scary permissions | ✅ `scary_permission.png` / `draw_over_other_apps.png` |
-| 13 | WTF #1: LinkedIn trips up the reader — snippet + "…more" collapse | ✅ `linked_in_more_collapsed.png` |
-| 14 | WTF #2: Twitter — one-blob `contentDescription` (typographic) | (⚠️ `quote_tweet.png` available, unwired) |
-| 15 | "challenge accepted" meme | ✅ `challenge_accepted.png` |
-| 16 | Let's write some Java from 1998 — the extractor interface | — |
-| 17 | The reality: Regex wars | — |
-| 18 | That was one app, not even done well — treadmill + sweating meme | ✅ `sweating.gif` |
-| 19 | What if.. — a11y-as-API for agents (the forward-look aside, §3b) | ✅ `chagpt`/`gemini`/`claude`/`siri` logos |
-| 20 | Wait. Maybe an AI model can just… *look* at it? | — |
-| 21 | Step one: get the pixels — irony + pipeline | — |
-| 22 | Houston, we have a problem — privacy | ✅ `side_eye_meme.png` |
-| 23 | Running an LLM locally — divider | — |
-| 24 | "Doesn't Android just… give you this?" — Gemini Nano ⚠️verify | — |
-| 25 | Modelling — bring your own brain (adb / HF download) | ✅ `download_gemma_huggingface.png` |
-| 26 | Using LiteRT-LM — the engine | — |
-| 27 | First run: it worked! 🎉 — CPU war story | 🎬 slow-CPU-run recording |
-| 28 | Why? — CPU-fallback explanation | — |
-| 29 | Four lines of XML | — |
-| 30 | Old phones will still choke — hardware floor | — |
-| 31 | Asking it something — prompt vs regex wall | — |
-| **32** | **Remember what we were building?** — demo-zoom callback + share-sheet door **← REVIEW RESUMES** | 🎬 demo-zoom GIF |
-| 33 | It *understands* the screen — not just OCR + verbatim/gags | 🎬 long-press demo GIF |
-| 34 | Everything you just saw is a real app — no Activity | — |
-| 35 | How did I even go about this? — 3 registry chips + trench coat | — |
-| 36 | Your problem: the very busy screen | 🖼️ busy JET screen |
-| 37 | What we actually want — checklist | — |
-| 38 | API #1: `retain` — like `remember`, but tougher | — |
-| 39 | You don't even need a `ViewModel` anymore 🧪 — 3 snippets | — |
-| 40 | API #2: `rememberViewModelStoreOwner` | — |
-| 41 | Bonus: Navigation 3 — ⚠️ CUTTABLE | 🎬 Nav3-in-overlay GIF |
-| 42 | The Fragment-shaped hole: filled 🧩 | — |
-| 43 | Takeaway #1 — local LLMs are ready | — |
-| 44 | Takeaway #2 — Compose finally feels… complete | — |
-| 45 | That's the talk — QR / repo / sign-off | 🖼️ repo QR code |
+| 4 | So I built a thing that tells me — hero demo | ✅ `demo_fast.gif` |
+| 5 | Once more, slowly — the demo in 3 frozen frames | ✅ `start_post`/`summon_in_progress`/`verdict` |
+| 6 | What this talk is about — roadmap | ✅ `start_post.png` |
+| 7 | Astute observers might have noticed — slop post zoomed on 🤖 AI flag | ✅ `linkedin_slop_post_zoomed_in.png` |
+| 8 | AI is very good at detecting other AI — Pangram (Chrome ext + API curl snippets) | — |
+| 9 | What do we want? — that extension, but system-wide on a phone | — |
+| 10 | "glad you asked" meme — the pivot | ✅ `glad_you_asked_meme.png` |
+| 11 | At a glance — the machine (face/eyes/brain cards) | — |
+| 12 | Another easy weekend project — Interstellar meme | ✅ `insterstellar_maneuvere_meme.png` |
+| 13 | Attempt #1: just read the screen! | — |
+| 14 | Not so fast — scary permissions | ✅ `scary_permission.png` / `draw_over_other_apps.png` |
+| 15 | WTF #1: LinkedIn trips up the reader — snippet + "…more" collapse | ✅ `linked_in_more_collapsed.png` |
+| 16 | WTF #2: Twitter/X — one-blob `contentDescription` (typographic) | (⚠️ `quote_tweet.png` in `assets/`, unwired) |
+| 17 | "challenge accepted" meme | ✅ `challenge_accepted.png` |
+| 18 | Let's write some Java 1998 — the extractor interface | — |
+| 19 | …then wire them all up — dispatcher | — |
+| 20 | The reality: Regex wars | — |
+| 21 | That was *one* app, not even done well — treadmill + sweating meme | ✅ `sweating.gif` |
+| 22 | What if.. — a11y-as-API for agents (forward-look aside, §3b) | ✅ `chagpt`/`gemini`/`claude`/`siri` logos |
+| 23 | Maybe an AI model can just… *look* at it | — |
+| 24 | Step one: get the pixels — irony + pipeline | — |
+| 25 | Houston, we have a problem — privacy | ✅ `side_eye_meme.png` |
+| 26 | Running an LLM locally — divider | — |
+| 27 | "Doesn't Android just… give you this?" — Gemini Nano ⚠️verify | — |
+| 28 | Modelling — bring your own brain (adb / HF download) | ✅ `download_gemma_4_huggingface.png` |
+| 29 | Using LiteRT-LM — the engine | — |
+| 30 | First run: everything worked! 🎉 — CPU war story | — |
+| 31 | Why? — CPU-fallback explanation | — |
+| 32 | Four lines of XML | — |
+| 33 | Old phones will still choke — hardware floor | — |
+| 34 | Asking it something — prompt vs regex wall | — |
+| 35 | Throwback 📼 — demo replay + human-vs-robot writing | ✅ `demo_fast.gif` / `human_written` / `robot_written` |
+| 36 | The third door: just share it — share-sheet path | ✅ `select_text.jpg` / `share_improved.jpg` |
+| 37 | Not just OCR — it *understands* + verbatim/gags | — |
+| 38 | Everything you just saw is a real app — no Activity | — |
+| 39 | How? — 3 registry chips + trench coat | — |
+| 40 | What's in it for me? — the busy-screen setup | ✅ `serp_default_screen.jpg` / `menu_default_screen.jpg` |
+| 41 | Busy screens — the problem | — |
+| 42 | Now change one thing | ✅ `menu_default_screen.jpg` |
+| 43 | What we actually want — checklist | — |
+| 44 | API #1: `retain` — like `remember`, but tougher | — |
+| 45 | You don't even need a `ViewModel` anymore 🧪 — 3 snippets | — |
+| 46 | API #2: `rememberViewModelStoreOwner` — real, locally-scoped ViewModels | — |
+| 47 | Bonus: Navigation 3 — ⚠️ CUTTABLE | 🎬 Nav3-in-overlay GIF |
+| 48 | The Fragment-shaped hole: filled 🧩 | — |
+| 49 | Takeaway #1 — local LLMs are ready. I was surprised too. | — |
+| 50 | Takeaway #2 — Compose finally feels… complete | — |
+| 51 | That's the talk — sign-off | 🖼️ repo QR code |
+
+**Only 2 placeholders left** (both Costa's): Nav3-in-overlay GIF (s47, needs POC resurrected
+from `notes/nav3-viewmodels-in-a-service-overlay.md`) and the repo QR code (s51). Every other
+referenced image/GIF exists and is wired — the old hero-demo / CPU-run / demo-zoom / long-press
+/ busy-JET placeholders were all filled.
 
 (Numbering will drift as slides get cut in the trim — the section order is the stable
-reference; re-verify numbers against the overview at http://localhost:3030/overview/.)
+reference; re-verify numbers against the `<!-- Slide N -->` markers or the overview at
+http://localhost:3030/overview/.)
 
 ## Raw-material index (verified against the codebase, 2026-07-07)
 
