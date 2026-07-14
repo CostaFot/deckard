@@ -1423,23 +1423,24 @@ RetainObserver is the hook for anything that needs a lifecycle: onRetired is you
 
 ---
 
-# You don't even need a `ViewModel` anymore 🧪
+# Do we even need `ViewModel` anymore?
 <!-- Slide 43 -->
 
 <div class="text-sm">
 
 ```kotlin
-// 1. a "ViewModel": just a scope + cleanup, driven by RetainObserver
 abstract class RetainedViewModel : RetainObserver {
     val viewModelScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
-    override fun onRetired() { onCleared(); viewModelScope.cancel() }   // 🧹
+    
+    override fun onRetired() { 
+        onCleared(); viewModelScope.cancel() 
+    } 
 }
 ```
 
 <v-click>
 
 ```kotlin
-// 2. a one-liner to fetch-or-create it — scoped to the composition
 @Composable
 inline fun <reified T : RetainedViewModel> rememberRetainedViewModel(
     noinline factory: (Context) -> T,
@@ -1454,7 +1455,7 @@ inline fun <reified T : RetainedViewModel> rememberRetainedViewModel(
 <v-click>
 
 ```kotlin
-// 3. DIY dependency injection — the factory reaches straight into the DI graph
+// DIY dependency injection — the factory reaches straight into the DI graph
 val viewModel = rememberRetainedViewModel { context ->
     EntryPoints.get(context, SampleEntryPoint::class.java).sampleRetainedViewModel()
 }
@@ -1463,14 +1464,6 @@ val viewModel = rememberRetainedViewModel { context ->
 </v-click>
 
 </div>
-
-<v-click>
-
-<div class="pt-2 text-center opacity-90">
-Scope ✅ cleanup ✅ DI ✅ — no androidx <code>ViewModel</code>, no owners, no factories. <b>The sky's the limit.</b> 💸
-</div>
-
-</v-click>
 
 <!--
 Three snippets, one per click — walk them slowly, don't overload the room.
