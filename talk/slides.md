@@ -14,13 +14,15 @@ transition: slide-left
 mdc: true
 ---
 
-# Fighting AI slop with anti-slop
+<h1 class="!text-4xl whitespace-nowrap">Fighting AI slop with anti-slop</h1>
 <!-- Slide 1 -->
 
-The on-device Android engineering behind a slop detector
-
-<div class="pt-16 text-sm opacity-70">
-Costa Fotiadis · <code>@markasduplicate</code>
+<div v-click="1" class="pt-14 flex items-center justify-center gap-4">
+  <img src="./assets/profile_pic.jpg" class="rounded-full shadow-lg" style="width: 88px; height: 88px; object-fit: cover" alt="Costa Fotiadis" />
+  <div class="text-left">
+    <div class="text-base">Costa Fotiadis</div>
+    <div class="text-sm opacity-70">Senior Android dev · Just Eat Takeaway.com</div>
+  </div>
 </div>
 
 <!--
@@ -30,28 +32,20 @@ inside," not as ceremony.)
 -->
 
 ---
-layout: two-cols-header
+layout: center
+class: text-center
 ---
 
 # The internet is drowning in slop 🚀
 <!-- Slide 2 -->
 
-::left::
-
-<div class="pr-6 pt-6 text-lg leading-relaxed opacity-80">
-Every feed. Every day. 🚀 "I'm humbled to announce…", the em-dashes, the engagement bait.
-<br><br>
-Did a person write this, or did they paste it out of ChatGPT? I genuinely can't tell anymore.
-</div>
-
-::right::
-
-<img src="./assets/linkedin_slop_post.png" class="rounded-xl shadow-lg" style="max-height: 420px" alt="A maximally sloppy LinkedIn post — 🚀 emojis, 'I got fired on Monday.', numbered life lessons, flagged AI" />
+<img src="./assets/linkedin_slop_post.png" class="mx-auto mt-6 rounded-xl shadow-lg" style="max-height: 420px" alt="A maximally sloppy LinkedIn post — 🚀 emojis, 'I got fired on Monday.', numbered life lessons, flagged AI" />
 
 <!--
 Flash slide — a couple of seconds, let the room read the real specimen, move on. Real
-content gets the laugh that a parody can't. The screenshot does the work; the line on the
-left is the beat: "I genuinely can't tell anymore — and it's everywhere."
+content gets the laugh that a parody can't. The screenshot does all the work; say the beat
+out loud: "Every feed, every day. Did a person write this, or did they paste it out of
+ChatGPT? I genuinely can't tell anymore."
 -->
 
 ---

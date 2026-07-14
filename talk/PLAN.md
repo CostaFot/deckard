@@ -48,6 +48,9 @@ slide count first, Costa trims.
 
 ## Status log
 
+- **2026-07-14 (title slide)** — Slide 1 gained the speaker intro: `assets/profile_pic.jpg`
+  as a round avatar next to "Costa Fotiadis · `@markasduplicate` / Senior Android dev ·
+  Just Eat Takeaway.com". Deck map updated (s1 no longer asset-free).
 - **2026-07-14 (trim & polish pass, with Costa slide-by-slide)** — **49 → 43 slides.** Six
   merges, zero beats lost: **16+17** (interface + dispatcher, two clicks on "Java 1998");
   **28+29** ("everything worked! …but slow" + the `INTERNAL` logcat, one slide, two clicks);
@@ -358,7 +361,7 @@ lists what's wired; — = text/emoji only.
 
 | # | Title / content | Assets |
 |---|---|---|
-| 1 | Title — *Fighting AI slop with anti-slop* | — |
+| 1 | Title — *Fighting AI slop with anti-slop* + avatar/name/role | `profile_pic.jpg` |
 | 2 | The internet is drowning in slop 🚀 | `linkedin_slop_post.png` |
 | 3 | Victoria Beckham meme | `victoria_meme.jpg` |
 | 4 | So I built a thing that tells me — hero demo | `demo_fast.gif` |
