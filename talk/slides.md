@@ -1529,8 +1529,10 @@ stress test.
 -->
 
 ---
+layout: center
+---
 
-<h1 class="!text-4xl whitespace-nowrap">Closing #1 — local LLMs are actually quite good now</h1>
+<h1 class="!text-4xl whitespace-nowrap">Recap — local LLMs are actually quite good now</h1>
 <!-- Slide 41 -->
 
 <div class="pt-4 text-xl leading-relaxed">
@@ -1555,41 +1557,41 @@ today is the boring, stable part — the brains keep improving underneath it.
 -->
 
 ---
+layout: center
+---
 
-<h1 class="!text-4xl whitespace-nowrap">Closing #2 — Compose finally feels… complete</h1>
+<h1 class="!text-4xl whitespace-nowrap">Recap — Compose is in a good place</h1>
 <!-- Slide 42 -->
 
-<div class="pt-4 text-lg leading-relaxed">
+<div class="pt-8 text-2xl leading-loose">
 
 <v-clicks>
 
-- Let's gossip: **scoping a ViewModel to a composable** — and surviving rotation — never
-  had a clear-cut answer. Everyone hacked around it or let a nav library do it. All of it
-  **chained to an Activity** underneath 🙊
-- Everyone quietly asked: *"how do I get my old Fragment back — the nice way, in pure
-  Compose?"* There wasn't one.
-- These were **core APIs**. Honestly? They should have shipped years ago.
+- Core APIs like <code>retain</code> are a very welcome addition
+- …and they play very nicely with **Navigation 3**
+- Should've shipped with Compose 1.0 — but better late than never
 
 </v-clicks>
 
 </div>
 
-<v-click>
-
-<div class="pt-6 text-center text-xl leading-relaxed">
-But they're here: <code>retain</code> · <code>rememberViewModelStoreOwner</code> · Navigation 3.<br>
-<b>This is the year Compose is really ready to replace Views and Fragments.</b>
-</div>
-
-</v-click>
-
 <!--
 Deadpan, not mean — the frustration is real but the ending is genuinely positive.
 
-Compose has been out for years and was missing load-bearing pieces the whole time; we
-all just accepted the workarounds as normal. The fact that a floating wizard overlay and
-your busy production screen are fixed by the SAME two APIs is the proof they got the
-abstraction right.
+Bullet 1, the gossip compressed: scoping a ViewModel to a composable never had a
+clear-cut answer — everyone hacked around it or let a nav library do it, all chained to
+an Activity underneath. These were load-bearing pieces, missing while Compose was being
+sold as THE way to build Android UI; we just accepted the workarounds — and the
+confusion — as normal.
+
+Bullet 2, Nav 3 (one line only, no slide covers it): the new nav library is built on
+exactly these primitives — pure-Compose nav, per-entry ViewModel scoping, no Activity
+anywhere in sight.
+
+Bullet 3, the turn: better late than never — a floating wizard overlay and your busy
+production screen are fixed by the SAME APIs, which is the proof they got the
+abstraction right. This is the year Compose is really ready to replace Views and
+Fragments.
 -->
 
 ---

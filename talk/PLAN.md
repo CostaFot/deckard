@@ -61,6 +61,15 @@ slide count first, Costa trims.
   title **"Wait a minute…"** alone, click → **"Yeah. We just rewrote Fragments in
   Compose. 🧩"**; the sincere half + busy-screen payoff live in the speaker note. **Comment colour**: `setup/shiki.ts` comments `#7A7E85` grey → `#FFC66D` yellow
   (comments are on-slide annotations; pops on dark, no token-colour collision).
+  **Later, same session — the close:** s40 collapsed further (Costa's call) to "Wait a
+  minute…" → click → "Yeah. It's a `Fragment`." (inline code via `<code>`, backticks
+  don't parse in an HTML div). s41 retitled by Costa to **"Closing #1 — local LLMs are
+  actually quite good now"**, bullets tightened; one-line h1 treatment applied. s42
+  retitled **"Closing #2"** to match, and **rewritten to two beats**: "core APIs like
+  `retain` are great — ideally shipped back when Compose was first promoted for wide
+  adoption" / "better late than never 🙂" — the cut closing line **removed the Nav3
+  name-drop, resolving the deferred defect**; the gossip + "year Compose is ready" line
+  live in the speaker note.
 - **2026-07-14 (title slide)** — Slide 1 gained the speaker intro: `assets/profile_pic.jpg`
   as a round avatar next to "Costa Fotiadis · `@markasduplicate` / Senior Android dev ·
   Just Eat Takeaway.com". Deck map updated (s1 no longer asset-free).
@@ -356,10 +365,12 @@ slide count first, Costa trims.
    ON STAGE, decide live) and s31 (share sheet — the can't-fail demo path). ~10 of the 43
    are 5-second beats (memes/dividers), so the deck should now rehearse at roughly 18–20
    min. **Next gate is a timed rehearsal**, not more cutting.
-4. **Loose ends, in order:** (a) the deferred defect — **s42 Takeaway #2 still name-drops
-   Navigation 3**, which no slide covers (Costa said he'll look at it); (b) the repo **QR
-   code placeholder, s43**; (c) decide whether `quote_tweet.png` replaces the typographic
-   X blob on **s14**. **Prerequisites for a live demo:** flip `isMocked` + real
+4. **Loose ends, in order:** (a) ~~the deferred defect — s42 name-drops Navigation 3~~ —
+   **closed 2026-07-15**: Costa deliberately kept a one-line Nav3 bullet in the s42 rework
+   ("plays very nicely with Navigation 3"); the speaker note now carries a one-line
+   explainer (built on these primitives, per-entry VM scoping) so the mention is covered;
+   (b) the repo **QR code placeholder, s43**; (c) decide whether `quote_tweet.png` replaces
+   the typographic X blob on **s14**. **Prerequisites for a live demo:** flip `isMocked` + real
    `AI_DETECTOR_API_KEY`; optionally the persona line on the report card for "This is slop,
    son" on screen.
 5. Rehearsal pass: count minutes against the trimmed deck; export
@@ -414,8 +425,8 @@ lists what's wired; — = text/emoji only.
 | 38 | Do we even need `ViewModel` anymore? — line-by-line + "should you? not really 🧪" (merged) | `peepoHappy.png` 🐸 |
 | 39 | API #2: `rememberViewModelStoreOwner` | — |
 | 40 | Wait a minute… → "Yeah. We just rewrote Fragments in Compose. 🧩" (one-beat punchline) | — |
-| 41 | Closing #1 — local LLMs are actually quite good now | — |
-| 42 | Closing #2 — Compose finally feels… complete (⚠️ still name-drops Nav3, deferred) | — |
+| 41 | Recap — local LLMs are actually quite good now | — |
+| 42 | Recap — Compose is in a good place (retain welcome / plays nicely with Nav3 / better late than never) | — |
 | 43 | That's the talk — sign-off | 🖼️ repo QR code placeholder |
 
 **Only 1 placeholder left** (Costa's): the repo QR code (**s43**). **Still unwired:**
