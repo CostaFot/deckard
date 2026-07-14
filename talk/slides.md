@@ -1416,7 +1416,7 @@ RetainObserver is the hook for anything that needs a lifecycle: onRetired is you
 
 <div class="med-code">
 
-```kotlin
+```kotlin {1|2|4-7|all}
 abstract class RetainedViewModel : RetainObserver {
     val viewModelScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     
@@ -1444,56 +1444,36 @@ val viewModel = rememberRetainedViewModel { context ->   // = retain { factory(c
 
 </div>
 
-<!--
-Two snippets, one per click — walk them slowly, don't overload the room.
-
-1. RetainedViewModel: a coroutine scope + onCleared, driven by RetainObserver — the whole
-   "ViewModel contract" in five lines, no androidx.lifecycle.ViewModel anywhere
-2. DI: rememberRetainedViewModel is nothing but retain { factory(context) } (say it — the
-   whole helper is the comment on that line). The factory lambda is YOURS — grab a Hilt
-   entry point / your application component and inject whatever you want. No
-   @HiltViewModel, no ViewModelProvider.Factory.
-
-This is real code from the keyboard era of this very app.
--->
-
----
-layout: center
-class: text-center
----
-
-# Should someone actually do this?
-<!-- Slide 44 -->
-
-<div class="pt-8 text-3xl leading-relaxed">
-
 <v-click>
 
-Not really. Why reinvent the wheel?
-
-</v-click>
-
-<div class="pt-8 text-2xl opacity-80 leading-relaxed" style="max-width: 46rem; margin-inline: auto">
-
-<v-click>
-
-<div class="flex items-center justify-center gap-3">
-<span><code>ViewModel</code> works. But it is a funny little experiment.</span>
+<div class="pt-6 text-xl text-center opacity-90 flex items-center justify-center gap-3">
+<span>Should someone actually do this? <b>Not really.</b> But it is a funny little experiment.</span>
 <img src="./assets/peepoHappy.png" class="rounded-lg shadow-lg" style="height: 1.6em" alt="Peepo happy" />
 </div>
 
 </v-click>
 
-</div>
-
-</div>
-
 <!--
-The honest beat. I'm not telling anyone to rip out ViewModel — it works, it's proven, and
-your team already knows it. This was a "can I?" not a "should I?".
+The first snippet walks itself line by line — one highlight per click:
 
-The value isn't the replacement; it's that building it forces you to understand retain{},
-RetainObserver, and where state actually lives. Land it self-deprecating, then move on.
+1. (on entry) the class line: it's just a RetainObserver — no androidx.lifecycle.ViewModel
+   anywhere
+2. click: its own coroutine scope — there's your viewModelScope
+3. click: onRetired IS onCleared — cancel the scope, clean up. The whole "ViewModel
+   contract" in five lines
+4. click: the full picture, let it breathe
+
+Then click: DI. rememberRetainedViewModel is nothing but retain { factory(context) }
+(say it — the whole helper is the comment on that line). The factory lambda is YOURS —
+grab a Hilt entry point / your application component and inject whatever you want. No
+@HiltViewModel, no ViewModelProvider.Factory.
+
+This is real code from the keyboard era of this very app.
+
+Last click, the honest beat: I'm not telling anyone to rip out ViewModel — it works, it's
+proven, and your team already knows it. This was a "can I?" not a "should I?". The value
+is that building it forces you to understand retain{}, RetainObserver, and where state
+actually lives. Land it self-deprecating, then move on.
 -->
 
 ---
