@@ -1154,7 +1154,7 @@ apps the a11y extractors can't parse.
 
 <div class="text-rose-400 font-bold pb-4">👎 The bad</div>
 
-- Not 100% — can grab the **wrong** text occasionally
+- Not 100% — can grab the **wrong** text once in a while
 - Not instant
 
 </div>
@@ -1181,12 +1181,12 @@ layout: center
 - pure **Compose** UI
 - **ViewModels**
 - **Repositories**
-- **DI** (dagger) everywhere
+- **DI** (dagger-hilt)
 
 </div>
 
 <div class="pt-8 text-3xl text-center">
-And there is <b>no Activity anywhere</b>. 🫠
+And there is <b>no Activity anywhere</b>
 </div>
 
 <!--
@@ -1207,7 +1207,7 @@ layout: center
 <v-click>
 
 <div class="pt-4 text-xl text-center opacity-90 leading-relaxed">
-Turns out an Activity is just <b>three services in a trench coat</b>: 🥸
+An Activity is (mostly) <b>three services in a trench coat</b>:
 </div>
 
 </v-click>
