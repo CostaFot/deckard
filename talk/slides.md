@@ -1325,7 +1325,7 @@ never small.
 
 ---
 
-# Now change one thing
+# Change one thing
 <!-- Slide 40 -->
 
 <div class="grid grid-cols-2 gap-8 pt-4 items-center">
@@ -1338,7 +1338,7 @@ never small.
 
 <v-clicks>
 
-- Thread your state, callbacks, and dependencies through **everything above it**…
+- Thread your state, callbacks, and dependencies through **everything above it**
 - Break a hundred call sites on the way
 - ...and 100 screenshots and UI tests
 
@@ -1347,14 +1347,6 @@ never small.
 </div>
 
 </div>
-
-<v-click>
-
-<div class="pt-8 text-center text-3xl">
-A composable is <b>really hard to make independent</b> on a busy screen.
-</div>
-
-</v-click>
 
 <!--
 This is the WIIFM hook — I work on the JET app, this screen is real, and everyone in the
