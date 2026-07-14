@@ -187,6 +187,8 @@ That flag is the verdict. Deckard reads the screen, then something has to actual
 # AI is very good at detecting other AI
 <!-- Slide 8 -->
 
+<img src="./assets/pangram_logo.png" v-click="1" class="absolute top-28 right-16 rounded-lg shadow-lg" style="max-height: 90px" alt="Pangram logo" />
+
 <div class="pt-6 text-2xl leading-loose">
 
 <v-clicks>
