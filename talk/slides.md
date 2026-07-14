@@ -1567,58 +1567,11 @@ composables in the overlay own their ViewModels.
 -->
 
 ---
-
-# Bonus: Navigation 3 — nav that isn't chained to an Activity
-<!-- Slide 46 -->
-
-```kotlin
-val backStack = rememberNavBackStack(ScreenA)     // a plain list. YOU own it.
-NavDisplay(
-    backStack = backStack,
-    onBack = { backStack.removeLastOrNull() },
-    entryDecorators = listOf(
-        rememberSaveableStateHolderNavEntryDecorator(),
-        rememberViewModelStoreNavEntryDecorator(),  // ← per-screen VMs, cleared on pop
-    ),
-    entryProvider = entryProvider {
-        entry<ScreenA> { ScreenA(viewModel(factory = factory)) }
-        entry<ScreenB> { /* … */ }
-    },
-)
-```
-
-<v-clicks>
-
-- **Pure Compose** — not tied to an Activity, not tied to *anything*. Great for **KMP** too
-- I ran this — back stack, per-screen ViewModels, the lot — **inside the overlay. No
-  Activity.** And it just worked 🤯
-
-</v-clicks>
-
-<div class="mt-3 flex items-center justify-center border-2 border-dashed rounded-xl opacity-70" style="height: 90px">
-  <div class="text-center text-sm px-6">
-    🎬 <b>PLACEHOLDER</b> — GIF: Nav3 panel navigating inside the overlay, no Activity anywhere
-  </div>
-</div>
-
-<!--
-⚠️ CUTTABLE SLIDE — Costa decides in the trim pass.
-
-Navigation 3: the back stack is literally a mutableStateList you own; NavDisplay renders
-it; decorators bolt on saveable state + per-entry ViewModel scoping (cleared on pop —
-ViewModel.onCleared fires when the screen is popped).
-
-Proving ground: I ran the full thing inside the WindowManager overlay — screens, back
-navigation, per-screen DI'd ViewModels, retained across recomposition, cleared on pop.
-Write-up lives in the repo (notes/nav3-viewmodels-in-a-service-overlay.md).
--->
-
----
 layout: center
 ---
 
 # The Fragment-shaped hole: filled 🧩
-<!-- Slide 47 -->
+<!-- Slide 46 -->
 
 <div class="pt-4 text-xl text-center leading-relaxed">
 
@@ -1652,7 +1605,7 @@ is the everyday value; the overlay was just the stress test.
 ---
 
 # Takeaway #1 — local LLMs are ready. I was surprised too.
-<!-- Slide 48 -->
+<!-- Slide 47 -->
 
 <div class="pt-4 text-xl leading-relaxed">
 
@@ -1687,7 +1640,7 @@ today is the boring, stable part — the brains keep improving underneath it.
 ---
 
 # Takeaway #2 — Compose finally feels… complete
-<!-- Slide 49 -->
+<!-- Slide 48 -->
 
 <div class="pt-4 text-lg leading-relaxed">
 
@@ -1728,7 +1681,7 @@ class: text-center
 ---
 
 # That's the talk
-<!-- Slide 50 -->
+<!-- Slide 49 -->
 
 <div class="pt-4 text-xl opacity-90">
 Go build something. Accessibly, please — the agents are coming. 🤖
