@@ -880,8 +880,9 @@ layout: center
 
 <v-click>
 
-<div class="text-5xl text-center mt-16 leading-relaxed">
-…but it was so <b>slow</b>. 😡
+<div class="text-5xl mt-16 leading-relaxed flex items-center justify-center gap-4">
+<span>…but it was so <b>slow</b>.</span>
+<img src="./assets/madge.png" class="rounded-lg shadow-lg" style="height: 1.2em" alt="Madge — annoyed Pepe" />
 </div>
 
 </v-click>
