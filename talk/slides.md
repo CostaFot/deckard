@@ -758,7 +758,7 @@ And now the talk owes the audience an answer: yes — and here's how. Into LiteR
 
 <v-click>
 
-- Sort of! Google is making an effort lately to provide these out of the box
+- Sort of! Google is giving it a go
 
 </v-click>
 
@@ -769,7 +769,7 @@ And now the talk owes the audience an answer: yes — and here's how. Into LiteR
 <div class="pl-8 pt-4 text-2xl leading-loose">
 
 - **Gated** — limited devices, **quotas** on who calls it and how much
-- Not really suitable for an app whose whole job is **hammering a vision model**
+- ... where's the fun in that?
 
 </div>
 
