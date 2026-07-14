@@ -878,38 +878,33 @@ layout: center
 
 <v-click>
 
-<div class="text-5xl mt-16 leading-relaxed flex items-center justify-center gap-4">
+<div class="text-4xl mt-10 leading-relaxed flex items-center justify-center gap-4">
 <span>…but it was so <b>slow</b>.</span>
 <img src="./assets/madge.png" class="rounded-lg shadow-lg" style="height: 1.2em" alt="Madge — annoyed Pepe" />
 </div>
 
 </v-click>
 
-<!--
-Spend a beat here. It "worked" — that's the trap. A summon took the better part of a
-minute. It was shit. Let the slow-run recording sell how bad it was.
--->
+<v-click>
 
----
-layout: center
----
-
-# Why?
-<!-- Slide 29 -->
-
-<div class="mt-8 mx-auto p-5 border rounded-xl font-mono text-lg" style="max-width: 40rem">
+<div class="mt-10 mx-auto p-5 border rounded-xl font-mono text-lg" style="max-width: 40rem">
 E/litert: GPU backend initialization failed: INTERNAL<br>
 I/litert: falling back to CPU
 </div>
 
-<div class="pt-8 text-xl text-center leading-relaxed">
+<div class="pt-6 text-xl text-center leading-relaxed">
 An opaque <code>INTERNAL</code> error… then a <b>silent</b> fallback to CPU
 </div>
 
+</v-click>
+
 <!--
-Nothing crashes. No exception reaches you. You just get a slow app and one cryptic line
-in logcat. What would YOU google for "INTERNAL"? This is the setup for the fix — four lines
-of XML.
+Spend a beat here. It "worked" — that's the trap. A summon took the better part of a
+minute. It was shit.
+
+Click: why? Nothing crashes. No exception reaches you. You just get a slow app and one
+cryptic line in logcat. What would YOU google for "INTERNAL"? This is the setup for the
+fix — four lines of XML.
 -->
 
 ---
