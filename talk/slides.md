@@ -504,7 +504,7 @@ interface ScreenContentExtractor {
 
 <div class="pt-1 med-code">
 
-```kotlin {2|5-6|all}{at:2}
+```kotlin {2|5-6|all}{at:3}
 class ScreenContentExtractors @Inject constructor(
     private val extractors: Set<ScreenContentExtractor>,
     private val generic: GenericContentExtractor,   // unknown-app fallback
