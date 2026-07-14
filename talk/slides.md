@@ -534,8 +534,12 @@ every app on Earth."
 
 ---
 
-# The reality: Regex wars
 <!-- Slide 18 -->
+
+<h1 class="flex items-center gap-3 m-0">
+  <span>The reality: Regex wars</span>
+  <img src="./assets/peepoFine.gif" class="rounded-lg shadow-lg" style="height: 1em" alt="Peepo sweating — this is fine" />
+</h1>
 
 <div class="pt-8">
 
