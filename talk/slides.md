@@ -485,7 +485,7 @@ I'll just handle every app myself."
 
 <v-click>
 
-<div class="pt-10 big-code">
+<div class="pt-4 med-code">
 
 ```kotlin
 interface ScreenContentExtractor {
@@ -498,22 +498,11 @@ interface ScreenContentExtractor {
 
 </v-click>
 
-<!--
-This looks GREAT in a design doc. Clean seam: one interface, one implementation per app.
-I was very proud of it.
-
-Say the title straight. Click the interface in — then hand off: "and then you just wire
-them all up." Next slide is the wiring.
--->
-
----
-
-# …then wire them all up
-<!-- Slide 17 -->
-
 <v-click>
 
-<div class="pt-10 big-code">
+<div class="pt-3 opacity-80">…then wire them all up:</div>
+
+<div class="pt-1 med-code">
 
 ```kotlin
 class ScreenContentExtractors @Inject constructor(
@@ -530,7 +519,11 @@ class ScreenContentExtractors @Inject constructor(
 </v-click>
 
 <!--
-The Hilt multibinding: add an app = one class + one @IntoSet binding, fall back to a generic
+This looks GREAT in a design doc. Clean seam: one interface, one implementation per app.
+I was very proud of it.
+
+Say the title straight. Click 1: the interface. Click 2: the dispatcher — the Hilt
+multibinding: add an app = one class + one @IntoSet binding, fall back to a generic
 extractor for the unknown app.
 
 Deadpan: "I was building a beautiful, extensible system… for hand-writing a parser for
