@@ -48,6 +48,23 @@ slide count first, Costa trims.
 
 ## Status log
 
+- **2026-07-14 (defect-fix pass)** — Review of the full deck found 7 defects; 6 fixed, 1
+  deferred. Fixed: **s45** `ComponentViewModelScope` snippet had a dangling `}` +
+  bad indentation (now compiles); **s20** "accesibility" typo; **s33/s35 notes** — the
+  second-movement transition ("everything you just saw is Compose") moved from s33's note
+  to s35's, since s34–35 still follow s33 (slide order kept); **s8/s9 notes** — s8's ghost
+  reference to the cut at-a-glance slide removed, and s9's note gained an explicit
+  say-out-loud line that Deckard ships the screen text to Pangram (the deck stated it
+  nowhere after that slide was cut); **s37** "three services in a trench coat" →
+  "three **registries**" (a talk starring a literal `Service` shouldn't overload the word);
+  **s42** verified against androidx sources (runtime-retain 1.11.0 in the Gradle cache):
+  `RetainedValuesStore` + `RetainObserver` are the real names, `retain` is public/stable in
+  `androidx.compose.runtime.retain` — but it's a **separate artifact**
+  (`androidx.compose.runtime:runtime-retain`), so the snippet gained an import line with an
+  artifact-coordinate comment + the note carries the full coordinate. **Deferred: the s48
+  close still name-drops Navigation 3, which no slide covers** — Costa will look at it.
+  Review's remaining big item: the trim (49 → time-fits-20-min via merges: 16+17, 28+29,
+  38+39, 41→42, 43+44, and one of s4/s5; candidates to cut: s25, s34).
 - **2026-07-14 (later)** — **Editing pass over the deck: 3 slides cut, 1 added, reaction
   images wired, deck now 49 slides (was 51).** The trim pass has *started*. Cut: **"At a
   glance"** (the face/eyes/brain cards) and **"Another easy weekend project"** (Interstellar

@@ -1397,9 +1397,11 @@ mean the composable depends on something far above it. The new APIs kill that de
 <!-- Slide 42 -->
 
 ```kotlin
+import androidx.compose.runtime.retain.retain
+
 @Composable
 fun BeerCounter() {
-    // like remember { } — but also survives configuration changes
+    // like remember — but also survives configuration changes
     val counter = retain { Counter() }
 }
 ```
@@ -1422,7 +1424,9 @@ fun BeerCounter() {
 
 <!--
 The plain API first — androidx.compose.runtime.retain. One line to adopt: swap
-remember{} for retain{} where the value should outlive a config change.
+remember{} for retain{} where the value should outlive a config change. Full coordinate
+if asked: androidx.compose.runtime:runtime-retain (verified against 1.11.0 sources —
+public API, not experimental; RetainedValuesStore and RetainObserver are the real names).
 
 RetainObserver is the hook for anything that needs a lifecycle: onRetired is your
 "onCleared" moment. Which is exactly the ingredient for the next slide…
