@@ -251,8 +251,9 @@ the verdict — async because detection takes a few seconds. `fraction_ai: 1.0` 
 the report card. In the app it's a two-method Retrofit interface (`net/PangramService.kt`).
 
 Seed for the descent: if there's a detector this good behind that badge, I can point it at
-anything I can read off the screen — which is the whole app. (That Deckard calls Pangram's
-API is spelled out on the machine-at-a-glance slide; here it's just "meet the detector.")
+anything I can read off the screen — which is the whole app. (Here it's just "meet the
+detector" — the explicit "Deckard sends the screen text to Pangram" line lands out loud on
+the next slide.)
 -->
 
 ---
@@ -284,6 +285,10 @@ The one-line pitch, fast — don't linger. Pangram already solved "is this AI?" 
 on a handful of sites. I wanted that same verdict everywhere: any app, anything on screen,
 system-wide on Android. That gap — browser-extension → phone-wide overlay — is the entire
 engineering project the rest of the talk is about.
+
+SAY EXPLICITLY (the deck never states it anywhere else): Deckard's whole job is reading
+the text off the current screen and sending THAT to Pangram's API — same detector, new
+eyes. The hard part is the eyes; that's the rest of the talk.
 -->
 
 ---
@@ -611,7 +616,7 @@ There is no way to handle everything for every app. Full stop.
 <v-click>
 
 <div class="pt-6 text-2xl leading-relaxed">
-and that same accesibility tree grows even more important?
+and that same accessibility tree grows even more important?
 </div>
 
 <div class="pt-10 flex items-center gap-8 opacity-80">
@@ -1097,9 +1102,9 @@ layout: center
 The audience has been in the engine room for ten minutes — resurface. This is the same
 hero demo, zoomed on the verdict.
 
-Then the turn into the second movement: "I've talked services, models, API calls. But
-everything you just SAW — the mascot, the bubble, the report card — is Compose. And
-here's the thing…"
+Don't turn toward Compose yet — two more beats first: the share-sheet path, then the
+honest good/bad of the OCR approach. The second-movement transition lives on "Not just
+OCR" (two slides ahead).
 -->
 
 ---
@@ -1166,7 +1171,9 @@ The verbatim nuance is the sharpest technical point in this act: the LLM is a RE
 a summarizer. Any rewriting biases Pangram toward "AI" — the whole pipeline depends on the
 model resisting its own urge to be helpful.
 
-The demo GIF should be an app never handled in the a11y era — that's the proof.
+Then the turn into the second movement: "I've talked services, models, API calls. But
+everything you just SAW — the mascot, the bubble, the report card — is Compose. And
+here's the thing…"
 -->
 
 ---
@@ -1207,7 +1214,7 @@ layout: center
 <v-click>
 
 <div class="pt-4 text-xl text-center opacity-90 leading-relaxed">
-An Activity is (mostly) <b>three services in a trench coat</b>:
+An Activity is (mostly) <b>three registries in a trench coat</b>:
 </div>
 
 </v-click>
@@ -1524,12 +1531,11 @@ RetainObserver, and where state actually lives. Land it self-deprecating, then m
 ```kotlin
 @Composable
 fun ComponentViewModelScope(content: @Composable () -> Unit) {
-        val storeOwner = rememberViewModelStoreOwner()   // ← this composable OWNS a store
-        CompositionLocalProvider(
-            LocalViewModelStoreOwner provides storeOwner,
-            content = content,
-        )
-    }
+    val storeOwner = rememberViewModelStoreOwner()   // ← this composable OWNS a store
+    CompositionLocalProvider(
+        LocalViewModelStoreOwner provides storeOwner,
+        content = content,
+    )
 }
 ```
 
