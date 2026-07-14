@@ -137,10 +137,15 @@ layout: two-cols
 
 <div class="pt-6 text-xl leading-loose">
 
-<v-clicks>
+<v-click at="1">
 
-- AGI is coming and you dont need to read the code anymore
-- jk getting an LLM to help with a slightly non-deterministic problem
+- <span :class="{ 'line-through decoration-red-500 decoration-2 opacity-50': $clicks >= 2 }" class="transition-opacity">AGI is coming - we might as well pivot to Irish step dancing</span>
+
+</v-click>
+
+<v-clicks at="3">
+
+- Getting an LLM to help with a slightly non-deterministic problem
 - New-ish useful compose APIs and how to apply 
 
 </v-clicks>
@@ -148,11 +153,6 @@ layout: two-cols
 </div>
 
 </div>
-
-<div class="absolute bottom-6 left-0 right-0 text-center text-base">
-  <a href="https://github.com/costa/deckard">github.com/costa/deckard</a>
-</div>
-
 <!--
 The roadmap beat, right after the demo proves the product — modelled on Zac's "SLIDES"
 preamble slide (image left, agenda right, link at the bottom). Say it plainly: the detector
