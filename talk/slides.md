@@ -1350,35 +1350,16 @@ the host's owners, so everything gets threaded from the top.
 
 ---
 
-# What we actually want
+# API #1: `retain`
 <!-- Slide 41 -->
 
-<div class="pt-8 text-3xl leading-loose mx-auto" style="max-width: 40rem">
-
-A composable that:
-
-<v-clicks>
-
-- **makes its own dependencies**
-- **owns its own ViewModel**— scoped to the composition
-- survives configuration changes
-
-</v-clicks>
-
+<div class="pt-1 text-lg opacity-80">
+First: a composable that <b>keeps its own state</b>, surviving rotation.
 </div>
 
-<!--
-Name the problem precisely before showing APIs: scoping + DI + cleanup, all local to the
-composable.
+<v-click>
 
-The classic answers were "put it on the nav graph" or "scope it to the Activity" — both
-mean the composable depends on something far above it. The new APIs kill that dependency.
--->
-
----
-
-# API #1: `retain`
-<!-- Slide 42 -->
+<div class="pt-3">
 
 ```kotlin
 import androidx.compose.runtime.retain.retain
@@ -1390,24 +1371,36 @@ fun BeerCounter() {
 }
 ```
 
+</div>
+
+</v-click>
+
 <v-clicks>
 
 - Retention at the **Compose-runtime level** — scoped to the composition
 - Rotate the phone: `remember` → gone, **`retain` → still there**
-- Backed by `RetainedValuesStore`, so it's flexible enough
 
 </v-clicks>
 
 <v-click>
 
-<div class="mt-8 mx-auto p-5 border-2 border-red-500/60 rounded-xl text-xl text-center" style="max-width: 44rem">
+<div class="mt-6 mx-auto p-4 border-2 border-red-500/60 rounded-xl text-xl text-center" style="max-width: 44rem">
 ⚠️ No process death / saved state handling
 </div>
 
 </v-click>
 
 <!--
-The plain API first — androidx.compose.runtime.retain. One line to adopt: swap
+Open on the want, not the API — but only the piece THIS slide answers: state that lives
+with the composition and survives rotation. The bigger want (own ViewModel, own
+dependencies) lands over the next two slides. The classic answers were "put it on the nav
+graph" or "scope it to the Activity" — both mean the composable depends on something far
+above it. These new APIs kill that dependency.
+
+If asked how it's implemented: it's backed by RetainedValuesStore, which is public API —
+flexible enough to build on (as the next slide proves).
+
+Click — the first answer: androidx.compose.runtime.retain. One line to adopt: swap
 remember{} for retain{} where the value should outlive a config change. Full coordinate
 if asked: androidx.compose.runtime:runtime-retain (verified against 1.11.0 sources —
 public API, not experimental; RetainedValuesStore and RetainObserver are the real names).
@@ -1421,7 +1414,7 @@ RetainObserver is the hook for anything that needs a lifecycle: onRetired is you
 # Do we even need `ViewModel` anymore?
 <!-- Slide 43 -->
 
-<div class="text-sm">
+<div class="med-code">
 
 ```kotlin
 abstract class RetainedViewModel : RetainObserver {
@@ -1436,39 +1429,30 @@ abstract class RetainedViewModel : RetainObserver {
 
 <v-click>
 
-```kotlin
-@Composable
-inline fun <reified T : RetainedViewModel> rememberRetainedViewModel(
-    noinline factory: (Context) -> T,
-): T {
-    val context = LocalContext.current
-    return retain { factory(context) }
-}
-```
-
-</v-click>
-
-<v-click>
+<div class="pt-4">
 
 ```kotlin
 // DIY dependency injection — the factory reaches straight into the DI graph
-val viewModel = rememberRetainedViewModel { context ->
+val viewModel = rememberRetainedViewModel { context ->   // = retain { factory(context) }
     EntryPoints.get(context, SampleEntryPoint::class.java).sampleRetainedViewModel()
 }
 ```
+
+</div>
 
 </v-click>
 
 </div>
 
 <!--
-Three snippets, one per click — walk them slowly, don't overload the room.
+Two snippets, one per click — walk them slowly, don't overload the room.
 
 1. RetainedViewModel: a coroutine scope + onCleared, driven by RetainObserver — the whole
    "ViewModel contract" in five lines, no androidx.lifecycle.ViewModel anywhere
-2. rememberRetainedViewModel: fetch-or-create via retain{}
-3. DI: the factory lambda is YOURS — grab a Hilt entry point / your application component
-   and inject whatever you want. No @HiltViewModel, no ViewModelProvider.Factory.
+2. DI: rememberRetainedViewModel is nothing but retain { factory(context) } (say it — the
+   whole helper is the comment on that line). The factory lambda is YOURS — grab a Hilt
+   entry point / your application component and inject whatever you want. No
+   @HiltViewModel, no ViewModelProvider.Factory.
 
 This is real code from the keyboard era of this very app.
 -->
