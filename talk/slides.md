@@ -713,13 +713,7 @@ layout: center
 
 <div class="pt-6 text-xl text-center leading-relaxed">
 
-<v-click>
-
 This thing sees <b>everything on the screen</b>.<br>
-
-</v-click>
-
-<v-click>
 
 <div class="pt-6">
 Now imagine shipping all of that to a remote LLM ⚠️
@@ -728,8 +722,6 @@ Now imagine shipping all of that to a remote LLM ⚠️
 <div class="pt-8 flex justify-center">
   <img src="./assets/side_eye_meme.png" class="rounded-xl shadow-lg" style="max-height: 200px" alt="Side-eye meme" />
 </div>
-
-</v-click>
 
 </div>
 
