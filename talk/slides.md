@@ -540,7 +540,7 @@ every app on Earth."
 
 ---
 
-<!-- Slide 18 -->
+<!-- Slide 17 -->
 
 <h1 class="flex items-center gap-3 m-0">
   <span>The reality: Regex wars</span>
@@ -578,7 +578,7 @@ fix reveals a new special case."
 ---
 
 <div class="pt-16">
-<!-- Slide 19 -->
+<!-- Slide 18 -->
 
 # That was <span v-mark.red="0">one</span> app, not even done well
 
@@ -608,7 +608,7 @@ There is no way to handle everything for every app. Full stop.
 ---
 
 # What if…
-<!-- Slide 20 -->
+<!-- Slide 19 -->
 
 <div class="pt-8 text-2xl leading-relaxed">
 …<b>agents</b> become the de facto way of using a device,
@@ -646,7 +646,7 @@ class: text-center
 ---
 
 # Maybe an AI model can just… <i>look</i> at it
-<!-- Slide 21 -->
+<!-- Slide 20 -->
 
 <v-click>
 
@@ -666,7 +666,7 @@ Don't oversell yet — the payoff proof comes after we get the model running.
 ---
 
 # Step one: get the pixels
-<!-- Slide 22 -->
+<!-- Slide 21 -->
 
 <div class="pt-6 med-code">
 
@@ -715,7 +715,7 @@ layout: center
 ---
 
 # Houston, we have a problem.
-<!-- Slide 23 -->
+<!-- Slide 22 -->
 
 <div class="pt-6 text-xl text-center leading-relaxed">
 
@@ -746,7 +746,7 @@ class: text-center
 ---
 
 # Running an LLM locally
-<!-- Slide 24 -->
+<!-- Slide 23 -->
 
 <!--
 The bridge lands. The screen never leaves the device — that's the deal that makes the
@@ -758,7 +758,7 @@ And now the talk owes the audience an answer: yes — and here's how. Into LiteR
 ---
 
 # Bring your own brain
-<!-- Slide 25 -->
+<!-- Slide 24 -->
 
 <div class="pt-2 text-lg opacity-80">
 "Doesn't Android just… give you this?" — sort of (<b>Gemini Nano</b>), but it's
@@ -814,7 +814,7 @@ The keyboard line is a throwaway — one beat, move on.
 ---
 
 # Using LiteRT-LM
-<!-- Slide 27 -->
+<!-- Slide 25 -->
 
 <div class="big-code pt-2">
 
@@ -860,7 +860,7 @@ layout: center
 ---
 
 # First run: everything worked! 
-<!-- Slide 28 -->
+<!-- Slide 26 -->
 
 <v-click>
 
@@ -896,7 +896,7 @@ fix — four lines of XML.
 ---
 
 # Four lines of XML
-<!-- Slide 30 -->
+<!-- Slide 27 -->
 
 <div class="med-code pt-6">
 
@@ -942,7 +942,7 @@ first-party sample that works and diff it.
 
 ---
 
-<!-- Slide 31 -->
+<!-- Slide 28 -->
 
 # Old phones will still choke
 
@@ -973,7 +973,7 @@ not a "works on Android" feature. Some floors software can't lift.
 ---
 
 # Asking it something
-<!-- Slide 32 -->
+<!-- Slide 29 -->
 
 <div class="big-code pt-2">
 
@@ -1043,7 +1043,7 @@ layout: center
 ---
 
 # Does it actually work?
-<!-- Slide 33 -->
+<!-- Slide 30 -->
 
 <div class="grid grid-cols-3 gap-8 items-center justify-items-center mt-4">
 
@@ -1075,7 +1075,7 @@ layout: center
 ---
 
 # Or… just share it
-<!-- Slide 34 -->
+<!-- Slide 31 -->
 
 <div class="grid grid-cols-2 gap-12 items-center justify-items-center mt-4">
 
@@ -1101,7 +1101,7 @@ apps the a11y extractors can't parse.
 ---
 
 # Not just OCR
-<!-- Slide 35 -->
+<!-- Slide 32 -->
 
 <div class="grid grid-cols-2 gap-10 pt-10 text-2xl leading-loose">
 
@@ -1144,7 +1144,7 @@ layout: center
 ---
 
 # Everything you just saw is a real app
-<!-- Slide 36 -->
+<!-- Slide 33 -->
 
 <div class="pt-4 text-xl mx-auto text-left" style="max-width: 20rem">
 
@@ -1172,7 +1172,7 @@ layout: center
 ---
 
 # How?
-<!-- Slide 37 -->
+<!-- Slide 34 -->
 
 <v-click>
 
@@ -1224,7 +1224,7 @@ work.
 ---
 
 # What's in it for me?
-<!-- Slide 38 -->
+<!-- Slide 35 -->
 
 <div class="grid mt-6">
 
@@ -1292,7 +1292,7 @@ composable with a hundred params, ten people, five features, all in the same fil
 ---
 
 # Change one thing
-<!-- Slide 40 -->
+<!-- Slide 36 -->
 
 <div class="grid grid-cols-2 gap-8 pt-4 items-center">
 
@@ -1326,7 +1326,7 @@ the host's owners, so everything gets threaded from the top.
 ---
 
 # API #1: `retain`
-<!-- Slide 41 -->
+<!-- Slide 37 -->
 
 <div class="pt-1 text-lg opacity-80">
 First: a composable that <b>keeps its own state</b>, surviving rotation.
@@ -1387,7 +1387,7 @@ RetainObserver is the hook for anything that needs a lifecycle: onRetired is you
 ---
 
 # Do we even need `ViewModel` anymore?
-<!-- Slide 43 -->
+<!-- Slide 38 -->
 
 <div class="med-code">
 
@@ -1454,7 +1454,7 @@ actually lives. Land it self-deprecating, then move on.
 ---
 
 # API #2: `rememberViewModelStoreOwner`
-<!-- Slide 45 -->
+<!-- Slide 39 -->
 
 ```kotlin
 @Composable
@@ -1505,7 +1505,7 @@ layout: center
 ---
 
 # The Fragment-shaped hole: filled 🧩
-<!-- Slide 46 -->
+<!-- Slide 40 -->
 
 <div class="pt-4 text-xl text-center leading-relaxed">
 
@@ -1539,7 +1539,7 @@ is the everyday value; the overlay was just the stress test.
 ---
 
 # Takeaway #1 — local LLMs are ready. I was surprised too.
-<!-- Slide 47 -->
+<!-- Slide 41 -->
 
 <div class="pt-4 text-xl leading-relaxed">
 
@@ -1574,7 +1574,7 @@ today is the boring, stable part — the brains keep improving underneath it.
 ---
 
 # Takeaway #2 — Compose finally feels… complete
-<!-- Slide 48 -->
+<!-- Slide 42 -->
 
 <div class="pt-4 text-lg leading-relaxed">
 
@@ -1615,7 +1615,7 @@ class: text-center
 ---
 
 # That's the talk
-<!-- Slide 49 -->
+<!-- Slide 43 -->
 
 <div class="pt-4 text-xl opacity-90">
 Go build something. Accessibly, please — the agents are coming. 🤖
