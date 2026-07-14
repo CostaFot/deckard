@@ -4,7 +4,8 @@ import { defineShikiSetup } from '@slidev/types'
  * JetBrains "Islands Dark" / Darcula syntax colours, as a TextMate theme for Shiki.
  * Mirrors the new-UI Darcula scheme so code blocks read like the IDE:
  *   keyword  #CF8E6D (orange)   string   #6AAB73 (green)    number  #2AACB8 (teal)
- *   comment  #7A7E85 (grey)     function #56A8F5 (blue)     const   #C77DBB (purple)
+ *   comment  #FFC66D (yellow — intentionally louder than Darcula's grey; comments are
+ *   on-slide annotations in this deck)      function #56A8F5 (blue)   const   #C77DBB (purple)
  *   annotation #B3AE60 (olive)  tag      #E8BF6A (gold)     default #BCBEC4
  */
 const darcula = {
@@ -17,10 +18,10 @@ const darcula = {
   settings: [
     { settings: { background: '#1E1F22', foreground: '#BCBEC4' } },
 
-    // Comments
+    // Comments — deliberately loud: the deck uses comments as on-slide annotations
     {
       scope: ['comment', 'punctuation.definition.comment', 'string.comment'],
-      settings: { foreground: '#7A7E85' },
+      settings: { foreground: '#FFC66D' },
     },
 
     // Keywords, storage, modifiers, control flow

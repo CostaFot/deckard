@@ -1235,11 +1235,11 @@ work.
 
 <div class="text-2xl leading-loose">
 
-<v-clicks at="2">
+<v-clicks at="3">
 
 - **God ViewModel(s)**
 - 100 API calls
-- 50 features
+- 50 feature toggles
 - **10 people** working on it
 - …and the 3 different teams trying to catch the next release
 
@@ -1247,27 +1247,20 @@ work.
 
 </div>
 
-<div class="text-xs" style="max-height: 440px; overflow: hidden">
+<div class="text-sm" style="max-height: 440px; overflow: hidden">
 
-```kotlin
+```kotlin {all|11}{at:2}
 @Composable
 fun MenuScreen(
     restaurant: Restaurant,
     offers: List<Offer>,
-    popularItems: List<MenuItem>,
-    categories: List<Category>,
     basket: Basket,
     deliveryEta: Eta,
-    isGroupOrder: Boolean,
     onItemClick: (MenuItem) -> Unit,
     onAddToBasket: (MenuItem) -> Unit,
     onOfferClick: (Offer) -> Unit,
-    onCategoryClick: (Category) -> Unit,
-    onSearchClick: () -> Unit,
-    onGroupOrderClick: () -> Unit,
-    onBasketClick: () -> Unit,
     onBack: () -> Unit,
-    // …90 more
+    // …plus 90 more params
 ) { /* … */ }
 ```
 
@@ -1285,6 +1278,10 @@ Click: the screenshots give way to what they're like to MAINTAIN. These screens 
 dense by accident — they're the seam where the whole org meets. One God ViewModel, a
 composable with a hundred params, ten people, five features, all in the same file
 (bullets land one per click). That's why changing "one small thing" is never small.
+
+Click 1: the screenshots swap out for the snippet, shown whole. Click 2: everything dims
+except "…plus 90 more params" — the punchline. The eight params on screen are the
+trailer; the real signature is the movie. Then the bullets, one per click (3–7).
 -->
 
 ---
