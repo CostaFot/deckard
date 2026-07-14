@@ -1478,9 +1478,48 @@ This is real code from the keyboard era of this very app.
 -->
 
 ---
+layout: center
+class: text-center
+---
+
+# Should someone actually do this?
+<!-- Slide 44 -->
+
+<div class="pt-8 text-3xl leading-relaxed">
+
+<v-click>
+
+Not really. Why reinvent the wheel?
+
+</v-click>
+
+<div class="pt-8 text-2xl opacity-80 leading-relaxed" style="max-width: 46rem; margin-inline: auto">
+
+<v-click>
+
+<div class="flex items-center justify-center gap-3">
+<span><code>ViewModel</code> works. But it is a funny little experiment.</span>
+<img src="./assets/peepoHappy.png" class="rounded-lg shadow-lg" style="height: 1.6em" alt="Peepo happy" />
+</div>
+
+</v-click>
+
+</div>
+
+</div>
+
+<!--
+The honest beat. I'm not telling anyone to rip out ViewModel — it works, it's proven, and
+your team already knows it. This was a "can I?" not a "should I?".
+
+The value isn't the replacement; it's that building it forces you to understand retain{},
+RetainObserver, and where state actually lives. Land it self-deprecating, then move on.
+-->
+
+---
 
 # API #2: `rememberViewModelStoreOwner` — real ViewModels, locally scoped
-<!-- Slide 44 -->
+<!-- Slide 45 -->
 
 ```kotlin
 @Composable
@@ -1527,7 +1566,7 @@ composables in the overlay own their ViewModels.
 ---
 
 # Bonus: Navigation 3 — nav that isn't chained to an Activity
-<!-- Slide 45 -->
+<!-- Slide 46 -->
 
 ```kotlin
 val backStack = rememberNavBackStack(ScreenA)     // a plain list. YOU own it.
@@ -1576,7 +1615,7 @@ layout: center
 ---
 
 # The Fragment-shaped hole: filled 🧩
-<!-- Slide 46 -->
+<!-- Slide 47 -->
 
 <div class="pt-4 text-xl text-center leading-relaxed">
 
@@ -1610,7 +1649,7 @@ is the everyday value; the overlay was just the stress test.
 ---
 
 # Takeaway #1 — local LLMs are ready. I was surprised too.
-<!-- Slide 47 -->
+<!-- Slide 48 -->
 
 <div class="pt-4 text-xl leading-relaxed">
 
@@ -1645,7 +1684,7 @@ today is the boring, stable part — the brains keep improving underneath it.
 ---
 
 # Takeaway #2 — Compose finally feels… complete
-<!-- Slide 48 -->
+<!-- Slide 49 -->
 
 <div class="pt-4 text-lg leading-relaxed">
 
@@ -1686,7 +1725,7 @@ class: text-center
 ---
 
 # That's the talk
-<!-- Slide 49 -->
+<!-- Slide 50 -->
 
 <div class="pt-4 text-xl opacity-90">
 Go build something. Accessibly, please — the agents are coming. 🤖
