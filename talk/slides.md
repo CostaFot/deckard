@@ -396,8 +396,9 @@ But the reader doesn't stop at "…more" — it hands back the <b>entire post</b
 
 <v-click>
 
-<div class="pt-6 text-2xl font-bold">
-We're getting <span class="underline">more</span> text than expected. 💢
+<div class="pt-6 text-2xl font-bold flex items-center justify-center gap-3">
+<span>We're getting <span class="underline">more</span> text than expected.</span>
+<img src="./assets/madge.png" style="height: 2.2em" alt="Madge — annoyed Pepe" />
 </div>
 
 </v-click>
