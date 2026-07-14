@@ -937,7 +937,7 @@ of XML.
 
 <div>The GPU delegate is a native lib that lives <b>on the phone</b> — if you're lucky.</div>
 
-<div>Since Android 12, you can only <b>load</b> native libs you <b>declare</b> in the manifest.</div>
+<div>Have to declare in the manifest in order to use it</div>
 
 </div>
 
