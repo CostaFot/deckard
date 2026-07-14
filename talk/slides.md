@@ -963,8 +963,12 @@ first-party sample that works and diff it.
 
 ---
 
-# Old phones will still choke
 <!-- Slide 31 -->
+
+<h1 class="flex items-center gap-3 m-0">
+  <span>Old phones will still choke</span>
+  <img src="./assets/peepoFine.gif" class="rounded-lg shadow-lg" style="height: 1.2em" alt="Peepo sweating — this is fine" />
+</h1>
 
 <div class="pt-8 text-3xl leading-relaxed">
 Loading the entire <b>3 GB model</b> into memory, and onto the GPU requires a powerful phone
@@ -977,7 +981,7 @@ Loading the entire <b>3 GB model</b> into memory, and onto the GPU requires a po
 </div>
 
 <div class="border-2 rounded-xl p-10 text-center">
-  <div class="text-3xl font-bold">GPU can't take it 🫪</div>
+  <div class="text-3xl font-bold">GPU can't take it</div>
 </div>
 
 </div>
@@ -1070,7 +1074,7 @@ it literally has to be told to ignore Deckard's own face.
 layout: center
 ---
 
-# Throwback 📼
+# Does it actually work?
 <!-- Slide 33 -->
 
 <div class="grid grid-cols-3 gap-8 items-center justify-items-center mt-4">
