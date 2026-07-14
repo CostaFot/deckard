@@ -662,7 +662,7 @@ Don't oversell yet — the payoff proof comes after we get the model running.
 # Step one: get the pixels
 <!-- Slide 22 -->
 
-<div class="pt-6">
+<div class="pt-6 med-code">
 
 ```kotlin
 // yep. still using the AccessibilityService
@@ -675,7 +675,7 @@ takeScreenshot(Display.DEFAULT_DISPLAY, executor, callback)
 
 <div class="pt-8 text-lg opacity-80">Capture, then downscale.</div>
 
-<div class="pt-4">
+<div class="pt-4 med-code">
 
 ```kotlin
 val bitmap = Bitmap.wrapHardwareBuffer(screenshot.hardwareBuffer, screenshot.colorSpace)
