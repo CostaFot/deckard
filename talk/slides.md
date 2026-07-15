@@ -1247,7 +1247,7 @@ work.
 
 </div>
 
-<div class="text-sm" style="max-height: 440px; overflow: hidden">
+<div class="big-code" style="max-height: 440px; overflow: hidden">
 
 ```kotlin {all|11}{at:2}
 @Composable
@@ -1452,7 +1452,7 @@ actually lives. Land it self-deprecating, then move on.
 # API #2: `rememberViewModelStoreOwner`
 <!-- Slide 39 -->
 
-```kotlin
+```kotlin {all|3|5}
 @Composable
 fun ComponentViewModelScope(content: @Composable () -> Unit) {
     val storeOwner = rememberViewModelStoreOwner()   // ← this composable OWNS a store
