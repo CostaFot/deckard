@@ -297,3 +297,7 @@ method in `DeckardApplication`, `NetworkModule`'s todo wiring, `:work`'s `Expedi
 and
 the `get_todo` / `title_activity_second|third` strings. Also: `LlmEngine` + `OcrPrompt` still live
 under `suggestion/llm/` (a vestigial keyboard-era package name) — consider moving them to `llm/`.
+
+## Board
+
+This repo is the Linear project **deckard** on Costa's public board (https://www.costafotiadis.com/board/). The `board` skill has the commands. Issues for this repo carry that project and one area label (`android`). Follow-ups (a deferred fix, a check that waits on something external, a TODO written here) become an issue before the session ends; a note in this file is not a substitute.
