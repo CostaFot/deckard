@@ -41,11 +41,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.LifecycleResumeEffect
+import com.markedusduplicate.deckard.R
 import com.markedusduplicate.deckard.accessibility.DeckardAccessibilityService
 import com.markedusduplicate.deckard.mascot.BodyTextStyle
 import com.markedusduplicate.deckard.mascot.DeckardOverlayService
@@ -57,6 +59,7 @@ import com.markedusduplicate.deckard.mascot.TitleTextStyle
 import com.markedusduplicate.design.theme.AppTheme
 import com.markedusduplicate.design.theme.stampInks
 import com.markedusduplicate.logging.logDebug
+import com.markedusduplicate.textresource.asString
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -112,12 +115,11 @@ private fun SetupScreen() {
             Masthead()
 
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                SectionLabel(text = "WHAT HE NEEDS")
+                SectionLabel(text = stringResource(R.string.setup_section_what_he_needs))
                 Step(
                     index = "01",
-                    title = "Screen reading",
-                    detail = "Deckard reads the text the app in front of you is already showing. " +
-                            "The reading happens on your phone.",
+                    title = stringResource(R.string.setup_step_screen_reading_title),
+                    detail = stringResource(R.string.setup_step_screen_reading_detail),
                     done = isAccessibilityEnabled,
                     onAction = {
                         context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
@@ -125,9 +127,8 @@ private fun SetupScreen() {
                 )
                 Step(
                     index = "02",
-                    title = "Drawing over apps",
-                    detail = "Lets him float above whatever you're reading instead of asking you " +
-                            "to switch apps.",
+                    title = stringResource(R.string.setup_step_overlay_title),
+                    detail = stringResource(R.string.setup_step_overlay_detail),
                     done = canDrawOverlays,
                     onAction = {
                         context.startActivity(
@@ -155,15 +156,14 @@ private fun SetupScreen() {
             )
 
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                SectionLabel(text = "SUMMONING HIM")
+                SectionLabel(text = stringResource(R.string.setup_section_summoning_him))
                 Gesture(
-                    gesture = "Swipe the left-edge tab",
-                    detail = "Reads the text the app is already exposing. Comes back instantly.",
+                    gesture = stringResource(R.string.setup_gesture_swipe_title),
+                    detail = stringResource(R.string.setup_gesture_swipe_detail),
                 )
                 Gesture(
-                    gesture = "Hold the left-edge tab",
-                    detail = "Reads a screenshot with the on-device model instead. Slower, but it " +
-                            "works on apps that expose nothing.",
+                    gesture = stringResource(R.string.setup_gesture_hold_title),
+                    detail = stringResource(R.string.setup_gesture_hold_detail),
                 )
             }
         }
@@ -176,15 +176,15 @@ private fun Masthead() {
         DeckardPlate(size = 64.dp, emojiSize = 34.sp)
         Spacer(modifier = Modifier.width(16.dp))
         Column {
-            Text(text = "Deckard", style = DisplayTextStyle)
+            Text(text = stringResource(R.string.setup_wordmark), style = DisplayTextStyle)
             Text(
-                text = "ON-DEVICE AI-SLOP DETECTOR",
+                text = stringResource(R.string.setup_tagline),
                 style = MetaTextStyle,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Spacer(modifier = Modifier.height(6.dp))
             Text(
-                text = DeckardVoice.CATCHPHRASE,
+                text = DeckardVoice.CATCHPHRASE.asString(),
                 style = BodyTextStyle.copy(fontStyle = FontStyle.Italic),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -271,7 +271,7 @@ private fun Step(
                     border = BorderStroke(1.dp, colors.onSurface),
                 ) {
                     Text(
-                        text = "Open settings",
+                        text = stringResource(R.string.setup_open_settings),
                         style = BodyTextStyle.copy(fontSize = 13.sp),
                         modifier = Modifier.padding(horizontal = 14.dp, vertical = 7.dp),
                     )
@@ -308,7 +308,9 @@ private fun StartButton(
         modifier = Modifier.fillMaxWidth(),
     ) {
         Text(
-            text = if (running) "Stop Deckard" else "Start Deckard",
+            text = stringResource(
+                if (running) R.string.setup_stop_deckard else R.string.setup_start_deckard,
+            ),
             style = TitleTextStyle,
             textAlign = TextAlign.Center,
             modifier = Modifier

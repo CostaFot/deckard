@@ -33,13 +33,16 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.markedusduplicate.deckard.R
 import com.markedusduplicate.deckard.slop.ScreenReadFailure
 import com.markedusduplicate.design.theme.AppTheme
+import com.markedusduplicate.textresource.asString
 
 private const val MASCOT_EMOJI = "🧙"
 private const val PLATE_SIZE_DP = 52
@@ -90,7 +93,7 @@ fun DeckardMascot(
         ) {
             Icon(
                 imageVector = Icons.Filled.Close,
-                contentDescription = "Dismiss Deckard",
+                contentDescription = stringResource(R.string.mascot_dismiss),
                 modifier = Modifier.padding(5.dp),
             )
         }
@@ -205,7 +208,7 @@ private fun DeckardThinkingPreview() {
     AppTheme {
         Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.padding(16.dp)) {
             ReadMethod.entries.forEach { how ->
-                DeckardThinkingBubble(text = DeckardVoice.thinking(how))
+                DeckardThinkingBubble(text = DeckardVoice.thinking(how).asString())
             }
         }
     }
@@ -218,7 +221,7 @@ private fun DeckardSetbackPreview() {
         listOf(NoVerdict.NotEnoughText, NoVerdict.DetectorUnreachable)
     AppTheme {
         Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.padding(16.dp)) {
-            setbacks.forEach { DeckardBubble(text = DeckardVoice.setback(it)) }
+            setbacks.forEach { DeckardBubble(text = DeckardVoice.setback(it).asString()) }
         }
     }
 }

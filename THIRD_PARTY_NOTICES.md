@@ -1,16 +1,18 @@
 # Third-party notices
 
-## SymSpell frequency dictionary
+## TextResource
 
-`app/src/main/assets/dictionary/en_frequency.txt` is the
-`frequency_dictionary_en_82_765.txt` word-frequency list from
-[SymSpell](https://github.com/wolfgarbe/SymSpell) by Wolf Garbe, used under the MIT License.
-It is derived from SCOWL and the Google Books Ngram data.
+`textresource/src/main/java/com/markedusduplicate/textresource/TextResource.kt` is adapted from
+[TextResource](https://github.com/dkmarkell/textresource) by Derek Markell, used under the MIT
+License. The library is not depended on — its core is one small file, so it is vendored and trimmed:
+only the `raw` and `simple` factories are kept (upstream also has `plural`), `resolveString` is
+renamed to `asString`, and resolution takes `Resources` rather than `Context`, which is the seam
+Compose's own `stringResource()` reads.
 
 ```
 MIT License
 
-Copyright (c) 2022 Wolf Garbe
+Copyright (c) 2025 Derek Markell
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.markedusduplicate.deckard.R
 import com.markedusduplicate.design.theme.AppTheme
+import com.markedusduplicate.textresource.asString
 import kotlinx.coroutines.flow.StateFlow
 
 /**
@@ -125,15 +126,16 @@ class DeckardComposeView(
 
                     when (val current = s) {
                         DeckardState.Hidden -> Unit
-                        is DeckardState.Thinking ->
-                            DeckardThinkingBubble(text = DeckardVoice.thinking(current.how))
+                        is DeckardState.Thinking -> DeckardThinkingBubble(
+                            text = DeckardVoice.thinking(current.how).asString(),
+                        )
 
                         is DeckardState.Unavailable ->
-                            DeckardBubble(text = DeckardVoice.setback(current.reason))
+                            DeckardBubble(text = DeckardVoice.setback(current.reason).asString())
 
                         is DeckardState.Verdict -> SlopReportCard(
                             verdict = current.verdict,
-                            note = DeckardVoice.remark(current.verdict),
+                            note = DeckardVoice.remark(current.verdict).asString(),
                             onViewAnalysis = onViewAnalysis,
                             onCopyLink = onCopyLink,
                         )

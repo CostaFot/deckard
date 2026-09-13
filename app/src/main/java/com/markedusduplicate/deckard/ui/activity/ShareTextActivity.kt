@@ -7,6 +7,8 @@ import android.provider.Settings
 import android.widget.Toast
 import com.markedusduplicate.deckard.mascot.DeckardOverlayService
 import com.markedusduplicate.deckard.mascot.DeckardVoice
+import com.markedusduplicate.textresource.TextResource
+import com.markedusduplicate.textresource.asString
 
 /**
  * Invisible share target. Receives text shared from any app (`ACTION_SEND` / `text/plain`) and hands
@@ -42,7 +44,7 @@ class ShareTextActivity : Activity() {
         finish()
     }
 
-    private fun toast(message: String) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    private fun toast(message: TextResource) {
+        Toast.makeText(this, message.asString(this), Toast.LENGTH_SHORT).show()
     }
 }

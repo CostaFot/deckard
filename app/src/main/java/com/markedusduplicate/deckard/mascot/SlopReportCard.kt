@@ -21,20 +21,24 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.markedusduplicate.deckard.R
 import com.markedusduplicate.deckard.slop.SlopLabel
 import com.markedusduplicate.design.theme.AppTheme
 import com.markedusduplicate.design.theme.stampInks
+import com.markedusduplicate.textresource.asString
 import java.util.Locale
 import kotlin.math.roundToInt
 
@@ -73,7 +77,7 @@ fun SlopReportCard(
         ) {
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Stamp(
-                    label = verdict.headline.ifBlank { verdict.label.stampText },
+                    label = verdict.headline.ifBlank { verdict.label.stampText.asString() },
                     percentHuman = percentHuman,
                     stamp = stamp,
                 )
@@ -130,7 +134,11 @@ private fun Stamp(label: String, percentHuman: Int, stamp: Color) {
         Spacer(modifier = Modifier.width(10.dp))
         Column(horizontalAlignment = Alignment.End) {
             Text(text = "$percentHuman%", style = StampNumberStyle, color = stamp)
-            Text(text = "HUMAN", style = MetaTextStyle, color = stamp)
+            Text(
+                text = stringResource(R.string.card_human_share_label),
+                style = MetaTextStyle,
+                color = stamp,
+            )
         }
     }
 }
@@ -221,7 +229,7 @@ private fun Actions(
             modifier = Modifier.fillMaxWidth(),
         ) {
             Text(
-                text = "View full analysis",
+                text = stringResource(R.string.card_view_analysis),
                 style = BodyTextStyle.copy(fontSize = 14.sp),
                 modifier = Modifier.padding(vertical = 11.dp),
                 textAlign = TextAlign.Center,
@@ -235,7 +243,7 @@ private fun Actions(
             modifier = Modifier.fillMaxWidth(),
         ) {
             Text(
-                text = "Copy link",
+                text = stringResource(R.string.card_copy_link),
                 style = BodyTextStyle.copy(fontSize = 13.sp),
                 modifier = Modifier.padding(vertical = 10.dp),
                 textAlign = TextAlign.Center,
@@ -244,11 +252,16 @@ private fun Actions(
     }
 }
 
-private fun metaLine(verdict: UiSlopVerdict): String = buildString {
-    append("PANGRAM ${verdict.version}")
-    append(" · ${verdict.wordCount} WORDS")
-    if (verdict.confidence.isNotBlank()) {
-        append(" · ${verdict.confidence.uppercase(Locale.ROOT)}")
+@Composable
+@ReadOnlyComposable
+private fun metaLine(verdict: UiSlopVerdict): String {
+    val words = stringResource(R.string.card_meta_words, verdict.wordCount)
+    return buildString {
+        append("PANGRAM ${verdict.version}")
+        append(" · $words")
+        if (verdict.confidence.isNotBlank()) {
+            append(" · ${verdict.confidence.uppercase(Locale.ROOT)}")
+        }
     }
 }
 
@@ -258,30 +271,42 @@ private fun metaLine(verdict: UiSlopVerdict): String = buildString {
  */
 @Preview(name = "Verdict — AI")
 @Composable
-private fun SlopReportCardAiPreview() = CardPreview(SlopLabel.AI)
+private fun SlopReportCardAiPreview() = CardPreview(SlopLabel.AI, "Fully AI-Generated")
 
 @Preview(name = "Verdict — assisted")
 @Composable
-private fun SlopReportCardAssistedPreview() = CardPreview(SlopLabel.ASSISTED)
+private fun SlopReportCardAssistedPreview() = CardPreview(SlopLabel.ASSISTED, "Lightly AI-Assisted")
 
 @Preview(name = "Verdict — human")
 @Composable
-private fun SlopReportCardHumanPreview() = CardPreview(SlopLabel.HUMAN)
+private fun SlopReportCardHumanPreview() = CardPreview(SlopLabel.HUMAN, "Mostly Human Written")
+
+/**
+ * The one verdict Pangram sent no phrase for, so the stamp falls back to our own wording. It is the
+ * only place [stampText] is ever read.
+ */
+@Preview(name = "Verdict — no headline")
+@Composable
+private fun SlopReportCardNoHeadlinePreview() = CardPreview(SlopLabel.ASSISTED, headline = "")
 
 @Composable
-private fun CardPreview(label: SlopLabel) {
-    val verdict = previewVerdict(label)
+private fun CardPreview(label: SlopLabel, headline: String) {
+    val verdict = previewVerdict(label, headline)
     AppTheme {
         SlopReportCard(
             verdict = verdict,
-            note = DeckardVoice.remark(verdict),
+            note = DeckardVoice.remark(verdict).asString(),
             onViewAnalysis = {},
             onCopyLink = {},
         )
     }
 }
 
-private fun previewVerdict(label: SlopLabel): UiSlopVerdict {
+/**
+ * A stand-in for a Pangram response, so [headline] is a literal here exactly as it would arrive off
+ * the wire — Pangram's own vocabulary, not ours.
+ */
+private fun previewVerdict(label: SlopLabel, headline: String): UiSlopVerdict {
     val (ai, assisted, human) = when (label) {
         SlopLabel.AI -> Triple(0.92, 0.08, 0.0)
         SlopLabel.ASSISTED -> Triple(0.21, 0.54, 0.25)
@@ -289,9 +314,9 @@ private fun previewVerdict(label: SlopLabel): UiSlopVerdict {
     }
     return UiSlopVerdict(
         label = label,
-        summary = label.stampText,
+        summary = headline,
         predictionShort = label.name,
-        headline = label.stampText,
+        headline = headline,
         prediction = "",
         fractionAi = ai,
         fractionAiAssisted = assisted,

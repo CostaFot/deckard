@@ -1,5 +1,68 @@
 <resources>
+    <!-- Read from the manifest and accessibility_service_config.xml, not from Kotlin. -->
     <string name="share_to_deckard_label">Judge with Deckard</string>
     <string name="accessibility_service_label">Deckard screen context</string>
     <string name="accessibility_service_description">Reads on-screen text so the slop detector can check what\'s on your screen. Nothing leaves your device.</string>
+
+    <!--
+      Deckard's voice. Named by DeckardVoice, which is the only file that decides which of these he
+      says; this is the only file that decides what they are. Read it top to bottom — the register
+      is one thing, and it drifts a line at a time if you write it a line at a time.
+    -->
+    <string name="voice_catchphrase">Slop, my son.</string>
+    <string name="voice_thinking_tree">Skimming the screen</string>
+    <string name="voice_thinking_screenshot">Squinting at the screen</string>
+    <string name="voice_thinking_shared_text">Reading what you brought me</string>
+    <string name="voice_too_thin">Too thin to judge. Bring me %1$d words.</string>
+    <string name="voice_detector_unreachable">I sent it out for a second opinion. Nobody answered.</string>
+    <string name="voice_remark_assisted">Someone started this. Something else finished it.</string>
+    <string name="voice_remark_human">A person wrote this. You don\'t see that often.</string>
+    <string name="voice_nothing_shared">You\'ve brought me nothing to read.</string>
+    <string name="voice_needs_overlay_permission">Let me draw over other apps first.</string>
+    <string name="voice_no_accessibility_service">You haven\'t let me read the screen yet. Until you do, I\'m decoration.</string>
+    <string name="voice_model_not_ready">No eyes for pictures yet. Swipe instead; that read needs no model.</string>
+    <string name="voice_screenshot_failed">I reached for the screen and came back holding nothing.</string>
+    <string name="voice_transcription_failed">I stared at it a good while and made nothing of it.</string>
+    <string name="voice_no_text_found">Not a word on this screen. Nothing to weigh.</string>
+
+    <!--
+      The setup screen. setup_wordmark is deliberately not @string/app_name: app_name is a resValue
+      set per build type, so it reads "Deckard Debug" on a debug build.
+    -->
+    <string name="setup_wordmark">Deckard</string>
+    <string name="setup_tagline">ON-DEVICE AI-SLOP DETECTOR</string>
+    <string name="setup_section_what_he_needs">WHAT HE NEEDS</string>
+    <string name="setup_step_screen_reading_title">Screen reading</string>
+    <string name="setup_step_screen_reading_detail">Deckard reads the text the app in front of you is already showing. The reading happens on your phone.</string>
+    <string name="setup_step_overlay_title">Drawing over apps</string>
+    <string name="setup_step_overlay_detail">Lets him float above whatever you\'re reading instead of asking you to switch apps.</string>
+    <string name="setup_open_settings">Open settings</string>
+    <string name="setup_start_deckard">Start Deckard</string>
+    <string name="setup_stop_deckard">Stop Deckard</string>
+    <string name="setup_section_summoning_him">SUMMONING HIM</string>
+    <string name="setup_gesture_swipe_title">Swipe the left-edge tab</string>
+    <string name="setup_gesture_swipe_detail">Reads the text the app is already exposing. Comes back instantly.</string>
+    <string name="setup_gesture_hold_title">Hold the left-edge tab</string>
+    <string name="setup_gesture_hold_detail">Reads a screenshot with the on-device model instead. Slower, but it works on apps that expose nothing.</string>
+
+    <!--
+      The report card. Everything Pangram authors — the headline, the confidence, the judged passage
+      — is rendered verbatim and is never a resource; these are only the words the card adds itself.
+    -->
+    <string name="card_human_share_label">HUMAN</string>
+    <string name="card_meta_words">%1$d WORDS</string>
+    <string name="card_view_analysis">View full analysis</string>
+    <string name="card_copy_link">Copy link</string>
+    <string name="card_clip_label">Pangram result</string>
+
+    <!--
+      The stamp's own wording, used only when Pangram sent no headline of its own. Stored mixed-case
+      because the stamp uppercases whatever it is given, so these and Pangram's phrase go through
+      the same call.
+    -->
+    <string name="stamp_ai">AI-Generated</string>
+    <string name="stamp_assisted">AI-Assisted</string>
+    <string name="stamp_human">Human-Written</string>
+
+    <string name="mascot_dismiss">Dismiss Deckard</string>
 </resources>

@@ -1,8 +1,10 @@
 package com.markedusduplicate.deckard.mascot
 
 import androidx.compose.ui.graphics.Color
+import com.markedusduplicate.deckard.R
 import com.markedusduplicate.deckard.slop.SlopLabel
 import com.markedusduplicate.design.theme.StampInks
+import com.markedusduplicate.textresource.TextResource
 
 /**
  * UI-layer representation of a slop verdict, shown in Deckard's speech bubble. Carries the scalar
@@ -37,10 +39,15 @@ fun StampInks.forLabel(label: SlopLabel): Color = when (label) {
     SlopLabel.HUMAN -> human
 }
 
-/** What the stamp reads when the detector sent no phrase of its own. */
-val SlopLabel.stampText: String
+/**
+ * What the stamp reads when the detector sent no phrase of its own.
+ *
+ * Stored mixed-case, because the stamp uppercases whatever it is handed — so this fallback and
+ * Pangram's own headline go through the same call rather than one of them arriving pre-shouted.
+ */
+val SlopLabel.stampText: TextResource
     get() = when (this) {
-        SlopLabel.AI -> "AI-Generated"
-        SlopLabel.ASSISTED -> "AI-Assisted"
-        SlopLabel.HUMAN -> "Human-Written"
+        SlopLabel.AI -> TextResource.simple(R.string.stamp_ai)
+        SlopLabel.ASSISTED -> TextResource.simple(R.string.stamp_assisted)
+        SlopLabel.HUMAN -> TextResource.simple(R.string.stamp_human)
     }

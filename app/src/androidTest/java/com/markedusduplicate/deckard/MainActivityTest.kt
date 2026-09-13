@@ -27,17 +27,24 @@ class MainActivityTest {
     fun setup() {
         // This is how to reach into SingletonComponent for the test application
         // prefer TestInstallIn imo
-        val appInitializer = EntryPoints.get(
+        EntryPoints.get(
             composeTestRule.activity.application,
             ApplicationEntryPoint::class.java
         ).appInitializer()
-
     }
 
+    /**
+     * Asserted against the resource rather than a literal: the copy now lives in `strings.xml`, and
+     * a test holding its own copy of a string is a test that goes stale the first time the wording
+     * changes. (This one had — it asserted on a line the screen stopped saying.)
+     */
     @Test
     fun setupScreen_isShown() {
+        val context = composeTestRule.activity
         composeTestRule.apply {
-            onNodeWithText("slop detector setup").assertIsDisplayed()
+            onNodeWithText(context.getString(R.string.setup_tagline)).assertIsDisplayed()
+            onNodeWithText(context.getString(R.string.setup_section_what_he_needs))
+                .assertIsDisplayed()
         }
     }
 }

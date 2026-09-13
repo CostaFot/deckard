@@ -80,6 +80,7 @@ dependencies {
     implementation(project(":common"))
     implementation(project(":work"))
     implementation(project(":logging"))
+    implementation(project(":textresource"))
 
     implementation(libs.material.design)
     implementation(libs.androidx.activity.compose)

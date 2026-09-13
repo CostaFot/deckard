@@ -24,6 +24,7 @@ import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.markedusduplicate.common.coroutine.DispatcherProvider
+import com.markedusduplicate.deckard.R
 import com.markedusduplicate.deckard.di.AccessibilityScreenText
 import com.markedusduplicate.deckard.di.OcrContentScreenText
 import com.markedusduplicate.deckard.mascot.DeckardOverlayService.Companion.detectText
@@ -263,7 +264,7 @@ class DeckardOverlayService :
 
     private fun copyLink(url: String) {
         getSystemService(ClipboardManager::class.java)
-            ?.setPrimaryClip(ClipData.newPlainText("Pangram result", url))
+            ?.setPrimaryClip(ClipData.newPlainText(getString(R.string.card_clip_label), url))
     }
 
     private fun onDrag(dx: Float, dy: Float) {

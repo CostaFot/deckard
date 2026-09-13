@@ -28,6 +28,7 @@ a small setup screen (`MainActivity`) for granting permissions and starting/stop
 
 - `app` — the slop detector (overlay + accessibility services) + the setup `MainActivity`
 - `design` — theme/UI (`AppTheme`)
+- `textresource` — `TextResource`, a string that resolves at the draw site (see *Copy* below)
 - `common`, `common-test`, `logging`, `work`, `auth`, `testing` — shared libs
   (namespaces stay `com.markedusduplicate.*`; only the app/template packages were renamed to
   deckard)
@@ -120,6 +121,43 @@ components inherit it and nothing has to be hand-plumbed at the call site.
 - Launcher icon (`res/drawable-v24/ic_deckard_launcher_*`, adaptive + monochrome): the same idea as
   the card — a page with a verdict stamped across it, on the ink ground. The app theme
   (`Theme.Deckard`) is DayNight so the window behind a dark composition isn't white.
+
+### Copy — `app/res/values/strings.xml` + `:textresource`
+
+Every word the product says is a string resource. Nothing is a Kotlin literal, with three
+deliberate exceptions: **Pangram's own text** (`headline`, `confidence`, `prediction`,
+`analyzedText`) is server-authored and rendered verbatim; the wire tokens in `SlopVerdictMapper`
+(`"AI"`/`"Mixed"`/`"Human"`) are protocol, not copy; and glyph ornament (`"01"`, `"✓"`, `"—"`, the
+`%` after the human share, the vendor name `PANGRAM`) is not language.
+
+The resources group by where they're said: `voice_*`, `setup_*`, `card_*`, `stamp_*`.
+
+- **`mascot/DeckardVoice.kt`** decides *which* line each fact gets; `strings.xml` decides *what* the
+  line is. The `when`s are exhaustive over the sealed types, so an unwritten line is a compile error
+  rather than a blank bubble.
+- It returns a **`TextResource`**, not a `String`, because most of what Deckard says is decided away
+  from the UI — by `DeckardOverlayService`, by `ShareTextActivity` — and those have no business
+  resolving copy. Whoever draws it resolves it: `asString()` in a composition,
+  `asString(context)` anywhere else. `ShareTextActivity` is the case that earns the type: a plain
+  `Activity` with no composition that still has to speak.
+- **`:textresource`** is that type: a `fun interface` over `Resources` with `raw` and `simple`
+  factories, vendored and trimmed from
+  [dkmarkell/textresource](https://github.com/dkmarkell/textresource) (MIT — see
+  `THIRD_PARTY_NOTICES.md`) rather than depended on, because the core is one file. Factory instances
+  are backed by private data classes so they have **value equality** — safe in `DeckardState`, which
+  rides a `StateFlow`. A SAM instance has reference equality only.
+- It resolves against **`Resources`**, not `Context`, which is the seam Compose's own
+  `stringResource()` reads. That makes the composable extension one line over `LocalResources` —
+  the local that invalidates its readers on a configuration change, where `LocalContext` (a
+  `staticCompositionLocalOf`) does not.
+- Two traps, both load-bearing:
+    - `android.nonFinalResIds=true` in `gradle.properties`, so `R.string.*` is not a compile-time
+      constant — the voice's lines cannot be `const val`.
+    - `app_name` is a per-build-type `resValue` ("Deckard Debug" on debug), so the setup screen's
+      wordmark is its own `setup_wordmark` and must never point at `@string/app_name`.
+- The one formatted string is `voice_too_thin` (`%1$d`, `MIN_WORDS_TO_DETECT`). Note that routing
+  args through `TextResource.simple(resId, vararg)` hides them from lint's `StringFormatMatches`,
+  so a mismatch there is a runtime `IllegalFormatException`, not a build failure.
 
 ### Screen reading — `slop/` + `accessibility/`
 
@@ -353,8 +391,9 @@ bubble shows the verdict as a **report card** (`mascot/SlopReportCard`).
 
 Done: the API→domain→UI wiring (`AiDetectorRepository` + `DetectSlopUseCase`, base URL/auth in
 `NetworkModule`), the report-card UI, Deckard's look (see above), content isolation on the
-screenshot path, and two per-app extractors (LinkedIn, X). His **voice** is not — only the thinking
-state was rewritten.
+screenshot path, two per-app extractors (LinkedIn, X), and every word the app says now living in
+`strings.xml` behind `:textresource` (see *Copy* above). His **voice** — the wording itself — is
+still not written; only the thinking state was rewritten. It is now all in one file to rewrite.
 
 Cleared out along the way: the JSONPlaceholder/Todo demo (repository, mapper, domain/API models,
 service, the `jsonPlaceHolderRepository()` entry-point method, `NetworkModule`'s todo wiring,
