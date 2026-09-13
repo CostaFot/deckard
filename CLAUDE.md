@@ -314,48 +314,36 @@ bodies.
 (e.g. `LlmEngine`, `DeckardOverlayService`). The native LiteRT runtime logs under `litert` /
 `litert-lm`.
 
-## Status & what's left (for the next session)
+## Where it stands
 
 The pivot + rename are done and the build is green (`:app:compileDebugKotlin`,
-`:app:testDebugUnitTest`). End to end today: summon Deckard → **a11y-tree screen read** (swipe) **or
-screenshot OCR content-isolation** (long-press) → **Pangram detection** → the bubble shows the
-verdict
-as a Pangram-style **report card** (`mascot/SlopReportCard`).
-Steps 1–2 below are done (API→domain→UI wiring via `AiDetectorRepository` + `DetectSlopUseCase`,
-base
-URL/auth in `NetworkModule`, and the report-card UI). Remaining, in rough priority:
+`:app:testDebugUnitTest`, `:app:lintDebug`). End to end today: summon Deckard → **a11y-tree screen
+read** (swipe) **or screenshot OCR content-isolation** (long-press) → **Pangram detection** → the
+bubble shows the verdict as a **report card** (`mascot/SlopReportCard`).
 
-3. **Deckard's voice.** The **visual** pass is done (see "Deckard's look" above: plated mascot,
-   tailed bubble, stamped report card, rebuilt setup screen, real launcher icon) — the copy is not.
-   Only the thinking state was rewritten ("Reading the screen"). Give him the weary-scholar persona:
-   verdict lines like *"Slop, my son. (91.7%)"*, the confidence score deadpan, and his own
-   catchphrase — keep the wise-elder archetype but avoid Blizzard's literal Deckard-Cain tells
-   ("stay awhile and listen", robed-Horadrim imagery). Lands wherever the verdict is rendered.
-4. **Content isolation.** Done for the **screenshot** path: a **long-press** on the edge tab runs
-   `OcrContentScreenTextReader` (`OcrPrompt.extractMainContent()`), which has the on-device model
-   pick
-   the main post out of the screenshot verbatim before detection — no per-app code (verified working
-   on device). The text-only `slop/ContentExtractor` (+ `ContentExtractionPrompt`) stays dormant; it
-   would do the same over a noisy a11y capture.
-5. **Per-app extractors (`accessibility/extract/`).** The in-use a11y reader now dispatches by
-   foreground package to a per-app `ScreenContentExtractor`. **LinkedIn** (`com.linkedin.android`)
-   and **X** (`com.twitter.android`) are done — most-visible / centred post (see their bullets
-   above; X's single-blob `contentDescription` is frozen at good-enough). Next, one extractor each
-   for **Reddit, Substack, Medium** (capture the tree via `uiautomator dump`, add a class +
-   `@IntoSet` binding + fixture test) — **Reddit** is the friendliest next target (native, id-rich
-   tree, more like LinkedIn than X). LinkedIn polish: include author/timestamp, handle "…more"
-   truncation, confirm post-detail screens. The OCR reader remains a fallback behind
-   `@OcrScreenText`.
+Done: the API→domain→UI wiring (`AiDetectorRepository` + `DetectSlopUseCase`, base URL/auth in
+`NetworkModule`), the report-card UI, Deckard's look (see above), content isolation on the
+screenshot path, and two per-app extractors (LinkedIn, X). His **voice** is not — only the thinking
+state was rewritten.
 
-**Cruft**: the JSONPlaceholder/Todo demo is gone (repository, mapper, domain/API models, service,
-the `jsonPlaceHolderRepository()` entry-point method, `NetworkModule`'s todo wiring, `:work`'s
-`ExpeditedGetTodoWorker`, the dead strings), along with `drawable/cheems.jpg` and the duplicate
-template theme under `ui/ui/theme/`. `:design`'s template teal is gone too — the `md_theme_*`
-colours and the unreferenced `Theme.Template` / `AppTheme` / splash XML styles that consumed them.
-Still outstanding: `LlmEngine` + `OcrPrompt` live under `suggestion/llm/` (a vestigial keyboard-era
-package name) — consider moving them to `llm/`; and `:design`'s `ic_splash` drawable plus its
-`androidx.core.splashscreen` dependency are now unreferenced (the app never installed a splash).
+Cleared out along the way: the JSONPlaceholder/Todo demo (repository, mapper, domain/API models,
+service, the `jsonPlaceHolderRepository()` entry-point method, `NetworkModule`'s todo wiring,
+`:work`'s `ExpeditedGetTodoWorker`, the dead strings), `drawable/cheems.jpg`, the duplicate template
+theme under `ui/ui/theme/`, `:design`'s template teal (the `md_theme_*` colours and the
+`Theme.Template` / `AppTheme` / splash XML styles that consumed them), and the custom `:lint` module
+(it held only the Android Studio sample detector, and its Java/Kotlin JVM targets disagreed, which
+broke `lintDebug` outright).
+
+**What's left is on the board, not in this file.** See below.
 
 ## Board
 
-This repo is the Linear project **deckard** on Costa's public board (https://www.costafotiadis.com/board/). The `board` skill has the commands. Issues for this repo carry that project and one area label (`android`). Follow-ups (a deferred fix, a check that waits on something external, a TODO written here) become an issue before the session ends; a note in this file is not a substitute.
+This repo is the Linear project **deckard** on Costa's public board
+(https://www.costafotiadis.com/board/). The `board` skill has the commands. Issues for this repo
+carry that project and one area label (`android`).
+
+**All future work lives there, not in this file.** No TODO sections, no roadmaps, no "next session"
+lists on disk — a plan is an issue's description, a roadmap is issues in the project. Follow-ups (a
+deferred fix, a check that waits on something external, a TODO you were about to write down) become
+an issue before the session ends, and the closing message names it. A note in this file is not a
+substitute.
