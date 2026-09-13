@@ -1,6 +1,5 @@
 package com.markedusduplicate.deckard.core.initialize
 
-import com.markedusduplicate.common.AppLocaleManager
 import com.markedusduplicate.common.FlagProvider
 import com.markedusduplicate.logging.logDebug
 import timber.log.Timber
@@ -11,8 +10,7 @@ import javax.inject.Singleton
 
 @Singleton
 class AppInitializer @Inject constructor(
-    private val featureFlagProvider: FlagProvider,
-    private val appLocaleManager: AppLocaleManager
+    private val featureFlagProvider: FlagProvider
 ) {
 
     private val isInitialized = AtomicBoolean(false)
@@ -20,7 +18,6 @@ class AppInitializer @Inject constructor(
     fun startup() {
         check(!isInitialized.get()) { "Attempted to initialize app more than once" }
         initLogger()
-        appLocaleManager.initialise()
         isInitialized.set(true)
     }
 

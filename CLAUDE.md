@@ -360,9 +360,13 @@ Cleared out along the way: the JSONPlaceholder/Todo demo (repository, mapper, do
 service, the `jsonPlaceHolderRepository()` entry-point method, `NetworkModule`'s todo wiring,
 `:work`'s `ExpeditedGetTodoWorker`, the dead strings), `drawable/cheems.jpg`, the duplicate template
 theme under `ui/ui/theme/`, `:design`'s template teal (the `md_theme_*` colours and the
-`Theme.Template` / `AppTheme` / splash XML styles that consumed them), and the custom `:lint` module
+`Theme.Template` / `AppTheme` / splash XML styles that consumed them), the custom `:lint` module
 (it held only the Android Studio sample detector, and its Java/Kotlin JVM targets disagreed, which
-broke `lintDebug` outright).
+broke `lintDebug` outright), and the per-app language plumbing (`ProdLocaleManager` and its Hilt
+module, the `app_language`/`app_region` strings and every `values-en`/`values-en-rAU`/`values-it`
+dir, `locales_config.xml` with the manifest's `localeConfig` and `AppLocalesMetadataHolderService`,
+and the `localeFilters` — activity-lifecycle machinery reading two strings into a `StateFlow`
+nothing ever collected, in a product whose only surface is an overlay with no Activity at all).
 
 **What's left is on the board, not in this file.** See below.
 

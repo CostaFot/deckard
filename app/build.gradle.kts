@@ -32,10 +32,6 @@ android {
             useSupportLibrary = true
         }
 
-        androidResources {
-            localeFilters += setOf("en", "en-rAU", "it")
-        }
-
         buildConfigField("String", "AI_DETECTOR_API_KEY", "\"$aiDetectorApiKey\"")
         buildConfigField("String", "MOCK_VERDICT", "\"off\"")
     }
