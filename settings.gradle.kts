@@ -16,7 +16,6 @@ dependencyResolutionManagement {
 }
 rootProject.name = "deckard"
 include(":app")
-include(":lint")
 include(":design")
 include(":common")
 include(":testing")

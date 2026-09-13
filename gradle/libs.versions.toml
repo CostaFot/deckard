@@ -1,7 +1,6 @@
 [versions]
 androidGradlePlugin = "9.1.0"
 # Should be AGP + 23
-lint = "32.1.0"
 
 androidDesugarJdkLibs = "2.1.5"
 androidxActivity = "1.12.3"
@@ -121,7 +120,6 @@ kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinxCoroutines" }
 kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinxDatetime" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
-lint-api = { group = "com.android.tools.lint", name = "lint-api", version.ref = "lint" }
 material-design = { group = "com.google.android.material", name = "material", version.ref = "material" }
 okhttp-logging = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp" }
 protobuf-protoc = { group = "com.google.protobuf", name = "protoc", version.ref = "protobuf" }
