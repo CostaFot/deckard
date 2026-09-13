@@ -15,6 +15,11 @@ val aiDetectorApiKey: String = System.getenv("AI_DETECTOR_API_KEY")?.takeIf { it
         if (file.exists()) file.inputStream().use { load(it) }
     }.getProperty("AI_DETECTOR_API_KEY", "")
 
+// A canned verdict for seeing the report card without spending a Pangram call, e.g.
+// `./gradlew :app:installDebug -PmockVerdict=assisted`. One of ai / assisted / human / mixed; any
+// other value (and every release build) leaves detection real.
+val mockVerdict: String = (findProperty("mockVerdict") as String?).orEmpty().ifBlank { "off" }
+
 android {
     defaultConfig {
         applicationId = "com.markedusduplicate.deckard"
@@ -32,6 +37,7 @@ android {
         }
 
         buildConfigField("String", "AI_DETECTOR_API_KEY", "\"$aiDetectorApiKey\"")
+        buildConfigField("String", "MOCK_VERDICT", "\"off\"")
     }
 
     buildFeatures {
@@ -43,6 +49,7 @@ android {
         val debug by getting {
             applicationIdSuffix = ".debug"
             resValue("string", "app_name", "Deckard Debug")
+            buildConfigField("String", "MOCK_VERDICT", "\"$mockVerdict\"")
         }
         val release by getting {
             isMinifyEnabled = true

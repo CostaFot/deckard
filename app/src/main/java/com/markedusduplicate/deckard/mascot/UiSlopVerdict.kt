@@ -1,13 +1,15 @@
 package com.markedusduplicate.deckard.mascot
 
+import androidx.compose.ui.graphics.Color
+import com.markedusduplicate.deckard.slop.SlopLabel
+import com.markedusduplicate.design.theme.StampInks
+
 /**
  * UI-layer representation of a slop verdict, shown in Deckard's speech bubble. Carries the scalar
- * breakdown for now and relies on its data-class [toString] for display ("toString in the bubble
- * for now"); per-segment windows are omitted as they don't fit the bubble.
+ * breakdown for now; per-segment windows are omitted as they don't fit the bubble.
  */
 data class UiSlopVerdict(
-    val isAi: Boolean,
-    val aiLikelihood: Double,
+    val label: SlopLabel,
     val summary: String,
     val predictionShort: String,
     val headline: String,
@@ -23,5 +25,22 @@ data class UiSlopVerdict(
     val wordCount: Int,
     val analyzedText: String,
     val confidence: String,
-    val dominantLabel: String,
 )
+
+/**
+ * The ink a verdict is stamped in. It lives here rather than on [StampInks] because `:design` holds
+ * the three inks but knows nothing about what they judge.
+ */
+fun StampInks.forLabel(label: SlopLabel): Color = when (label) {
+    SlopLabel.AI -> ai
+    SlopLabel.ASSISTED -> assisted
+    SlopLabel.HUMAN -> human
+}
+
+/** What the stamp reads when the detector sent no phrase of its own. */
+val SlopLabel.stampText: String
+    get() = when (this) {
+        SlopLabel.AI -> "AI-Generated"
+        SlopLabel.ASSISTED -> "AI-Assisted"
+        SlopLabel.HUMAN -> "Human-Written"
+    }

@@ -37,10 +37,7 @@ data class StampInks(
     val ai: Color,
     val assisted: Color,
     val human: Color,
-) {
-    /** The ink a verdict is stamped in: red for machine, green for human. */
-    fun forVerdict(isAi: Boolean): Color = if (isAi) ai else human
-}
+)
 
 internal val LightStampInks = StampInks(
     ai = Color(0xFFD93A1E),

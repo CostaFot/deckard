@@ -22,17 +22,17 @@ class DetectSlopUseCaseTest {
 
     @Test
     fun `judges text at or above the word threshold`() = runTest {
-        coEvery { aiDetectorRepository.detect(any(), any()) } returns Result.Success(aiVerdict)
+        coEvery { aiDetectorRepository.detect(any()) } returns Result.Success(aiVerdict)
 
         val result = useCase(text(words = MIN_WORDS_TO_DETECT))
 
         assertTrue(result is SlopCheck.Judged)
-        assertTrue((result as SlopCheck.Judged).verdict.isAi)
+        assertEquals(SlopLabel.AI, (result as SlopCheck.Judged).verdict.label)
     }
 
     @Test
     fun `surfaces a detection failure`() = runTest {
-        coEvery { aiDetectorRepository.detect(any(), any()) } returns Result.Error(RuntimeException("boom"))
+        coEvery { aiDetectorRepository.detect(any()) } returns Result.Error(RuntimeException("boom"))
 
         val result = useCase(text(words = MIN_WORDS_TO_DETECT))
 
@@ -44,15 +44,14 @@ class DetectSlopUseCaseTest {
         val result = useCase(text(words = MIN_WORDS_TO_DETECT - 1))
 
         assertEquals(SlopCheck.NotEnoughText, result)
-        coVerify(exactly = 0) { aiDetectorRepository.detect(any(), any()) }
+        coVerify(exactly = 0) { aiDetectorRepository.detect(any()) }
     }
 
     private fun text(words: Int): String = (1..words).joinToString(" ") { "word" }
 
     private companion object {
         val aiVerdict = DomainSlopVerdict(
-            isAi = true,
-            aiLikelihood = 0.917,
+            label = SlopLabel.AI,
             summary = "AI Detected",
             predictionShort = "AI",
             headline = "AI Detected",
@@ -69,7 +68,6 @@ class DetectSlopUseCaseTest {
             wordCount = 60,
             analyzedText = "word word word",
             confidence = "High",
-            dominantLabel = "AI-Generated",
         )
     }
 }

@@ -31,6 +31,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.markedusduplicate.deckard.slop.SlopLabel
 import com.markedusduplicate.design.theme.AppTheme
 import com.markedusduplicate.design.theme.stampInks
 import java.util.Locale
@@ -52,9 +53,8 @@ fun SlopReportCard(
     onViewAnalysis: (String) -> Unit,
     onCopyLink: (String) -> Unit,
 ) {
-    val stamp = MaterialTheme.stampInks.forVerdict(verdict.isAi)
-    val percent = (maxOf(verdict.fractionAi, verdict.fractionAiAssisted, verdict.fractionHuman) * 100)
-        .roundToInt()
+    val stamp = MaterialTheme.stampInks.forLabel(verdict.label)
+    val percentHuman = (verdict.fractionHuman * 100).roundToInt()
 
     Surface(
         shape = SpeechBubbleShape(corner = 18.dp),
@@ -66,7 +66,11 @@ fun SlopReportCard(
             modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 22.dp, bottom = 10.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
-            Stamp(label = verdict.dominantLabel, percent = percent, stamp = stamp)
+            Stamp(
+                label = verdict.headline.ifBlank { verdict.label.stampText },
+                percentHuman = percentHuman,
+                stamp = stamp,
+            )
 
             Excerpt(text = verdict.analyzedText, stamp = stamp)
 
@@ -94,9 +98,13 @@ fun SlopReportCard(
 /**
  * The verdict as a rubber stamp: a hard ruled box, tilted a degree or two off the grid so it reads
  * as something pressed onto the page rather than another Material container.
+ *
+ * The detector's own phrase, over the human share — the one number that means the same thing under
+ * every label, so the word and the figure can never contradict each other. It is the pairing the
+ * site's own Pangram badge uses.
  */
 @Composable
-private fun Stamp(label: String, percent: Int, stamp: Color) {
+private fun Stamp(label: String, percentHuman: Int, stamp: Color) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -112,7 +120,10 @@ private fun Stamp(label: String, percent: Int, stamp: Color) {
             modifier = Modifier.weight(1f),
         )
         Spacer(modifier = Modifier.width(10.dp))
-        Text(text = "$percent%", style = StampNumberStyle, color = stamp)
+        Column(horizontalAlignment = Alignment.End) {
+            Text(text = "$percentHuman%", style = StampNumberStyle, color = stamp)
+            Text(text = "HUMAN", style = MetaTextStyle, color = stamp)
+        }
     }
 }
 
@@ -223,8 +234,7 @@ private fun SlopReportCardPreview() {
     AppTheme {
         SlopReportCard(
             verdict = UiSlopVerdict(
-                isAi = true,
-                aiLikelihood = 1.0,
+                label = SlopLabel.AI,
                 summary = "AI Generated",
                 predictionShort = "AI",
                 headline = "AI Generated",
@@ -241,7 +251,6 @@ private fun SlopReportCardPreview() {
                 analyzedText = "After the conclusion of Posidonia 2026, we continue to reflect on a " +
                         "highly productive and rewarding experience for the Department of Maritime Studies",
                 confidence = "High",
-                dominantLabel = "AI-Generated",
             ),
             onViewAnalysis = {},
             onCopyLink = {},

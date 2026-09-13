@@ -6,19 +6,16 @@ import javax.inject.Inject
 
 /**
  * Maps a Pangram [ApiPangramDetection] (API layer) to a [DomainSlopVerdict] (domain layer). The two
- * are near-1:1 for now; the `isAi`/`aiLikelihood` derivations are provisional (refined later).
+ * are near-1:1 apart from the judgement itself, which is derived — see [labelOf].
  */
 class SlopVerdictMapper @Inject constructor() {
 
     fun map(detection: ApiPangramDetection): DomainSlopVerdict {
-        val predictionShort = detection.predictionShort.orEmpty()
         val windows = detection.windows.orEmpty()
-        val dominant = windows.maxByOrNull { it.wordCount ?: 0 }
         return DomainSlopVerdict(
-            isAi = predictionShort != HUMAN,
-            aiLikelihood = detection.fractionAi ?: 0.0,
+            label = labelOf(detection),
             summary = detection.headline.orEmpty(),
-            predictionShort = predictionShort,
+            predictionShort = detection.predictionShort.orEmpty(),
             headline = detection.headline.orEmpty(),
             prediction = detection.prediction.orEmpty(),
             fractionAi = detection.fractionAi ?: 0.0,
@@ -32,10 +29,30 @@ class SlopVerdictMapper @Inject constructor() {
             version = detection.version.orEmpty(),
             wordCount = windows.sumOf { it.wordCount ?: 0 },
             analyzedText = detection.text.orEmpty(),
-            confidence = dominant?.confidence.orEmpty(),
-            dominantLabel = dominant?.label?.takeIf { it.isNotBlank() } ?: detection.headline.orEmpty(),
+            confidence = windows.maxByOrNull { it.wordCount ?: 0 }?.confidence.orEmpty(),
         )
     }
+
+    /**
+     * The judgement, three ways. Pangram's own overall call is the answer — `Human`, `Mixed` or
+     * `AI` — and `Mixed` is the middle that a boolean used to throw away, stamping a half-written
+     * passage as if a machine had written all of it.
+     *
+     * A response missing that call is read from the fractions instead, largest share winning and
+     * ties going to the graver reading. With no evidence at all it is nobody's fault: human.
+     */
+    private fun labelOf(detection: ApiPangramDetection): SlopLabel = when (detection.predictionShort) {
+        AI -> SlopLabel.AI
+        MIXED -> SlopLabel.ASSISTED
+        HUMAN -> SlopLabel.HUMAN
+        else -> dominantFraction(detection)
+    }
+
+    private fun dominantFraction(detection: ApiPangramDetection): SlopLabel = listOf(
+        SlopLabel.AI to (detection.fractionAi ?: 0.0),
+        SlopLabel.ASSISTED to (detection.fractionAiAssisted ?: 0.0),
+        SlopLabel.HUMAN to (detection.fractionHuman ?: 0.0),
+    ).maxBy { it.second }.takeIf { it.second > 0.0 }?.first ?: SlopLabel.HUMAN
 
     private fun mapWindow(window: ApiPangramWindow): DomainSlopWindow = DomainSlopWindow(
         text = window.text.orEmpty(),
@@ -49,6 +66,8 @@ class SlopVerdictMapper @Inject constructor() {
     )
 
     private companion object {
+        const val AI = "AI"
+        const val MIXED = "Mixed"
         const val HUMAN = "Human"
     }
 }

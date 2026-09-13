@@ -3,7 +3,6 @@ package com.markedusduplicate.deckard.slop
 import com.markedusduplicate.deckard.net.model.ApiPangramDetection
 import kotlinx.serialization.json.Json
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -30,15 +29,14 @@ class SlopDetectionContractTest {
 
         val verdict = mapper.map(detection)
 
-        assertFalse(verdict.isAi)
-        assertEquals(0.0, verdict.aiLikelihood, 0.0)
+        assertEquals(SlopLabel.HUMAN, verdict.label)
+        assertEquals(1.0, verdict.fractionHuman, 0.0)
         assertEquals("Human Written", verdict.summary)
         assertEquals(1, verdict.windows.size)
         assertEquals("High", verdict.windows.first().confidence)
         assertEquals("3.3.2", verdict.version)
         assertEquals(69, verdict.wordCount)
         assertEquals("High", verdict.confidence)
-        assertEquals("Human Written", verdict.dominantLabel)
         assertTrue(verdict.analyzedText.startsWith("22:42"))
     }
 
@@ -48,12 +46,12 @@ class SlopDetectionContractTest {
 
         val verdict = mapper.map(detection)
 
-        assertTrue(verdict.isAi)
+        assertEquals(SlopLabel.AI, verdict.label)
+        assertEquals(0.0, verdict.fractionHuman, 0.0)
         assertEquals("AI", verdict.predictionShort)
         assertEquals(1.0, verdict.fractionAi, 0.0)
         assertEquals(137, verdict.wordCount)
         assertEquals("High", verdict.confidence)
-        assertEquals("AI-Generated", verdict.dominantLabel)
         assertEquals("AI Generated", verdict.headline)
     }
 

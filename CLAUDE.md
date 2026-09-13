@@ -254,29 +254,37 @@ The repeatable loop for a new app (X, Reddit, …) or fixing an existing one. Ne
   `GET /task/{id}` until a terminal stage, mapping success via `slop/SlopVerdictMapper`
   (`ApiPangramDetection` → `DomainSlopVerdict`). Both repo and use case are main-safe
   (`withContext(io)`).
-- **Seeing a verdict without spending a Pangram call**: `AiDetectorRepository.detect` takes
-  `isMocked` (default false) and returns a canned `DomainSlopVerdict` when it's true, but *nothing
-  passes it* — flip the call in `DetectSlopUseCase` by hand, and edit `mockedVerdict`'s fractions to
-  exercise the case you want (a single dominant label hides `SlopReportCard`'s composition bar by
-  design; a mixture shows all three inks). Revert before committing. Without a key in
-  `local.properties` the real path fails at the network and Deckard says he couldn't reach the
-  oracle, which is a fine check of the bubble but never reaches the card.
+- **Seeing a verdict without spending a Pangram call** (Pangram bills ~5¢ per 100 words):
+  `./gradlew :app:installDebug -PmockVerdict=ai|assisted|human|mixed` stamps a canned verdict
+  instead of calling out. The property lands in `BuildConfig.MOCK_VERDICT` — `off` in `defaultConfig`
+  and overridden only in the **debug** build type, so a release build ignores the flag entirely.
+  `AiDetectorRepository.mockedDetection` returns an *API* payload, not a domain verdict, so the real
+  `SlopVerdictMapper` still derives the label and the mock can't disagree with the app. `mixed` is
+  the one that shows all three inks (a single-label verdict hides `SlopReportCard`'s composition bar
+  by design). Without a key in `local.properties` the real path fails at the network and Deckard says
+  he couldn't reach the oracle, which is a fine check of the bubble but never reaches the card.
 - `slop/DetectSlopUseCase` is the **domain → UI** seam the overlay calls (never the repository
   directly): it returns a `slop/SlopCheck` (`Judged(mascot/UiSlopVerdict)` / `NotEnoughText` /
   `Failed`). It gates on `MIN_WORDS_TO_DETECT` (50, in `slop/WordCount.kt`) — text below the
-  threshold returns `NotEnoughText` without hitting Pangram — then maps `repository.detect(text)` →
-  `it.toUi()`. To support the
-  report card it requests a public dashboard link (`publicDashboardLink = true`) and the mapper
-  derives `version`, `wordCount`, `analyzedText`, overall `confidence`, and `dominantLabel` (from
-  the
-  dominant `window`).
+  threshold returns `NotEnoughText` without hitting Pangram (50 is Pangram's own floor, the same one
+  the site's `scripts/pangram.mjs` enforces) — then maps `repository.detect(text)` → `it.toUi()`. To
+  support the report card it requests a public dashboard link (`publicDashboardLink = true`) and the
+  mapper derives `version`, `wordCount`, `analyzedText`, overall `confidence` (from the longest
+  `window`), and the three-way `label`.
+- **The verdict is three-way, not a boolean.** `slop/SlopLabel` (`AI` / `ASSISTED` / `HUMAN`) is
+  read straight off Pangram's own overall call — `prediction_short` is `AI` / `Mixed` / `Human`,
+  and `Mixed` is the middle. It rides through `DomainSlopVerdict.label` → `UiSlopVerdict.label` and
+  picks the ink via `mascot/forLabel`; a response missing `prediction_short` falls back to the
+  largest of the three fractions. Collapsing this to `isAi` early was the old bug: `StampInks.assisted`
+  was unreachable and a half-written passage was stamped as wholly machine-written.
 - The verdict renders as `mascot/SlopReportCard`, shown via `DeckardState.Verdict`: a marked-up
   document rather than a reproduction of Pangram's dashboard — the judgement lands as a **stamp**
-  (a ruled box tilted off the grid, carrying `dominantLabel` and the dominant share), the judged
-  passage sits under it behind a side rule, and the machine's readings run along the bottom in
-  monospace. The three-part composition bar appears only when the text is actually a mixture; under
-  a single-label verdict the stamp already says it. `isAi`/`aiLikelihood` derivations remain
-  provisional.
+  (a ruled box tilted off the grid), the judged passage sits under it behind a side rule, and the
+  machine's readings run along the bottom in monospace. The stamp pairs Pangram's own `headline`
+  phrase ("Mostly Human Written", "Lightly AI-Assisted") with **the human share, always**, labelled
+  as such — the same pairing the site's Pangram badge uses (`blog/src/lib/pangram.ts`), and the
+  reason the word and the figure can't contradict each other. The three-part composition bar appears
+  only when the text is actually a mixture; under a single-label verdict the stamp already says it.
 
 ### LiteRT-LM / on-device GPU (hard-won, easy to get wrong)
 

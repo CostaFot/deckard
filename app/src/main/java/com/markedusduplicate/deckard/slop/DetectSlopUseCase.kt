@@ -35,8 +35,7 @@ class DetectSlopUseCase @Inject constructor(
 }
 
 private fun DomainSlopVerdict.toUi(): UiSlopVerdict = UiSlopVerdict(
-    isAi = isAi,
-    aiLikelihood = aiLikelihood,
+    label = label,
     summary = summary,
     predictionShort = predictionShort,
     headline = headline,
@@ -52,5 +51,4 @@ private fun DomainSlopVerdict.toUi(): UiSlopVerdict = UiSlopVerdict(
     wordCount = wordCount,
     analyzedText = analyzedText,
     confidence = confidence,
-    dominantLabel = dominantLabel,
 )
