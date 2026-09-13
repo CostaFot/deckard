@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <!--
+      The overlay and the setup screen both follow the system's light/dark setting, so the window
+      behind them has to as well — a hard-light window flashes white under a dark composition.
+    -->
+    <style name="Theme.Deckard" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+        <item name="android:windowBackground">@color/deckard_paper</item>
+    </style>
+
+</resources>

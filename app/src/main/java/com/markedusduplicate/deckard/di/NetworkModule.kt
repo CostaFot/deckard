@@ -4,7 +4,6 @@ import android.content.Context
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.markedusduplicate.common.FlagProvider
 import com.markedusduplicate.deckard.BuildConfig
-import com.markedusduplicate.deckard.net.JsonPlaceHolderService
 import com.markedusduplicate.deckard.net.PangramService
 import dagger.Module
 import dagger.Provides
@@ -81,11 +80,6 @@ object NetworkModule {
                 )
             }.build()
     }
-
-    @Provides
-    fun providesJsonPlaceHolderService(
-        retrofit: Retrofit
-    ): JsonPlaceHolderService = retrofit.create(JsonPlaceHolderService::class.java)
 
     @Provides
     fun providesPangramService(

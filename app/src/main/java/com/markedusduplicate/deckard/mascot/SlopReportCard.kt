@@ -1,50 +1,47 @@
 package com.markedusduplicate.deckard.mascot
 
-import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.markedusduplicate.design.theme.AppTheme
+import java.util.Locale
 import kotlin.math.roundToInt
 
-private val SlopAiColor = Color(0xFFFF5A1F)
-private val SlopHumanColor = Color(0xFF2E7D32)
-
-private fun verdictColor(isAi: Boolean): Color = if (isAi) SlopAiColor else SlopHumanColor
+private const val CARD_WIDTH_DP = 300
 
 /**
- * Deckard's verdict rendered as a faithful-core replica of Pangram's "short report" card: header
- * (icon + title + subtitle), an excerpt card, a circular composition gauge, the label/confidence
- * row, and — when a public dashboard link is available — the "View full analysis" / "Copy link"
- * actions. Closed via the overlay's X button, not by tapping the card.
+ * Deckard's verdict, printed like a marked-up document: the judgement lands as a stamp across the
+ * top, the passage he judged sits underneath it, and the machine's own readings — composition,
+ * word count, model version, confidence — run along the bottom in monospace.
+ *
+ * The stamp carries the whole verdict on its own, so the card still reads at thumbnail size.
+ * Closed via the overlay's close control, not by tapping the card.
  */
 @Composable
 fun SlopReportCard(
@@ -52,168 +49,182 @@ fun SlopReportCard(
     onViewAnalysis: (String) -> Unit,
     onCopyLink: (String) -> Unit,
 ) {
-    val accent = verdictColor(verdict.isAi)
+    val colors = deckardColors
+    val stamp = colors.stamp(verdict.isAi)
     val percent = (maxOf(verdict.fractionAi, verdict.fractionAiAssisted, verdict.fractionHuman) * 100)
         .roundToInt()
 
     Surface(
-        shape = RoundedCornerShape(16.dp),
-        color = MaterialTheme.colorScheme.surface,
-        contentColor = MaterialTheme.colorScheme.onSurface,
-        shadowElevation = 6.dp,
-        modifier = Modifier.widthIn(max = 300.dp),
+        shape = SpeechBubbleShape(corner = 18.dp),
+        color = colors.paper,
+        contentColor = colors.ink,
+        border = BorderStroke(1.dp, colors.hairline),
+        shadowElevation = 8.dp,
+        modifier = Modifier.widthIn(max = CARD_WIDTH_DP.dp),
     ) {
         Column(
-            modifier = Modifier.padding(14.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 22.dp, bottom = 10.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
-            Header(verdict = verdict, accent = accent)
-            ExcerptCard(verdict = verdict)
-            Gauge(percent = percent, label = verdict.dominantLabel, accent = accent)
-            VerdictRow(verdict = verdict, accent = accent)
+            Stamp(label = verdict.dominantLabel, percent = percent, stamp = stamp)
+
+            Excerpt(text = verdict.analyzedText, stamp = stamp, colors = colors)
+
+            CompositionBar(verdict = verdict, colors = colors)
+
+            Text(
+                text = metaLine(verdict),
+                style = MetaTextStyle,
+                color = colors.inkMuted,
+            )
 
             val link = verdict.dashboardLink
             if (!link.isNullOrBlank()) {
-                Button(onClick = { onViewAnalysis(link) }, modifier = Modifier.fillMaxWidth()) {
-                    Text("View full analysis")
-                }
-                TextButton(onClick = { onCopyLink(link) }, modifier = Modifier.fillMaxWidth()) {
-                    Text("Copy link to result")
-                }
+                Divider(colors = colors)
+                Actions(
+                    stamp = stamp,
+                    colors = colors,
+                    onViewAnalysis = { onViewAnalysis(link) },
+                    onCopyLink = { onCopyLink(link) },
+                )
             }
         }
     }
 }
 
+/**
+ * The verdict as a rubber stamp: a hard ruled box, tilted a degree or two off the grid so it reads
+ * as something pressed onto the page rather than another Material container.
+ */
 @Composable
-private fun Header(verdict: UiSlopVerdict, accent: Color) {
+private fun Stamp(label: String, percent: Int, stamp: Color) {
     Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .rotate(-1.8f)
+            .border(width = 2.dp, color = stamp, shape = RoundedCornerShape(6.dp))
+            .padding(horizontal = 12.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(10.dp),
     ) {
+        Text(
+            text = label.uppercase(Locale.ROOT),
+            style = StampTextStyle,
+            color = stamp,
+            modifier = Modifier.weight(1f),
+        )
+        Spacer(modifier = Modifier.width(10.dp))
+        Text(text = "$percent%", style = StampNumberStyle, color = stamp)
+    }
+}
+
+/** The passage under examination, ruled down the side the way a quoted excerpt is marked. */
+@Composable
+private fun Excerpt(text: String, stamp: Color, colors: DeckardColors) {
+    Row(modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
         Box(
             modifier = Modifier
-                .size(40.dp)
-                .clip(CircleShape)
-                .background(accent.copy(alpha = 0.15f)),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(text = "🤖", fontSize = 20.sp)
-        }
-        Column {
-            Text(
-                text = verdict.headline,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = accent,
-            )
-            Text(
-                text = verdict.prediction,
-                fontSize = 13.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-    }
-}
-
-@Composable
-private fun ExcerptCard(verdict: UiSlopVerdict) {
-    Surface(
-        shape = RoundedCornerShape(12.dp),
-        color = MaterialTheme.colorScheme.surfaceContainer,
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        Column(
-            modifier = Modifier.padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp),
-        ) {
-            Text(
-                text = verdict.analyzedText,
-                fontSize = 13.sp,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-            )
-            Text(
-                text = "${verdict.wordCount} words · Pangram ${verdict.version}",
-                fontSize = 11.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-    }
-}
-
-@Composable
-private fun Gauge(percent: Int, label: String, accent: Color) {
-    val track = MaterialTheme.colorScheme.surfaceVariant
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(4.dp),
-    ) {
-        Box(modifier = Modifier.size(140.dp), contentAlignment = Alignment.Center) {
-            Canvas(modifier = Modifier.fillMaxSize()) {
-                val stroke = 14.dp.toPx()
-                val arcSize = Size(size.width - stroke, size.height - stroke)
-                val topLeft = Offset(stroke / 2, stroke / 2)
-                drawArc(
-                    color = track,
-                    startAngle = 135f,
-                    sweepAngle = 270f,
-                    useCenter = false,
-                    topLeft = topLeft,
-                    size = arcSize,
-                    style = Stroke(width = stroke, cap = StrokeCap.Round),
-                )
-                drawArc(
-                    color = accent,
-                    startAngle = 135f,
-                    sweepAngle = 270f * (percent / 100f),
-                    useCenter = false,
-                    topLeft = topLeft,
-                    size = arcSize,
-                    style = Stroke(width = stroke, cap = StrokeCap.Round),
-                )
-            }
-            Row(verticalAlignment = Alignment.Bottom) {
-                Text(text = "$percent", fontSize = 40.sp, fontWeight = FontWeight.Bold, color = accent)
-                Text(
-                    text = "%",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = accent,
-                    modifier = Modifier.padding(bottom = 6.dp),
-                )
-            }
-        }
+                .width(3.dp)
+                .fillMaxHeight()
+                .clip(RoundedCornerShape(2.dp))
+                .background(stamp.copy(alpha = 0.35f)),
+        )
         Text(
-            text = "of this text is $label",
-            fontSize = 13.sp,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            text = text,
+            style = BodyTextStyle,
+            color = colors.ink,
+            maxLines = 3,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.padding(start = 10.dp),
         )
     }
 }
 
+/**
+ * How the text breaks down: machine, machine-assisted, human. A single ruled bar, because the three
+ * shares are the one comparison worth making and they always sum to the whole.
+ */
 @Composable
-private fun VerdictRow(verdict: UiSlopVerdict, accent: Color) {
+private fun CompositionBar(verdict: UiSlopVerdict, colors: DeckardColors) {
+    val segments = listOf(
+        verdict.fractionAi.toFloat() to colors.stampAi,
+        verdict.fractionAiAssisted.toFloat() to colors.stampAssisted,
+        verdict.fractionHuman.toFloat() to colors.stampHuman,
+    ).filter { it.first > 0f }
+
+    if (segments.size < 2) return
+
     Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(6.dp)
+            .clip(RoundedCornerShape(3.dp))
+            .background(colors.hairline),
     ) {
-        Text(text = verdict.predictionShort, fontWeight = FontWeight.SemiBold, color = accent)
-        if (verdict.confidence.isNotBlank()) {
-            Surface(
-                shape = RoundedCornerShape(8.dp),
-                color = MaterialTheme.colorScheme.secondaryContainer,
-            ) {
-                Text(
-                    text = "Confidence ${verdict.confidence}",
-                    fontSize = 12.sp,
-                    color = MaterialTheme.colorScheme.onSecondaryContainer,
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                )
-            }
+        segments.forEach { (fraction, color) ->
+            Box(
+                modifier = Modifier
+                    .weight(fraction)
+                    .fillMaxHeight()
+                    .background(color),
+            )
         }
+    }
+}
+
+@Composable
+private fun Divider(colors: DeckardColors) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(1.dp)
+            .background(colors.hairline),
+    )
+}
+
+@Composable
+private fun Actions(
+    stamp: Color,
+    colors: DeckardColors,
+    onViewAnalysis: () -> Unit,
+    onCopyLink: () -> Unit,
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Surface(
+            onClick = onViewAnalysis,
+            shape = RoundedCornerShape(10.dp),
+            color = stamp,
+            contentColor = colors.paper,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Text(
+                text = "View full analysis",
+                style = BodyTextStyle.copy(fontSize = 14.sp),
+                modifier = Modifier.padding(vertical = 11.dp),
+                textAlign = TextAlign.Center,
+            )
+        }
+        Surface(
+            onClick = onCopyLink,
+            shape = RoundedCornerShape(10.dp),
+            color = Color.Transparent,
+            contentColor = colors.inkMuted,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Text(
+                text = "Copy link",
+                style = BodyTextStyle.copy(fontSize = 13.sp),
+                modifier = Modifier.padding(vertical = 10.dp),
+                textAlign = TextAlign.Center,
+            )
+        }
+    }
+}
+
+private fun metaLine(verdict: UiSlopVerdict): String = buildString {
+    append("PANGRAM ${verdict.version}")
+    append(" · ${verdict.wordCount} WORDS")
+    if (verdict.confidence.isNotBlank()) {
+        append(" · ${verdict.confidence.uppercase(Locale.ROOT)}")
     }
 }
 

@@ -66,9 +66,13 @@ under `model/` are gitignored.
 ### Overlay service — `mascot/DeckardOverlayService.kt`
 
 - A plain started `Service` (no Activity host) that hosts two `WindowManager` overlay windows: the
-  draggable mascot (`mascot/DeckardComposeView.kt`, an emoji + speech bubble / verdict report card
-  with an always-present X close button), and the always-present left-edge summon tab
+  draggable mascot (`mascot/DeckardComposeView.kt` — `mascot/DeckardMascot.kt`'s plated 🧙 with a
+  tailed bubble or the verdict report card beneath him, and an always-present X close control riding
+  the plate's corner), and the always-present left-edge summon tab
   (`mascot/DeckardEdgeHandleView.kt`).
+- The overlay window is WRAP_CONTENT, so any shadow drawn outside the content is clipped square at
+  the window edge. `DeckardComposeView` pads the root by `OVERLAY_SHADOW_ROOM` to give the mascot's
+  and the card's shadows room inside the window; the service's x offset compensates for that padding.
 - An overlay service has no lifecycle/decor-view callbacks, so the service implements
   `LifecycleOwner` + `ViewModelStoreOwner` + `SavedStateRegistryOwner` itself, drives its own
   `LifecycleRegistry` to RESUMED, and sets the view-tree owners directly on each overlay view — all
@@ -85,6 +89,27 @@ under `model/` are gitignored.
   moves past touch slop (cancelling the long-press), a hold stays put (no drag).
 - Requires the draw-over-apps permission (checked in `onCreate`) and the accessibility service
   (for reading the screen). Started/stopped from `MainActivity`'s setup screen.
+
+### Deckard's look — `mascot/DeckardLook.kt`
+
+The overlay draws on top of arbitrary apps, so it can't inherit its surroundings — it carries its
+own palette rather than the app-wide Material one. `DeckardLook.kt` holds it, and the setup screen
+uses it too so the app and the overlay read as one product.
+
+- `deckardColors` — paper / ink / inkMuted / hairline plus three stamp inks (AI red, human green,
+  assisted amber), each with a light and a dark set, switched on `isSystemInDarkTheme()`. **`ink`
+  and `paper` invert with the theme**, which is what makes the mascot's plate work: it's drawn in
+  `ink`, so it's near-black over a light app and near-white over a dark one, in contrast either way.
+- Type: a heavy, tight, upper-case sans for the stamp, plain sans for body, and **monospace for the
+  machine's readings** (word count, model version, confidence) — those are data, so they're set as
+  data. Actions are never monospace.
+- `SpeechBubbleShape` — the tailed shape worn by both the bubble and the report card, so whatever
+  Deckard is showing points back at him instead of floating beside him.
+- Everything carries a 1dp `hairline` border as well as a shadow: on a dark device the card's paper
+  and the app behind it are both near-black and a shadow doesn't read, so the edge does the work.
+- Launcher icon (`res/drawable-v24/ic_deckard_launcher_*`, adaptive + monochrome): the same idea as
+  the card — a page with a verdict stamped across it, on the ink ground. The app theme
+  (`Theme.Deckard`) is DayNight so the window behind a dark composition isn't white.
 
 ### Screen reading — `slop/` + `accessibility/`
 
@@ -217,9 +242,12 @@ The repeatable loop for a new app (X, Reddit, …) or fixing an existing one. Ne
   derives `version`, `wordCount`, `analyzedText`, overall `confidence`, and `dominantLabel` (from
   the
   dominant `window`).
-- The verdict renders as `mascot/SlopReportCard` — a faithful-core replica of Pangram's short report
-  (header, excerpt card, `Canvas` composition gauge, label/confidence row, "View full analysis" /
-  "Copy link" buttons) shown via `DeckardState.Verdict`. `isAi`/`aiLikelihood` derivations remain
+- The verdict renders as `mascot/SlopReportCard`, shown via `DeckardState.Verdict`: a marked-up
+  document rather than a reproduction of Pangram's dashboard — the judgement lands as a **stamp**
+  (a ruled box tilted off the grid, carrying `dominantLabel` and the dominant share), the judged
+  passage sits under it behind a side rule, and the machine's readings run along the bottom in
+  monospace. The three-part composition bar appears only when the text is actually a mixture; under
+  a single-label verdict the stamp already says it. `isAi`/`aiLikelihood` derivations remain
   provisional.
 
 ### LiteRT-LM / on-device GPU (hard-won, easy to get wrong)
@@ -269,10 +297,12 @@ Steps 1–2 below are done (API→domain→UI wiring via `AiDetectorRepository` 
 base
 URL/auth in `NetworkModule`, and the report-card UI). Remaining, in rough priority:
 
-3. **Deckard's voice.** The bubble copy is plain. Give him the weary-scholar persona: verdict lines
-   like *"Slop, my son. (91.7%)"*, the confidence score deadpan, and his own catchphrase — keep the
-   wise-elder archetype but avoid Blizzard's literal Deckard-Cain tells ("stay awhile and listen",
-   robed-Horadrim imagery). Lands wherever the verdict is rendered (step 2).
+3. **Deckard's voice.** The **visual** pass is done (see "Deckard's look" above: plated mascot,
+   tailed bubble, stamped report card, rebuilt setup screen, real launcher icon) — the copy is not.
+   Only the thinking state was rewritten ("Reading the screen"). Give him the weary-scholar persona:
+   verdict lines like *"Slop, my son. (91.7%)"*, the confidence score deadpan, and his own
+   catchphrase — keep the wise-elder archetype but avoid Blizzard's literal Deckard-Cain tells
+   ("stay awhile and listen", robed-Horadrim imagery). Lands wherever the verdict is rendered.
 4. **Content isolation.** Done for the **screenshot** path: a **long-press** on the edge tab runs
    `OcrContentScreenTextReader` (`OcrPrompt.extractMainContent()`), which has the on-device model
    pick
@@ -289,14 +319,11 @@ URL/auth in `NetworkModule`, and the report-card UI). Remaining, in rough priori
    truncation, confirm post-detail screens. The OCR reader remains a fallback behind
    `@OcrScreenText`.
 
-**Cruft worth deleting** (template/pivot leftovers, unused by the detector): the
-JSONPlaceholder/Todo
-demo — `domain/JsonPlaceHolderRepository`, `domain/TodoMapper`, `domain/model/DomainTodo`,
-`net/JsonPlaceHolderService`, `net/model/ApiTodo`, the `jsonPlaceHolderRepository()` entry-point
-method in `DeckardApplication`, `NetworkModule`'s todo wiring, `:work`'s `ExpeditedGetTodoWorker`,
-and
-the `get_todo` / `title_activity_second|third` strings. Also: `LlmEngine` + `OcrPrompt` still live
-under `suggestion/llm/` (a vestigial keyboard-era package name) — consider moving them to `llm/`.
+**Cruft**: the JSONPlaceholder/Todo demo is gone (repository, mapper, domain/API models, service,
+the `jsonPlaceHolderRepository()` entry-point method, `NetworkModule`'s todo wiring, `:work`'s
+`ExpeditedGetTodoWorker`, the dead strings), along with `drawable/cheems.jpg` and the duplicate
+template theme under `ui/ui/theme/`. Still outstanding: `LlmEngine` + `OcrPrompt` live under
+`suggestion/llm/` (a vestigial keyboard-era package name) — consider moving them to `llm/`.
 
 ## Board
 

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+     The app's mark is what the app does: a page, and a verdict stamped across it. The page is kept
+     clear of the adaptive icon's circular mask so the ink ground still reads as a ring around it.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- the page -->
+    <path
+        android:fillColor="#FAFAF7"
+        android:pathData="M40,26 H68 A4,4 0 0 1 72,30 V78 A4,4 0 0 1 68,82 H40 A4,4 0 0 1 36,78 V30 A4,4 0 0 1 40,26 Z" />
+
+    <!-- its text -->
+    <path android:fillColor="#C6CAD0" android:pathData="M42,36 H66 V40 H42 Z" />
+    <path android:fillColor="#C6CAD0" android:pathData="M42,45 H66 V49 H42 Z" />
+    <path android:fillColor="#C6CAD0" android:pathData="M42,67 H66 V71 H42 Z" />
+    <path android:fillColor="#C6CAD0" android:pathData="M42,76 H58 V80 H42 Z" />
+
+    <!-- the stamp -->
+    <group
+        android:pivotX="54"
+        android:pivotY="58"
+        android:rotation="-12">
+        <path
+            android:fillColor="#00000000"
+            android:pathData="M27,48 H81 A3,3 0 0 1 84,51 V65 A3,3 0 0 1 81,68 H27 A3,3 0 0 1 24,65 V51 A3,3 0 0 1 27,48 Z"
+            android:strokeColor="#D93A1E"
+            android:strokeWidth="5" />
+    </group>
+</vector>

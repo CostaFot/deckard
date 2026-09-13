@@ -9,7 +9,6 @@ import coil3.gif.AnimatedImageDecoder
 import coil3.request.crossfade
 import com.markedusduplicate.common.coroutine.DispatcherProvider
 import com.markedusduplicate.deckard.core.initialize.AppInitializer
-import com.markedusduplicate.deckard.domain.JsonPlaceHolderRepository
 import com.markedusduplicate.logging.logDebug
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
@@ -50,5 +49,4 @@ interface ApplicationEntryPoint {
     fun appInitializer(): AppInitializer
 
     fun dispatcherProvider(): DispatcherProvider
-    fun jsonPlaceHolderRepository(): JsonPlaceHolderRepository
 }

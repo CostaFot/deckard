@@ -125,7 +125,7 @@ class DeckardOverlayService :
 
     // The mascot is summoned next to the edge tab, so it speaks from the left-centre.
     private val layoutParams by lazy {
-        overlayParams(Gravity.LEFT or Gravity.CENTER_VERTICAL, x = dp(44), y = 0)
+        overlayParams(Gravity.LEFT or Gravity.CENTER_VERTICAL, x = dp(30), y = 0)
     }
     private val handleParams by lazy {
         overlayParams(Gravity.LEFT or Gravity.CENTER_VERTICAL, x = 0, y = 0)

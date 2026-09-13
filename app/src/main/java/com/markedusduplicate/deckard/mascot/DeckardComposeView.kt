@@ -7,40 +7,33 @@ import android.view.KeyEvent
 import android.window.OnBackInvokedCallback
 import android.window.OnBackInvokedDispatcher
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.gestures.detectDragGestures
-import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.platform.AbstractComposeView
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.markedusduplicate.deckard.R
 import com.markedusduplicate.design.theme.AppTheme
 import kotlinx.coroutines.flow.StateFlow
 
 /**
- * The floating mascot itself: a draggable 🧙 emoji with a speech bubble that shows whatever the LLM
- * just said. Rendered into a `WindowManager` overlay by [DeckardOverlayService], so the content is
- * wrap-sized and the background stays transparent — only the emoji and bubble occupy (and intercept
+ * The floating mascot itself: a draggable [DeckardMascot] with, beneath him, whatever he currently
+ * has to say — a tailed bubble while he reads, or the full [SlopReportCard] once he's judged.
+ * Rendered into a `WindowManager` overlay by [DeckardOverlayService], so the content is wrap-sized
+ * and the background stays transparent — only the mascot and his bubble occupy (and intercept
  * touches in) the window; everything else passes through to the app beneath.
  */
 @SuppressLint("ViewConstructor")
@@ -114,31 +107,27 @@ class DeckardComposeView(
     override fun Content() {
         val s by state.collectAsStateWithLifecycle()
         AppTheme {
-            if (s == DeckardState.Hidden) return@AppTheme
-            Box(modifier = Modifier.wrapContentSize()) {
+            AnimatedVisibility(
+                visible = s != DeckardState.Hidden,
+                enter = fadeIn(tween(140)) +
+                        scaleIn(tween(180), initialScale = 0.88f, transformOrigin = MascotOrigin),
+                exit = fadeOut(tween(100)) +
+                        scaleOut(tween(120), targetScale = 0.9f, transformOrigin = MascotOrigin),
+            ) {
                 Column(
-                    modifier = Modifier.wrapContentSize(),
+                    modifier = Modifier
+                        .wrapContentSize()
+                        .padding(OVERLAY_SHADOW_ROOM),
                     horizontalAlignment = Alignment.Start,
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                    verticalArrangement = Arrangement.spacedBy(2.dp),
                 ) {
-                    Text(
-                        text = "🧙",
-                        fontSize = 40.sp,
-                        modifier = Modifier
-                            .pointerInput(Unit) { detectTapGestures(onTap = { onTap() }) }
-                            .pointerInput(Unit) {
-                                detectDragGestures { change, amount ->
-                                    change.consume()
-                                    onDrag(amount.x, amount.y)
-                                }
-                            },
-                    )
+                    DeckardMascot(onTap = onTap, onDrag = onDrag, onDismiss = onDismiss)
 
                     when (val current = s) {
                         DeckardState.Hidden -> Unit
-                        DeckardState.Thinking -> Bubble(text = "🤔 …")
-                        is DeckardState.Speaking -> Bubble(text = current.remark)
-                        is DeckardState.Unavailable -> Bubble(text = current.reason)
+                        DeckardState.Thinking -> DeckardThinkingBubble(text = "Reading the screen")
+                        is DeckardState.Speaking -> DeckardBubble(text = current.remark)
+                        is DeckardState.Unavailable -> DeckardBubble(text = current.reason)
                         is DeckardState.Verdict -> SlopReportCard(
                             verdict = current.verdict,
                             onViewAnalysis = onViewAnalysis,
@@ -146,44 +135,16 @@ class DeckardComposeView(
                         )
                     }
                 }
-
-                CloseButton(onClick = onDismiss, modifier = Modifier.align(Alignment.TopEnd))
             }
         }
     }
 }
 
-@Composable
-private fun CloseButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
-    Surface(
-        onClick = onClick,
-        shape = CircleShape,
-        color = MaterialTheme.colorScheme.surfaceVariant,
-        contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-        shadowElevation = 2.dp,
-        modifier = modifier.size(28.dp),
-    ) {
-        Icon(
-            imageVector = Icons.Filled.Close,
-            contentDescription = "Close",
-            modifier = Modifier.padding(6.dp),
-        )
-    }
-}
+/** Deckard grows out of his own plate in the top-left, not out of the middle of the report. */
+private val MascotOrigin = TransformOrigin(0.08f, 0f)
 
-@Composable
-private fun Bubble(text: String) {
-    Surface(
-        shape = RoundedCornerShape(16.dp),
-        color = MaterialTheme.colorScheme.primaryContainer,
-        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-        shadowElevation = 4.dp,
-        modifier = Modifier.widthIn(max = 240.dp),
-    ) {
-        Text(
-            text = text,
-            fontSize = 14.sp,
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-        )
-    }
-}
+/**
+ * Breathing room inside the overlay window for the mascot's and the card's shadows. The window is
+ * wrap-content, so without it the shadow is clipped square at the window edge.
+ */
+private val OVERLAY_SHADOW_ROOM = 14.dp

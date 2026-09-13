@@ -9,33 +9,50 @@ import android.provider.Settings
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import com.markedusduplicate.deckard.accessibility.DeckardAccessibilityService
+import com.markedusduplicate.deckard.mascot.BodyTextStyle
+import com.markedusduplicate.deckard.mascot.DeckardColors
 import com.markedusduplicate.deckard.mascot.DeckardOverlayService
+import com.markedusduplicate.deckard.mascot.DeckardPlate
+import com.markedusduplicate.deckard.mascot.DisplayTextStyle
+import com.markedusduplicate.deckard.mascot.MetaTextStyle
+import com.markedusduplicate.deckard.mascot.TitleTextStyle
+import com.markedusduplicate.deckard.mascot.deckardColors
 import com.markedusduplicate.design.theme.AppTheme
 import com.markedusduplicate.logging.logDebug
 import dagger.hilt.android.AndroidEntryPoint
@@ -49,9 +66,7 @@ class MainActivity : AppCompatActivity() {
 
         setContent {
             AppTheme {
-                Surface {
-                    SetupScreen()
-                }
+                SetupScreen()
             }
         }
     }
@@ -62,9 +77,14 @@ class MainActivity : AppCompatActivity() {
     }
 }
 
+/**
+ * The only Activity in the app: hand Deckard the two permissions he can't grant himself, start him,
+ * and learn the two gestures that summon him. Everything after this happens in the overlay.
+ */
 @Composable
 private fun SetupScreen() {
     val context = LocalContext.current
+    val colors = deckardColors
 
     var isAccessibilityEnabled by remember { mutableStateOf(false) }
     var canDrawOverlays by remember { mutableStateOf(false) }
@@ -79,70 +99,231 @@ private fun SetupScreen() {
         onPauseOrDispose {}
     }
 
-    Column(
+    Surface(color = colors.paper, contentColor = colors.ink, modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .safeDrawingPadding()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 24.dp, vertical = 32.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp),
+        ) {
+            Masthead(colors = colors)
+
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                SectionLabel(text = "WHAT HE NEEDS", colors = colors)
+                Step(
+                    index = "01",
+                    title = "Screen reading",
+                    detail = "Deckard reads the text the app in front of you is already showing. " +
+                            "The reading happens on your phone.",
+                    done = isAccessibilityEnabled,
+                    colors = colors,
+                    onAction = {
+                        context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+                    },
+                )
+                Step(
+                    index = "02",
+                    title = "Drawing over apps",
+                    detail = "Lets him float above whatever you're reading instead of asking you " +
+                            "to switch apps.",
+                    done = canDrawOverlays,
+                    colors = colors,
+                    onAction = {
+                        context.startActivity(
+                            Intent(
+                                Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                                Uri.fromParts("package", context.packageName, null),
+                            ),
+                        )
+                    },
+                )
+            }
+
+            StartButton(
+                running = isDeckardRunning,
+                enabled = canDrawOverlays && isAccessibilityEnabled,
+                colors = colors,
+                onClick = {
+                    if (isDeckardRunning) {
+                        DeckardOverlayService.stop(context)
+                        isDeckardRunning = false
+                    } else {
+                        DeckardOverlayService.start(context)
+                        isDeckardRunning = true
+                    }
+                },
+            )
+
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                SectionLabel(text = "SUMMONING HIM", colors = colors)
+                Gesture(
+                    gesture = "Swipe the left-edge tab",
+                    detail = "Reads the text the app is already exposing. Comes back instantly.",
+                    colors = colors,
+                )
+                Gesture(
+                    gesture = "Hold the left-edge tab",
+                    detail = "Reads a screenshot with the on-device model instead. Slower, but it " +
+                            "works on apps that expose nothing.",
+                    colors = colors,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun Masthead(colors: DeckardColors) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        DeckardPlate(size = 64.dp, emojiSize = 34.sp)
+        Spacer(modifier = Modifier.width(16.dp))
+        Column {
+            Text(text = "Deckard", style = DisplayTextStyle, color = colors.ink)
+            Text(
+                text = "ON-DEVICE AI-SLOP DETECTOR",
+                style = MetaTextStyle,
+                color = colors.inkMuted,
+            )
+        }
+    }
+}
+
+@Composable
+private fun SectionLabel(text: String, colors: DeckardColors) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Text(text = text, style = MetaTextStyle, color = colors.inkMuted)
+        Spacer(modifier = Modifier.width(10.dp))
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .height(1.dp)
+                .background(colors.hairline),
+        )
+    }
+}
+
+/**
+ * One thing Deckard needs before he can work. The two steps are a real sequence — he can't be
+ * started until both are granted — so they carry their position, and a granted one steps back to a
+ * struck-through mark rather than shouting for attention it no longer needs.
+ */
+@Composable
+private fun Step(
+    index: String,
+    title: String,
+    detail: String,
+    done: Boolean,
+    colors: DeckardColors,
+    onAction: () -> Unit,
+) {
+    Row(
         modifier = Modifier
             .fillMaxWidth()
-            .safeDrawingPadding()
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp),
-        horizontalAlignment = Alignment.Start,
-        verticalArrangement = Arrangement.Top,
+            .clip(RoundedCornerShape(14.dp))
+            .border(1.dp, colors.hairline, RoundedCornerShape(14.dp))
+            .padding(14.dp),
+    ) {
+        Box(
+            modifier = Modifier
+                .size(26.dp)
+                .clip(CircleShape)
+                .background(if (done) colors.stampHuman else Color.Transparent)
+                .border(
+                    width = 1.dp,
+                    color = if (done) colors.stampHuman else colors.hairline,
+                    shape = CircleShape,
+                ),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(
+                text = if (done) "✓" else index,
+                style = MetaTextStyle.copy(fontSize = 12.sp, letterSpacing = 0.sp),
+                color = if (done) Color.White else colors.inkMuted,
+            )
+        }
+        Spacer(modifier = Modifier.width(12.dp))
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            Text(
+                text = title,
+                style = TitleTextStyle,
+                color = if (done) colors.inkMuted else colors.ink,
+            )
+            Text(
+                text = detail,
+                style = BodyTextStyle.copy(fontSize = 13.sp, lineHeight = 18.sp),
+                color = colors.inkMuted,
+            )
+            if (!done) {
+                Spacer(modifier = Modifier.height(4.dp))
+                Surface(
+                    onClick = onAction,
+                    shape = RoundedCornerShape(9.dp),
+                    color = Color.Transparent,
+                    contentColor = colors.ink,
+                    border = BorderStroke(1.dp, colors.ink),
+                ) {
+                    Text(
+                        text = "Open settings",
+                        style = BodyTextStyle.copy(fontSize = 13.sp),
+                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 7.dp),
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun StartButton(
+    running: Boolean,
+    enabled: Boolean,
+    colors: DeckardColors,
+    onClick: () -> Unit,
+) {
+    val background = when {
+        !enabled -> colors.hairline
+        running -> Color.Transparent
+        else -> colors.ink
+    }
+    val content = when {
+        !enabled -> colors.inkMuted
+        running -> colors.ink
+        else -> colors.paper
+    }
+    Surface(
+        onClick = onClick,
+        enabled = enabled,
+        shape = RoundedCornerShape(14.dp),
+        color = background,
+        contentColor = content,
+        border = if (running && enabled) BorderStroke(1.dp, colors.ink) else null,
+        modifier = Modifier.fillMaxWidth(),
     ) {
         Text(
-            text = "slop detector setup",
-            style = MaterialTheme.typography.headlineSmall,
+            text = if (running) "Stop Deckard" else "Start Deckard",
+            style = TitleTextStyle,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 16.dp),
         )
+    }
+}
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        StatusRow(label = "Screen reading (accessibility)", ok = isAccessibilityEnabled)
-        StatusRow(label = "Draw over apps (Deckard)", ok = canDrawOverlays)
-        StatusRow(label = "Deckard running", ok = isDeckardRunning)
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Button(
-            modifier = Modifier.fillMaxWidth(),
-            onClick = {
-                context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
-            },
-        ) {
-            Text(text = "1. Enable screen reading")
-        }
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        Button(
-            modifier = Modifier.fillMaxWidth(),
-            onClick = {
-                context.startActivity(
-                    Intent(
-                        Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                        Uri.fromParts("package", context.packageName, null),
-                    ),
-                )
-            },
-        ) {
-            Text(text = "2. Allow Deckard to draw over apps")
-        }
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        Button(
-            modifier = Modifier.fillMaxWidth(),
-            enabled = canDrawOverlays && isAccessibilityEnabled,
-            onClick = {
-                if (isDeckardRunning) {
-                    DeckardOverlayService.stop(context)
-                    isDeckardRunning = false
-                } else {
-                    DeckardOverlayService.start(context)
-                    isDeckardRunning = true
-                }
-            },
-        ) {
-            Text(text = if (isDeckardRunning) "3. Stop Deckard" else "3. Start Deckard")
-        }
+@Composable
+private fun Gesture(gesture: String, detail: String, colors: DeckardColors) {
+    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        Text(text = gesture, style = TitleTextStyle.copy(fontSize = 14.sp), color = colors.ink)
+        Text(
+            text = detail,
+            style = BodyTextStyle.copy(fontSize = 13.sp, lineHeight = 18.sp),
+            color = colors.inkMuted,
+        )
     }
 }
 
@@ -153,25 +334,4 @@ private fun isAccessibilityServiceEnabled(context: Context): Boolean {
         Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES,
     ) ?: return false
     return enabled.split(':').any { ComponentName.unflattenFromString(it) == expected }
-}
-
-@Composable
-private fun StatusRow(label: String, ok: Boolean) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            text = if (ok) "✓" else "✗",
-            color = if (ok) Color(0xFF2E7D32) else Color(0xFFC62828),
-            style = MaterialTheme.typography.titleMedium,
-        )
-        Spacer(modifier = Modifier.height(0.dp))
-        Text(
-            text = "  $label",
-            style = MaterialTheme.typography.bodyLarge,
-        )
-    }
 }
