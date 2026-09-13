@@ -18,6 +18,12 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import javax.inject.Singleton
 
+/**
+ * Pangram's auth header. Shared so the logging interceptor redacts the header the auth interceptor
+ * actually sends: two separate literals would drift and the key would go back into logcat.
+ */
+private const val API_KEY_HEADER = "x-api-key"
+
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
@@ -34,6 +40,7 @@ object NetworkModule {
         flagProvider: FlagProvider
     ): HttpLoggingInterceptor {
         return HttpLoggingInterceptor().apply {
+            redactHeader(API_KEY_HEADER)
             level = when {
                 flagProvider.isDebugEnabled -> HttpLoggingInterceptor.Level.BODY
                 else -> HttpLoggingInterceptor.Level.NONE
@@ -51,7 +58,7 @@ object NetworkModule {
             .apply {
                 addInterceptor { chain ->
                     val request = chain.request().newBuilder()
-                        .addHeader("x-api-key", BuildConfig.AI_DETECTOR_API_KEY)
+                        .addHeader(API_KEY_HEADER, BuildConfig.AI_DETECTOR_API_KEY)
                         .build()
                     chain.proceed(request)
                 }
