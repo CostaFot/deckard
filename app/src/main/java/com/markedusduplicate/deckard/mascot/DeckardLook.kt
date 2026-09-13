@@ -1,13 +1,8 @@
 package com.markedusduplicate.deckard.mascot
 
-import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
@@ -21,51 +16,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 /**
- * Deckard's own look, separate from the app-wide Material palette.
+ * Deckard's own type and shapes.
  *
- * The overlay draws on top of arbitrary apps, so it can't inherit its surroundings — it has to carry
- * its own contrast. The register is a marked-up document: paper ground, ink text, and a verdict
- * printed like a rubber stamp, with the machine's own readings (word count, model version,
- * confidence) set in monospace because that is what they are.
+ * The register is a marked-up document — the palette that goes with it lives in the theme
+ * ([com.markedusduplicate.design.theme.AppTheme]). Here it is the lettering: a heavy, tight,
+ * upper-case sans for the stamp, plain sans for what he says, and monospace for the machine's own
+ * readings (word count, model version, confidence), because that is what they are.
  */
-@Immutable
-data class DeckardColors(
-    val paper: Color,
-    val ink: Color,
-    val inkMuted: Color,
-    val hairline: Color,
-    val stampAi: Color,
-    val stampHuman: Color,
-    val stampAssisted: Color,
-) {
-    /** The stamp ink for a verdict: red for machine, green for human. */
-    fun stamp(isAi: Boolean): Color = if (isAi) stampAi else stampHuman
-}
-
-private val LightDeckardColors = DeckardColors(
-    paper = Color(0xFFFAFAF7),
-    ink = Color(0xFF14181F),
-    inkMuted = Color(0xFF5A6472),
-    hairline = Color(0xFFE3E4DF),
-    stampAi = Color(0xFFD93A1E),
-    stampHuman = Color(0xFF1B7A57),
-    stampAssisted = Color(0xFFB5791A),
-)
-
-private val DarkDeckardColors = DeckardColors(
-    paper = Color(0xFF15181D),
-    ink = Color(0xFFECEEF0),
-    inkMuted = Color(0xFF98A1AE),
-    hairline = Color(0xFF272C34),
-    stampAi = Color(0xFFFF6A4D),
-    stampHuman = Color(0xFF35C08A),
-    stampAssisted = Color(0xFFE0A33C),
-)
-
-val deckardColors: DeckardColors
-    @Composable
-    @ReadOnlyComposable
-    get() = if (isSystemInDarkTheme()) DarkDeckardColors else LightDeckardColors
 
 /** Deckard's own name, and nothing else. */
 val DisplayTextStyle = TextStyle(

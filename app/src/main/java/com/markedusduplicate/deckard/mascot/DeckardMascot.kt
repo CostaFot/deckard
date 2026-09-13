@@ -21,6 +21,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -44,9 +45,9 @@ private const val CLOSE_SIZE_DP = 22
  * Deckard himself, on a plate.
  *
  * The overlay sits over arbitrary apps, so a bare emoji has no ground to stand on and disappears
- * against half the screens it lands on. The plate is drawn in the theme's ink — near-black on a
- * light device, near-white on a dark one — which puts him in contrast with his surroundings either
- * way, and the ring keeps his edge legible over busy content.
+ * against half the screens it lands on. The plate is drawn in the theme's ink (`onSurface`) —
+ * near-black on a light device, near-white on a dark one — which puts him in contrast with his
+ * surroundings either way, and the ring keeps his edge legible over busy content.
  *
  * The dismiss control rides on the plate's corner rather than floating over the content beside it,
  * so it sits in the same place whatever Deckard is currently showing.
@@ -58,7 +59,7 @@ fun DeckardMascot(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val colors = deckardColors
+    val colors = MaterialTheme.colorScheme
     Box(modifier = modifier.size(PLATE_SIZE_DP.dp)) {
         DeckardPlate(
             modifier = Modifier
@@ -74,9 +75,9 @@ fun DeckardMascot(
         Surface(
             onClick = onDismiss,
             shape = CircleShape,
-            color = colors.ink,
-            contentColor = colors.paper,
-            border = BorderStroke(1.5.dp, colors.paper.copy(alpha = 0.9f)),
+            color = colors.onSurface,
+            contentColor = colors.surface,
+            border = BorderStroke(1.5.dp, colors.surface.copy(alpha = 0.9f)),
             shadowElevation = 3.dp,
             modifier = Modifier
                 .size(CLOSE_SIZE_DP.dp)
@@ -102,14 +103,14 @@ fun DeckardPlate(
     size: Dp = PLATE_SIZE_DP.dp,
     emojiSize: TextUnit = 26.sp,
 ) {
-    val colors = deckardColors
+    val colors = MaterialTheme.colorScheme
     Box(
         modifier = modifier
             .size(size)
             .shadow(elevation = 8.dp, shape = CircleShape)
             .clip(CircleShape)
-            .background(colors.ink)
-            .border(width = 1.5.dp, color = colors.paper.copy(alpha = 0.9f), shape = CircleShape),
+            .background(colors.onSurface)
+            .border(width = 1.5.dp, color = colors.surface.copy(alpha = 0.9f), shape = CircleShape),
         contentAlignment = Alignment.Center,
     ) {
         Text(text = MASCOT_EMOJI, fontSize = emojiSize)
@@ -122,12 +123,9 @@ fun DeckardPlate(
  */
 @Composable
 fun DeckardBubble(text: String, modifier: Modifier = Modifier) {
-    val colors = deckardColors
     Surface(
         shape = SpeechBubbleShape(),
-        color = colors.paper,
-        contentColor = colors.ink,
-        border = BorderStroke(1.dp, colors.hairline),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
         shadowElevation = 6.dp,
         modifier = modifier.widthIn(max = 240.dp),
     ) {
@@ -145,12 +143,9 @@ fun DeckardBubble(text: String, modifier: Modifier = Modifier) {
  */
 @Composable
 fun DeckardThinkingBubble(text: String, modifier: Modifier = Modifier) {
-    val colors = deckardColors
     Surface(
         shape = SpeechBubbleShape(),
-        color = colors.paper,
-        contentColor = colors.ink,
-        border = BorderStroke(1.dp, colors.hairline),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
         shadowElevation = 6.dp,
         modifier = modifier,
     ) {
@@ -159,7 +154,11 @@ fun DeckardThinkingBubble(text: String, modifier: Modifier = Modifier) {
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.padding(start = 14.dp, end = 14.dp, top = 18.dp, bottom = 12.dp),
         ) {
-            Text(text = text, style = BodyTextStyle, color = colors.inkMuted)
+            Text(
+                text = text,
+                style = BodyTextStyle,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
             PulsingDots()
         }
     }
@@ -167,7 +166,7 @@ fun DeckardThinkingBubble(text: String, modifier: Modifier = Modifier) {
 
 @Composable
 private fun PulsingDots() {
-    val colors = deckardColors
+    val ink = MaterialTheme.colorScheme.onSurface
     val transition = rememberInfiniteTransition(label = "thinking")
     Row(horizontalArrangement = Arrangement.spacedBy(3.dp)) {
         repeat(3) { index ->
@@ -185,7 +184,7 @@ private fun PulsingDots() {
                     .size(5.dp)
                     .alpha(alpha)
                     .clip(CircleShape)
-                    .background(colors.ink),
+                    .background(ink),
             )
         }
     }

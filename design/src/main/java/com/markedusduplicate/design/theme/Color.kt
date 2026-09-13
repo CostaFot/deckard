@@ -1,75 +1,55 @@
 package com.markedusduplicate.design.theme
 
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 
-val primaryLight = Color(0xFF00687A)
-val onPrimaryLight = Color(0xFFFFFFFF)
-val primaryContainerLight = Color(0xFFABEDFF)
-val onPrimaryContainerLight = Color(0xFF004E5C)
-val secondaryLight = Color(0xFF4B6269)
-val onSecondaryLight = Color(0xFFFFFFFF)
-val secondaryContainerLight = Color(0xFFCEE7EF)
-val onSecondaryContainerLight = Color(0xFF334A51)
-val tertiaryLight = Color(0xFF565D7E)
-val onTertiaryLight = Color(0xFFFFFFFF)
-val tertiaryContainerLight = Color(0xFFDDE1FF)
-val onTertiaryContainerLight = Color(0xFF3F4565)
-val errorLight = Color(0xFFBA1A1A)
-val onErrorLight = Color(0xFFFFFFFF)
-val errorContainerLight = Color(0xFFFFDAD6)
-val onErrorContainerLight = Color(0xFF93000A)
-val backgroundLight = Color(0xFFF5FAFC)
-val onBackgroundLight = Color(0xFF171C1E)
-val surfaceLight = Color(0xFFF5FAFC)
-val onSurfaceLight = Color(0xFF171C1E)
-val surfaceVariantLight = Color(0xFFDBE4E7)
-val onSurfaceVariantLight = Color(0xFF3F484B)
-val outlineLight = Color(0xFF70797B)
-val outlineVariantLight = Color(0xFFBFC8CB)
-val scrimLight = Color(0xFF000000)
-val inverseSurfaceLight = Color(0xFF2C3133)
-val inverseOnSurfaceLight = Color(0xFFECF2F4)
-val inversePrimaryLight = Color(0xFF84D2E6)
-val surfaceDimLight = Color(0xFFD5DBDD)
-val surfaceBrightLight = Color(0xFFF5FAFC)
-val surfaceContainerLowestLight = Color(0xFFFFFFFF)
-val surfaceContainerLowLight = Color(0xFFEFF4F7)
-val surfaceContainerLight = Color(0xFFE9EFF1)
-val surfaceContainerHighLight = Color(0xFFE4E9EB)
-val surfaceContainerHighestLight = Color(0xFFDEE3E5)
+/*
+ * Deckard's palette: a marked-up document. Paper ground, ink text, and a verdict printed like a
+ * rubber stamp.
+ *
+ * Ink and paper invert with the theme, which is what makes the overlay work: the mascot's plate is
+ * drawn in ink, so it is near-black over a light app and near-white over a dark one, in contrast
+ * either way. There are no accent roles here — everything structural is ink on paper, and the only
+ * colour in the product is the stamp.
+ */
 
-val primaryDark = Color(0xFF84D2E6)
-val onPrimaryDark = Color(0xFF003640)
-val primaryContainerDark = Color(0xFF004E5C)
-val onPrimaryContainerDark = Color(0xFFABEDFF)
-val secondaryDark = Color(0xFFB2CBD2)
-val onSecondaryDark = Color(0xFF1D343A)
-val secondaryContainerDark = Color(0xFF334A51)
-val onSecondaryContainerDark = Color(0xFFCEE7EF)
-val tertiaryDark = Color(0xFFBFC4EB)
-val onTertiaryDark = Color(0xFF282F4D)
-val tertiaryContainerDark = Color(0xFF3F4565)
-val onTertiaryContainerDark = Color(0xFFDDE1FF)
-val errorDark = Color(0xFFFFB4AB)
-val onErrorDark = Color(0xFF690005)
-val errorContainerDark = Color(0xFF93000A)
-val onErrorContainerDark = Color(0xFFFFDAD6)
-val backgroundDark = Color(0xFF0F1416)
-val onBackgroundDark = Color(0xFFDEE3E5)
-val surfaceDark = Color(0xFF0F1416)
-val onSurfaceDark = Color(0xFFDEE3E5)
-val surfaceVariantDark = Color(0xFF3F484B)
-val onSurfaceVariantDark = Color(0xFFBFC8CB)
-val outlineDark = Color(0xFF899295)
-val outlineVariantDark = Color(0xFF3F484B)
-val scrimDark = Color(0xFF000000)
-val inverseSurfaceDark = Color(0xFFDEE3E5)
-val inverseOnSurfaceDark = Color(0xFF2C3133)
-val inversePrimaryDark = Color(0xFF00687A)
-val surfaceDimDark = Color(0xFF0F1416)
-val surfaceBrightDark = Color(0xFF343A3C)
-val surfaceContainerLowestDark = Color(0xFF090F11)
-val surfaceContainerLowDark = Color(0xFF171C1E)
-val surfaceContainerDark = Color(0xFF1B2022)
-val surfaceContainerHighDark = Color(0xFF252B2D)
-val surfaceContainerHighestDark = Color(0xFF303638)
+internal val PaperLight = Color(0xFFFAFAF7)
+internal val InkLight = Color(0xFF14181F)
+internal val InkMutedLight = Color(0xFF5A6472)
+internal val HairlineLight = Color(0xFFE3E4DF)
+
+internal val PaperDark = Color(0xFF15181D)
+internal val InkDark = Color(0xFFECEEF0)
+internal val InkMutedDark = Color(0xFF98A1AE)
+internal val HairlineDark = Color(0xFF272C34)
+
+/**
+ * The three inks a verdict can be stamped in.
+ *
+ * Material gives you one [error][androidx.compose.material3.ColorScheme.error] role and no success
+ * or warning counterpart, so a three-way judgement has nowhere honest to sit in the scheme —
+ * borrowing `error`/`tertiary`/`secondary` for it would be a naming lie. They ride alongside the
+ * scheme instead, provided by [AppTheme] off the same `useDarkTheme` so they can never disagree
+ * with it.
+ */
+@Immutable
+data class StampInks(
+    val ai: Color,
+    val assisted: Color,
+    val human: Color,
+) {
+    /** The ink a verdict is stamped in: red for machine, green for human. */
+    fun forVerdict(isAi: Boolean): Color = if (isAi) ai else human
+}
+
+internal val LightStampInks = StampInks(
+    ai = Color(0xFFD93A1E),
+    assisted = Color(0xFFB5791A),
+    human = Color(0xFF1B7A57),
+)
+
+internal val DarkStampInks = StampInks(
+    ai = Color(0xFFFF6A4D),
+    assisted = Color(0xFFE0A33C),
+    human = Color(0xFF35C08A),
+)

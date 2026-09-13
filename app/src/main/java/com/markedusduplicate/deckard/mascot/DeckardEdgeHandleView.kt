@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -86,7 +87,7 @@ class DeckardEdgeHandleView(
                         .width(6.dp)
                         .height(72.dp)
                         .clip(RoundedCornerShape(3.dp))
-                        .background(deckardColors.ink.copy(alpha = 0.38f)),
+                        .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)),
                 )
             }
         }

@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,6 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.markedusduplicate.design.theme.AppTheme
+import com.markedusduplicate.design.theme.stampInks
 import java.util.Locale
 import kotlin.math.roundToInt
 
@@ -49,16 +52,13 @@ fun SlopReportCard(
     onViewAnalysis: (String) -> Unit,
     onCopyLink: (String) -> Unit,
 ) {
-    val colors = deckardColors
-    val stamp = colors.stamp(verdict.isAi)
+    val stamp = MaterialTheme.stampInks.forVerdict(verdict.isAi)
     val percent = (maxOf(verdict.fractionAi, verdict.fractionAiAssisted, verdict.fractionHuman) * 100)
         .roundToInt()
 
     Surface(
         shape = SpeechBubbleShape(corner = 18.dp),
-        color = colors.paper,
-        contentColor = colors.ink,
-        border = BorderStroke(1.dp, colors.hairline),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
         shadowElevation = 8.dp,
         modifier = Modifier.widthIn(max = CARD_WIDTH_DP.dp),
     ) {
@@ -68,22 +68,21 @@ fun SlopReportCard(
         ) {
             Stamp(label = verdict.dominantLabel, percent = percent, stamp = stamp)
 
-            Excerpt(text = verdict.analyzedText, stamp = stamp, colors = colors)
+            Excerpt(text = verdict.analyzedText, stamp = stamp)
 
-            CompositionBar(verdict = verdict, colors = colors)
+            CompositionBar(verdict = verdict)
 
             Text(
                 text = metaLine(verdict),
                 style = MetaTextStyle,
-                color = colors.inkMuted,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
 
             val link = verdict.dashboardLink
             if (!link.isNullOrBlank()) {
-                Divider(colors = colors)
+                HorizontalDivider()
                 Actions(
                     stamp = stamp,
-                    colors = colors,
                     onViewAnalysis = { onViewAnalysis(link) },
                     onCopyLink = { onCopyLink(link) },
                 )
@@ -119,7 +118,7 @@ private fun Stamp(label: String, percent: Int, stamp: Color) {
 
 /** The passage under examination, ruled down the side the way a quoted excerpt is marked. */
 @Composable
-private fun Excerpt(text: String, stamp: Color, colors: DeckardColors) {
+private fun Excerpt(text: String, stamp: Color) {
     Row(modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
         Box(
             modifier = Modifier
@@ -131,7 +130,6 @@ private fun Excerpt(text: String, stamp: Color, colors: DeckardColors) {
         Text(
             text = text,
             style = BodyTextStyle,
-            color = colors.ink,
             maxLines = 3,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.padding(start = 10.dp),
@@ -144,11 +142,12 @@ private fun Excerpt(text: String, stamp: Color, colors: DeckardColors) {
  * shares are the one comparison worth making and they always sum to the whole.
  */
 @Composable
-private fun CompositionBar(verdict: UiSlopVerdict, colors: DeckardColors) {
+private fun CompositionBar(verdict: UiSlopVerdict) {
+    val inks = MaterialTheme.stampInks
     val segments = listOf(
-        verdict.fractionAi.toFloat() to colors.stampAi,
-        verdict.fractionAiAssisted.toFloat() to colors.stampAssisted,
-        verdict.fractionHuman.toFloat() to colors.stampHuman,
+        verdict.fractionAi.toFloat() to inks.ai,
+        verdict.fractionAiAssisted.toFloat() to inks.assisted,
+        verdict.fractionHuman.toFloat() to inks.human,
     ).filter { it.first > 0f }
 
     if (segments.size < 2) return
@@ -158,7 +157,7 @@ private fun CompositionBar(verdict: UiSlopVerdict, colors: DeckardColors) {
             .fillMaxWidth()
             .height(6.dp)
             .clip(RoundedCornerShape(3.dp))
-            .background(colors.hairline),
+            .background(MaterialTheme.colorScheme.outlineVariant),
     ) {
         segments.forEach { (fraction, color) ->
             Box(
@@ -172,19 +171,8 @@ private fun CompositionBar(verdict: UiSlopVerdict, colors: DeckardColors) {
 }
 
 @Composable
-private fun Divider(colors: DeckardColors) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(1.dp)
-            .background(colors.hairline),
-    )
-}
-
-@Composable
 private fun Actions(
     stamp: Color,
-    colors: DeckardColors,
     onViewAnalysis: () -> Unit,
     onCopyLink: () -> Unit,
 ) {
@@ -193,7 +181,8 @@ private fun Actions(
             onClick = onViewAnalysis,
             shape = RoundedCornerShape(10.dp),
             color = stamp,
-            contentColor = colors.paper,
+            // Filled in the stamp's ink, lettered in the paper it was pressed onto.
+            contentColor = MaterialTheme.colorScheme.surface,
             modifier = Modifier.fillMaxWidth(),
         ) {
             Text(
@@ -207,7 +196,7 @@ private fun Actions(
             onClick = onCopyLink,
             shape = RoundedCornerShape(10.dp),
             color = Color.Transparent,
-            contentColor = colors.inkMuted,
+            contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.fillMaxWidth(),
         ) {
             Text(

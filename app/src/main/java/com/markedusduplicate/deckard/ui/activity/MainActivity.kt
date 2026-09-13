@@ -28,6 +28,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -46,14 +47,13 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import com.markedusduplicate.deckard.accessibility.DeckardAccessibilityService
 import com.markedusduplicate.deckard.mascot.BodyTextStyle
-import com.markedusduplicate.deckard.mascot.DeckardColors
 import com.markedusduplicate.deckard.mascot.DeckardOverlayService
 import com.markedusduplicate.deckard.mascot.DeckardPlate
 import com.markedusduplicate.deckard.mascot.DisplayTextStyle
 import com.markedusduplicate.deckard.mascot.MetaTextStyle
 import com.markedusduplicate.deckard.mascot.TitleTextStyle
-import com.markedusduplicate.deckard.mascot.deckardColors
 import com.markedusduplicate.design.theme.AppTheme
+import com.markedusduplicate.design.theme.stampInks
 import com.markedusduplicate.logging.logDebug
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -84,7 +84,6 @@ class MainActivity : AppCompatActivity() {
 @Composable
 private fun SetupScreen() {
     val context = LocalContext.current
-    val colors = deckardColors
 
     var isAccessibilityEnabled by remember { mutableStateOf(false) }
     var canDrawOverlays by remember { mutableStateOf(false) }
@@ -99,7 +98,7 @@ private fun SetupScreen() {
         onPauseOrDispose {}
     }
 
-    Surface(color = colors.paper, contentColor = colors.ink, modifier = Modifier.fillMaxSize()) {
+    Surface(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -108,17 +107,16 @@ private fun SetupScreen() {
                 .padding(horizontal = 24.dp, vertical = 32.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp),
         ) {
-            Masthead(colors = colors)
+            Masthead()
 
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                SectionLabel(text = "WHAT HE NEEDS", colors = colors)
+                SectionLabel(text = "WHAT HE NEEDS")
                 Step(
                     index = "01",
                     title = "Screen reading",
                     detail = "Deckard reads the text the app in front of you is already showing. " +
                             "The reading happens on your phone.",
                     done = isAccessibilityEnabled,
-                    colors = colors,
                     onAction = {
                         context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
                     },
@@ -129,7 +127,6 @@ private fun SetupScreen() {
                     detail = "Lets him float above whatever you're reading instead of asking you " +
                             "to switch apps.",
                     done = canDrawOverlays,
-                    colors = colors,
                     onAction = {
                         context.startActivity(
                             Intent(
@@ -144,7 +141,6 @@ private fun SetupScreen() {
             StartButton(
                 running = isDeckardRunning,
                 enabled = canDrawOverlays && isAccessibilityEnabled,
-                colors = colors,
                 onClick = {
                     if (isDeckardRunning) {
                         DeckardOverlayService.stop(context)
@@ -157,17 +153,15 @@ private fun SetupScreen() {
             )
 
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                SectionLabel(text = "SUMMONING HIM", colors = colors)
+                SectionLabel(text = "SUMMONING HIM")
                 Gesture(
                     gesture = "Swipe the left-edge tab",
                     detail = "Reads the text the app is already exposing. Comes back instantly.",
-                    colors = colors,
                 )
                 Gesture(
                     gesture = "Hold the left-edge tab",
                     detail = "Reads a screenshot with the on-device model instead. Slower, but it " +
                             "works on apps that expose nothing.",
-                    colors = colors,
                 )
             }
         }
@@ -175,31 +169,31 @@ private fun SetupScreen() {
 }
 
 @Composable
-private fun Masthead(colors: DeckardColors) {
+private fun Masthead() {
     Row(verticalAlignment = Alignment.CenterVertically) {
         DeckardPlate(size = 64.dp, emojiSize = 34.sp)
         Spacer(modifier = Modifier.width(16.dp))
         Column {
-            Text(text = "Deckard", style = DisplayTextStyle, color = colors.ink)
+            Text(text = "Deckard", style = DisplayTextStyle)
             Text(
                 text = "ON-DEVICE AI-SLOP DETECTOR",
                 style = MetaTextStyle,
-                color = colors.inkMuted,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
     }
 }
 
 @Composable
-private fun SectionLabel(text: String, colors: DeckardColors) {
+private fun SectionLabel(text: String) {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        Text(text = text, style = MetaTextStyle, color = colors.inkMuted)
+        Text(text = text, style = MetaTextStyle, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Spacer(modifier = Modifier.width(10.dp))
         Box(
             modifier = Modifier
                 .weight(1f)
                 .height(1.dp)
-                .background(colors.hairline),
+                .background(MaterialTheme.colorScheme.outlineVariant),
         )
     }
 }
@@ -215,24 +209,25 @@ private fun Step(
     title: String,
     detail: String,
     done: Boolean,
-    colors: DeckardColors,
     onAction: () -> Unit,
 ) {
+    val colors = MaterialTheme.colorScheme
+    val granted = MaterialTheme.stampInks.human
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(14.dp))
-            .border(1.dp, colors.hairline, RoundedCornerShape(14.dp))
+            .border(1.dp, colors.outlineVariant, RoundedCornerShape(14.dp))
             .padding(14.dp),
     ) {
         Box(
             modifier = Modifier
                 .size(26.dp)
                 .clip(CircleShape)
-                .background(if (done) colors.stampHuman else Color.Transparent)
+                .background(if (done) granted else Color.Transparent)
                 .border(
                     width = 1.dp,
-                    color = if (done) colors.stampHuman else colors.hairline,
+                    color = if (done) granted else colors.outlineVariant,
                     shape = CircleShape,
                 ),
             contentAlignment = Alignment.Center,
@@ -240,7 +235,7 @@ private fun Step(
             Text(
                 text = if (done) "✓" else index,
                 style = MetaTextStyle.copy(fontSize = 12.sp, letterSpacing = 0.sp),
-                color = if (done) Color.White else colors.inkMuted,
+                color = if (done) Color.White else colors.onSurfaceVariant,
             )
         }
         Spacer(modifier = Modifier.width(12.dp))
@@ -251,12 +246,12 @@ private fun Step(
             Text(
                 text = title,
                 style = TitleTextStyle,
-                color = if (done) colors.inkMuted else colors.ink,
+                color = if (done) colors.onSurfaceVariant else colors.onSurface,
             )
             Text(
                 text = detail,
                 style = BodyTextStyle.copy(fontSize = 13.sp, lineHeight = 18.sp),
-                color = colors.inkMuted,
+                color = colors.onSurfaceVariant,
             )
             if (!done) {
                 Spacer(modifier = Modifier.height(4.dp))
@@ -264,8 +259,8 @@ private fun Step(
                     onClick = onAction,
                     shape = RoundedCornerShape(9.dp),
                     color = Color.Transparent,
-                    contentColor = colors.ink,
-                    border = BorderStroke(1.dp, colors.ink),
+                    contentColor = colors.onSurface,
+                    border = BorderStroke(1.dp, colors.onSurface),
                 ) {
                     Text(
                         text = "Open settings",
@@ -282,18 +277,18 @@ private fun Step(
 private fun StartButton(
     running: Boolean,
     enabled: Boolean,
-    colors: DeckardColors,
     onClick: () -> Unit,
 ) {
+    val colors = MaterialTheme.colorScheme
     val background = when {
-        !enabled -> colors.hairline
+        !enabled -> colors.outlineVariant
         running -> Color.Transparent
-        else -> colors.ink
+        else -> colors.primary
     }
     val content = when {
-        !enabled -> colors.inkMuted
-        running -> colors.ink
-        else -> colors.paper
+        !enabled -> colors.onSurfaceVariant
+        running -> colors.onSurface
+        else -> colors.onPrimary
     }
     Surface(
         onClick = onClick,
@@ -301,7 +296,7 @@ private fun StartButton(
         shape = RoundedCornerShape(14.dp),
         color = background,
         contentColor = content,
-        border = if (running && enabled) BorderStroke(1.dp, colors.ink) else null,
+        border = if (running && enabled) BorderStroke(1.dp, colors.onSurface) else null,
         modifier = Modifier.fillMaxWidth(),
     ) {
         Text(
@@ -316,13 +311,13 @@ private fun StartButton(
 }
 
 @Composable
-private fun Gesture(gesture: String, detail: String, colors: DeckardColors) {
+private fun Gesture(gesture: String, detail: String) {
     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-        Text(text = gesture, style = TitleTextStyle.copy(fontSize = 14.sp), color = colors.ink)
+        Text(text = gesture, style = TitleTextStyle.copy(fontSize = 14.sp))
         Text(
             text = detail,
             style = BodyTextStyle.copy(fontSize = 13.sp, lineHeight = 18.sp),
-            color = colors.inkMuted,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
 }

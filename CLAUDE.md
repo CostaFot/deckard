@@ -90,23 +90,33 @@ under `model/` are gitignored.
 - Requires the draw-over-apps permission (checked in `onCreate`) and the accessibility service
   (for reading the screen). Started/stopped from `MainActivity`'s setup screen.
 
-### Deckard's look — `mascot/DeckardLook.kt`
+### Deckard's look — `design/theme/` + `mascot/DeckardLook.kt`
 
 The overlay draws on top of arbitrary apps, so it can't inherit its surroundings — it carries its
-own palette rather than the app-wide Material one. `DeckardLook.kt` holds it, and the setup screen
-uses it too so the app and the overlay read as one product.
+own register, and the setup screen wears it too so the app and the overlay read as one product. That
+register **is** the Material scheme rather than a palette sitting beside one: `design/theme/Color.kt`
+holds the paint and `AppTheme` (`design/theme/Theme.kt`) maps it onto the M3 roles, so stock
+components inherit it and nothing has to be hand-plumbed at the call site.
 
-- `deckardColors` — paper / ink / inkMuted / hairline plus three stamp inks (AI red, human green,
-  assisted amber), each with a light and a dark set, switched on `isSystemInDarkTheme()`. **`ink`
-  and `paper` invert with the theme**, which is what makes the mascot's plate work: it's drawn in
-  `ink`, so it's near-black over a light app and near-white over a dark one, in contrast either way.
-- Type: a heavy, tight, upper-case sans for the stamp, plain sans for body, and **monospace for the
-  machine's readings** (word count, model version, confidence) — those are data, so they're set as
-  data. Actions are never monospace.
+- **The mapping**: paper → `surface`/`background`, ink → `onSurface`/`primary`, inkMuted →
+  `onSurfaceVariant`/`outline`, hairline → `surfaceVariant`/`outlineVariant`. Read them through
+  `MaterialTheme.colorScheme`. **`ink` and `paper` invert with the theme**, which is what makes the
+  mascot's plate work: it's drawn in `onSurface`, so it's near-black over a light app and near-white
+  over a dark one, in contrast either way. There are no accent roles — `primary` is ink, because the
+  one filled control in the product is drawn in it.
+- **`StampInks`** (`ai` / `assisted` / `human`) is the one thing that can't be a scheme role: M3 has
+  a single `error` and no success or warning counterpart, so a three-way verdict has nowhere honest
+  to sit and borrowing `error`/`tertiary`/`secondary` would be a naming lie. `AppTheme` provides it
+  off the **same `useDarkTheme` parameter** as the scheme, so the two can never disagree; reach it
+  as `MaterialTheme.stampInks`.
+- Type (`mascot/DeckardLook.kt`): a heavy, tight, upper-case sans for the stamp, plain sans for body,
+  and **monospace for the machine's readings** (word count, model version, confidence) — those are
+  data, so they're set as data. Actions are never monospace.
 - `SpeechBubbleShape` — the tailed shape worn by both the bubble and the report card, so whatever
   Deckard is showing points back at him instead of floating beside him.
-- Everything carries a 1dp `hairline` border as well as a shadow: on a dark device the card's paper
-  and the app behind it are both near-black and a shadow doesn't read, so the edge does the work.
+- Everything carries a 1dp `outlineVariant` border as well as a shadow: on a dark device the card's
+  paper and the app behind it are both near-black and a shadow doesn't read, so the edge does the
+  work.
 - Launcher icon (`res/drawable-v24/ic_deckard_launcher_*`, adaptive + monochrome): the same idea as
   the card — a page with a verdict stamped across it, on the ink ground. The app theme
   (`Theme.Deckard`) is DayNight so the window behind a dark composition isn't white.
@@ -200,9 +210,20 @@ The repeatable loop for a new app (X, Reddit, …) or fixing an existing one. Ne
    PKG=com.markedusduplicate.deckard.debug
    SVC=$PKG/com.markedusduplicate.deckard.accessibility.DeckardAccessibilityService
    adb shell appops set $PKG SYSTEM_ALERT_WINDOW allow
-   adb shell settings put secure enabled_accessibility_services $SVC
-   adb shell settings put secure accessibility_enabled 1
+   adb shell appops set $PKG ACCESS_RESTRICTED_SETTINGS allow
+   adb shell monkey -p $PKG -c android.intent.category.LAUNCHER 1   # launch FIRST, see below
+   adb shell "settings put secure enabled_accessibility_services $SVC"
+   adb shell "settings put secure accessibility_enabled 1"
    ```
+   Two traps, both of which make the setting **silently revert to `null`** on Android 14+ (verified
+   on API 37):
+   - Without `ACCESS_RESTRICTED_SETTINGS allow`, Enhanced Confirmation Mode reverts the write within
+     a second or two. `adb shell dumpsys accessibility | grep "Bound services"` is the real check —
+     `settings get` can still read back the value it is about to lose.
+   - **`am force-stop` on the package disables the service**, so enable it *after* the app is
+     running, never before. To make `MainActivity` re-read the state, background and foreground it
+     (`input keyevent KEYCODE_HOME`, then launch again) rather than force-stopping.
+
    (Changing `accessibility_service_config.xml` only takes effect after the service re-binds —
    toggle it off/on by re-running the `settings put` lines.) Then open the app → **Start Deckard**.
 2. **Capture.** On the device, navigate to the exact screen/state to debug (e.g. a post with
@@ -233,6 +254,13 @@ The repeatable loop for a new app (X, Reddit, …) or fixing an existing one. Ne
   `GET /task/{id}` until a terminal stage, mapping success via `slop/SlopVerdictMapper`
   (`ApiPangramDetection` → `DomainSlopVerdict`). Both repo and use case are main-safe
   (`withContext(io)`).
+- **Seeing a verdict without spending a Pangram call**: `AiDetectorRepository.detect` takes
+  `isMocked` (default false) and returns a canned `DomainSlopVerdict` when it's true, but *nothing
+  passes it* — flip the call in `DetectSlopUseCase` by hand, and edit `mockedVerdict`'s fractions to
+  exercise the case you want (a single dominant label hides `SlopReportCard`'s composition bar by
+  design; a mixture shows all three inks). Revert before committing. Without a key in
+  `local.properties` the real path fails at the network and Deckard says he couldn't reach the
+  oracle, which is a fine check of the bubble but never reaches the card.
 - `slop/DetectSlopUseCase` is the **domain → UI** seam the overlay calls (never the repository
   directly): it returns a `slop/SlopCheck` (`Judged(mascot/UiSlopVerdict)` / `NotEnoughText` /
   `Failed`). It gates on `MIN_WORDS_TO_DETECT` (50, in `slop/WordCount.kt`) — text below the
@@ -322,8 +350,11 @@ URL/auth in `NetworkModule`, and the report-card UI). Remaining, in rough priori
 **Cruft**: the JSONPlaceholder/Todo demo is gone (repository, mapper, domain/API models, service,
 the `jsonPlaceHolderRepository()` entry-point method, `NetworkModule`'s todo wiring, `:work`'s
 `ExpeditedGetTodoWorker`, the dead strings), along with `drawable/cheems.jpg` and the duplicate
-template theme under `ui/ui/theme/`. Still outstanding: `LlmEngine` + `OcrPrompt` live under
-`suggestion/llm/` (a vestigial keyboard-era package name) — consider moving them to `llm/`.
+template theme under `ui/ui/theme/`. `:design`'s template teal is gone too — the `md_theme_*`
+colours and the unreferenced `Theme.Template` / `AppTheme` / splash XML styles that consumed them.
+Still outstanding: `LlmEngine` + `OcrPrompt` live under `suggestion/llm/` (a vestigial keyboard-era
+package name) — consider moving them to `llm/`; and `:design`'s `ic_splash` drawable plus its
+`androidx.core.splashscreen` dependency are now unreferenced (the app never installed a splash).
 
 ## Board
 
