@@ -1,5 +1,8 @@
 # deckard
 
+<!-- shot: two real swipe reads composited on the wave gradient — a machine-written post on the left, the 2019 retrofit-review post on the right, both judged by pangram-4 -->
+<img src="assets/hero.png" width="900" alt="One of these was written by a person. You don't see that often.">
+
 An Android app that judges whether what is on your screen was written by a machine. A wizard sits
 in an overlay above every other app; summon him and he reads the current screen and stamps a
 verdict on it.
@@ -14,6 +17,9 @@ Deckard reads the screen fine and then falls over at the network.
 
 Two permissions, both granted from the setup screen: draw over other apps, and the accessibility
 service that does the reading. He will not start without them.
+
+<!-- shot: MainActivity with both permissions granted, emulator on API 37, cropped below the summoning section -->
+<img src="assets/screenshots/setup.png" width="340" alt="what he needs before he will get out of bed">
 
 Optionally an on-device model — a `.litertlm` Gemma build, 2.4–3.5GB, run through LiteRT-LM. Only
 the screenshot path uses it. Without one that gesture says he has no brain yet and the rest carries
@@ -37,7 +43,10 @@ adb push gemma.litertlm /sdcard/Android/data/$PKG/files/models/gemma.litertlm
 ```
 
 He loads the first `.litertlm` he finds there, once per process — force-stop the app after pushing a
-new one.
+new one. Until you do, the long-press says so and the swipe carries on working:
+
+<!-- shot: long-press on the edge tab with no .litertlm pushed, cropped to the bubble -->
+<img src="assets/screenshots/no-model.png" width="560" alt="No eyes for pictures yet. Swipe instead; that read needs no model.">
 
 Pangram bills about 5¢ per 100 words, so for poking around there is a flag that stamps a canned
 verdict instead of calling out:
@@ -59,6 +68,9 @@ verdict instead of calling out:
 The verdict is three ways rather than two: **AI**, **assisted** or **human**, with the human share,
 the word count and how sure Pangram is. Assisted is the one worth having — a paragraph someone
 wrote and a model tidied up is neither of the other two, and calling it either is a lie.
+
+<!-- shot: a swipe read of a page that is half hand-written and half generated, which is what puts the third ink and the composition bar on the card -->
+<img src="assets/screenshots/verdict-assisted.png" width="420" alt="Someone started this. Something else finished it.">
 
 ## Notes and limits
 
