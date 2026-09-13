@@ -22,7 +22,7 @@ import javax.inject.Singleton
  * `POST /task`, polls `GET /task/{id}` until the task reaches a terminal stage, and maps a
  * successful result via [SlopVerdictMapper]. The whole flow runs on `dispatcherProvider.io` and is
  * wrapped with `attempt {}`, so any network error, failure stage, or timeout surfaces as a
- * [Result.Error] and callers degrade gracefully.
+ * [Result.Error] and callers degrade gracefully — including a key that cannot run [PANGRAM_MODEL].
  */
 @Singleton
 class AiDetectorRepository @Inject constructor(
@@ -30,12 +30,22 @@ class AiDetectorRepository @Inject constructor(
     private val slopVerdictMapper: SlopVerdictMapper,
     private val dispatcherProvider: DispatcherProvider,
 ) {
+    @Volatile
+    private var modelAvailable = false
+
     suspend fun detect(text: String): Result<Throwable, DomainSlopVerdict> {
         mockedDetection(text)?.let { return Result.Success(slopVerdictMapper.map(it)) }
         return withContext(dispatcherProvider.io) {
             attempt {
+                requireModel()
                 val taskId = pangramService
-                    .createTask(ApiPangramTaskRequest(text, publicDashboardLink = true))
+                    .createTask(
+                        ApiPangramTaskRequest(
+                            text = text,
+                            model = PANGRAM_MODEL,
+                            publicDashboardLink = true,
+                        ),
+                    )
                     .taskId
                 val detection = poll(taskId)
                 when (detection.stage) {
@@ -44,6 +54,21 @@ class AiDetectorRepository @Inject constructor(
                 }
             }
         }
+    }
+
+    /**
+     * Fails unless the key may actually run [PANGRAM_MODEL], the way the site's `scripts/pangram.mjs`
+     * does. `POST /task` rejects a model the key cannot have, so this changes an opaque mid-detection
+     * HTTP error into one that names the model and lists what the key does have — and it fails before
+     * any text is sent. Asked once per process: the answer only changes when the key does.
+     */
+    private suspend fun requireModel() {
+        if (modelAvailable) return
+        val models = pangramService.getModels().models
+        check(PANGRAM_MODEL in models) {
+            "Pangram key cannot run $PANGRAM_MODEL (it has: ${models.joinToString()})"
+        }
+        modelAvailable = true
     }
 
     /**
@@ -108,6 +133,12 @@ class AiDetectorRepository @Inject constructor(
     }
 
     private companion object {
+        /**
+         * The detector to judge with, pinned rather than left to Pangram's default. The site pins
+         * the same one (`scripts/pangram.mjs`), so a passage gets the same verdict wherever it is
+         * checked.
+         */
+        const val PANGRAM_MODEL = "pangram-4"
         const val STAGE_SUCCESS = "STAGE_SUCCESS"
         const val STAGE_FAILED = "STAGE_FAILED"
         const val POLL_INTERVAL_MS = 1500L

@@ -254,6 +254,14 @@ The repeatable loop for a new app (X, Reddit, …) or fixing an existing one. Ne
   `GET /task/{id}` until a terminal stage, mapping success via `slop/SlopVerdictMapper`
   (`ApiPangramDetection` → `DomainSlopVerdict`). Both repo and use case are main-safe
   (`withContext(io)`).
+- **The detector is pinned to `pangram-4`**, sent as `model` on every `POST /task`. Sending no model
+  is not an error — Pangram just answers with its default, an older detector (`version` 3.3.2 against
+  pangram-4's 4.0) — so the app and the site (`blog/scripts/pangram.mjs`, which pins the same model)
+  would judge the same passage with two different detectors and disagree. `detect()` checks
+  `GET /models` once per process before the first submission, so a key without access fails by name
+  rather than with an opaque HTTP error mid-detection. `SlopDetectionContractTest`'s fixtures are
+  real pangram-4 payloads and assert `version` 4.0; `AiDetectorRepositoryTest` asserts the request
+  carries the model at all, which is the regression nothing else would catch.
 - **Seeing a verdict without spending a Pangram call** (Pangram bills ~5¢ per 100 words):
   `./gradlew :app:installDebug -PmockVerdict=ai|assisted|human|mixed` stamps a canned verdict
   instead of calling out. The property lands in `BuildConfig.MOCK_VERDICT` — `off` in `defaultConfig`
