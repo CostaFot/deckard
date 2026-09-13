@@ -158,9 +158,9 @@ components inherit it and nothing has to be hand-plumbed at the call site.
   `ScreenContentExtractors`
   picks the first extractor whose `handles(packageName)` is true, else `GenericContentExtractor`
   (viewport-clipped whole-tree / WebView-only walk — the unknown-app fallback). Extractors are
-  contributed via Hilt `@IntoSet` in `di/ScreenTextExtractorsModule` (add an app = new class + one
-  binding). Shared helpers (`viewport`, `collectVisibleText`, `find`/`findAll`, `mostVisible`) live
-  in
+  contributed via Hilt `@IntoSet` in `di/ScreenTextExtractorsModule`. **The set is frozen at these
+  two — do not add a third** (see the runbook below for why). Shared helpers (`viewport`,
+  `collectVisibleText`, `find`/`findAll`, `mostVisible`) live in
   `accessibility/extract/NodeText.kt`.
     - **`LinkedInContentExtractor`** (`com.linkedin.android`): the feed is Jetpack Compose
       (`sdui:lazyColumn`, mostly bare `android.view.View`s with no ids). A post body is one large
@@ -198,9 +198,23 @@ components inherit it and nothing has to be hand-plumbed at the call site.
   the detector. The **long-press OCR path now does this same isolation at the vision step** (over a
   screenshot instead of a text capture) — see `OcrContentScreenTextReader` above.
 
-### Adding / tuning a per-app extractor (runbook)
+### Debugging a screen read (runbook)
 
-The repeatable loop for a new app (X, Reddit, …) or fixing an existing one. Needs a connected device
+**The extractors are frozen. No new ones, and no tuning of the two that exist** (Costa, 2026-09-14:
+per-app extraction is unreliable and not worth the long tail — every app is a fresh
+reverse-engineering job against a tree that changes when the app ships, and a wrong read hands the
+detector chrome, which is worse than no read). COS-227/228/229 (Reddit, Substack, Medium) and
+COS-230 (polishing LinkedIn) are cancelled on the board with that reason on each. The
+content-isolation answer is the OCR path, which needs no per-app knowledge at all.
+
+So `LinkedInContentExtractor` and `XContentExtractor` stay as they are, good enough on the centred
+common case and locked by fixture tests. **Do not add an extractor for a new app**, and do not read
+a bad read on some other app as a bug to fix here — the a11y path is kept for the comparison with
+the OCR read (COS-235), not because per-app extraction is going anywhere.
+
+What the loop below is still for: seeing what either reader actually got off a screen. The dump is
+the exact `ScreenNode` snapshot the extractor saw, so it is the tool for answering "why did the
+verdict judge *that* text", for the summon-UX work, and for the post. Needs a connected device
 (`adb devices`) and a debug build.
 
 1. **Install & enable.** `./gradlew :app:installDebug`. Grant overlay + accessibility (once per
@@ -233,17 +247,17 @@ The repeatable loop for a new app (X, Reddit, …) or fixing an existing one. Ne
    ```
    The file has the **extracted** text (what the user got), the **active-window** tree (what the
    extractor saw), and **all windows** (reveals content in a separate window, e.g. a bottom sheet).
-3. **Diagnose & write.** Read the dump: find the node holding the real content (check `class`, the
-   `viewId`, `text` vs `desc` — LinkedIn hides the full post in `desc`), and why the extractor
-   missed
-   it. Write/adjust the `ScreenContentExtractor`; for a new app add the class + one
-   `@Binds @IntoSet`
-   in `di/ScreenTextExtractorsModule`.
-4. **Lock it in with a test.** Hand-build a `ScreenNode` fixture from the dump (the `node(…)` helper
-   in `app/src/test/.../accessibility/TestNodes.kt`) and assert the extractor's output. Run
-   `./gradlew :app:testDebugUnitTest --tests "*<App>ContentExtractorTest"`.
-5. **Verify on device.** Re-`installDebug`, summon on the same screen, confirm the verdict reads the
-   right text. Iterate from step 2.
+3. **Read it.** The dump answers what was read and why. Find the node holding the real content
+   (check `class`, the `viewId`, `text` vs `desc` — LinkedIn hides the full post in `desc`) and
+   compare it with the extracted text at the top of the file. That is the finding; it does not
+   become an extractor change.
+4. **Cross-check.** `adb shell uiautomator dump` is a zero-code second opinion on the same tree.
+
+If a change to the two existing extractors is ever genuinely warranted, it needs a board issue
+first (the freeze above), and then it is: adjust the `ScreenContentExtractor`, hand-build a
+`ScreenNode` fixture from the dump (the `node(…)` helper in
+`app/src/test/.../accessibility/TestNodes.kt`), assert the output, and run
+`./gradlew :app:testDebugUnitTest --tests "*<App>ContentExtractorTest"`.
 
 ### Slop detection — `slop/AiDetectorRepository.kt`
 
