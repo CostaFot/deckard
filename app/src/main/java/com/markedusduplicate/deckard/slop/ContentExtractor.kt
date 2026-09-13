@@ -1,6 +1,6 @@
 package com.markedusduplicate.deckard.slop
 
-import com.markedusduplicate.deckard.suggestion.llm.LlmEngine
+import com.markedusduplicate.deckard.llm.LlmEngine
 import javax.inject.Inject
 import javax.inject.Singleton
 

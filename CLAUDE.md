@@ -288,7 +288,7 @@ The repeatable loop for a new app (X, Reddit, …) or fixing an existing one. Ne
 
 ### LiteRT-LM / on-device GPU (hard-won, easy to get wrong)
 
-`suggestion/llm/LlmEngine.kt` wraps the LiteRT-LM `Engine`. The non-obvious constraints:
+`llm/LlmEngine.kt` wraps the LiteRT-LM `Engine`. The non-obvious constraints:
 
 - **GPU needs `<uses-native-library>` in `AndroidManifest.xml`.** The GPU delegate (ML Drift) is
   OpenCL; on Android 12+ the app can't `dlopen` the vendor `libOpenCL.so` unless declared

@@ -1,8 +1,4 @@
-package com.markedusduplicate.deckard.suggestion.llm
-
-import com.markedusduplicate.deckard.suggestion.llm.OcrPrompt.extractMainContent
-import com.markedusduplicate.deckard.suggestion.llm.OcrPrompt.transcribe
-
+package com.markedusduplicate.deckard.llm
 
 /**
  * Prompts for reading a screenshot with the on-device vision model, plus cleanup of the answer.

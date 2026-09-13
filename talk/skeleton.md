@@ -111,8 +111,9 @@ How I actually went about it, in build order:
     real world you'd have the user download it at runtime via Play delivery (Play Asset
     Delivery / Play's on-device AI delivery). One line, gets the "you're not serious" laugh
     out of the way.
-  - One-liner color: `LlmEngine` still lives in a package called `suggestion/llm/` — this
-    app used to be a *keyboard*; the LLM is the sole survivor of the pivot.
+  - One-liner color: `LlmEngine` lived in a package called `suggestion/llm/` until
+    embarrassingly recently — this app used to be a *keyboard*; the LLM is the sole
+    survivor of the pivot.
 - **You need the library — LiteRT-LM.** `Engine` + `EngineConfig`, warm-up off the main
   thread, `engineOrNull()` never blocks. Tiny snippets.
 - **The intricacies of loading it — and getting it on the GPU.** The war story, spend real

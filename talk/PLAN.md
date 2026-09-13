@@ -449,7 +449,7 @@ The stories and where the evidence lives. Full architecture: root `CLAUDE.md`.
   `accessibility/ScreenTextCapturer` → per-app extractors in `accessibility/extract/`.
 - Long-press edge tab → screenshot + on-device LLM isolates the main post *verbatim*:
   `slop/OcrScreenTextReader.kt` (`OcrContentScreenTextReader`), prompt in
-  `suggestion/llm/OcrPrompt.kt` (`extractMainContent()` — verbatim rule is load-bearing,
+  `llm/OcrPrompt.kt` (`extractMainContent()` — verbatim rule is load-bearing,
   rewriting would bias Pangram toward "AI").
 - Share sheet from any app → `ui/activity/ShareTextActivity` → judges text directly, no
   screen read.

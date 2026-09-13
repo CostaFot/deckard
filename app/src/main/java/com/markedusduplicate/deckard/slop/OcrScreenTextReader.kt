@@ -1,8 +1,8 @@
 package com.markedusduplicate.deckard.slop
 
 import com.markedusduplicate.deckard.accessibility.ScreenshotCapturer
-import com.markedusduplicate.deckard.suggestion.llm.LlmEngine
-import com.markedusduplicate.deckard.suggestion.llm.OcrPrompt
+import com.markedusduplicate.deckard.llm.LlmEngine
+import com.markedusduplicate.deckard.llm.OcrPrompt
 import com.markedusduplicate.logging.logDebug
 import javax.inject.Inject
 import javax.inject.Singleton

@@ -1,4 +1,4 @@
-package com.markedusduplicate.deckard.suggestion.llm
+package com.markedusduplicate.deckard.llm
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue

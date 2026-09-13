@@ -1,4 +1,4 @@
-package com.markedusduplicate.deckard.suggestion.llm
+package com.markedusduplicate.deckard.llm
 
 import android.content.Context
 import com.google.ai.edge.litertlm.Backend
