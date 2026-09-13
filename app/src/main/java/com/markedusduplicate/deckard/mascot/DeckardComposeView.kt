@@ -125,11 +125,15 @@ class DeckardComposeView(
 
                     when (val current = s) {
                         DeckardState.Hidden -> Unit
-                        DeckardState.Thinking -> DeckardThinkingBubble(text = "Reading the screen")
-                        is DeckardState.Speaking -> DeckardBubble(text = current.remark)
-                        is DeckardState.Unavailable -> DeckardBubble(text = current.reason)
+                        is DeckardState.Thinking ->
+                            DeckardThinkingBubble(text = DeckardVoice.thinking(current.how))
+
+                        is DeckardState.Unavailable ->
+                            DeckardBubble(text = DeckardVoice.setback(current.reason))
+
                         is DeckardState.Verdict -> SlopReportCard(
                             verdict = current.verdict,
+                            note = DeckardVoice.remark(current.verdict),
                             onViewAnalysis = onViewAnalysis,
                             onCopyLink = onCopyLink,
                         )

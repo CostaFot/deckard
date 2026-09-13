@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.provider.Settings
 import android.widget.Toast
 import com.markedusduplicate.deckard.mascot.DeckardOverlayService
+import com.markedusduplicate.deckard.mascot.DeckardVoice
 
 /**
  * Invisible share target. Receives text shared from any app (`ACTION_SEND` / `text/plain`) and hands
@@ -25,10 +26,10 @@ class ShareTextActivity : Activity() {
 
         when {
             text.isNullOrBlank() ->
-                toast("Nothing for Deckard to judge")
+                toast(DeckardVoice.NOTHING_SHARED)
 
             !Settings.canDrawOverlays(this) -> {
-                toast("Let Deckard draw over apps first")
+                toast(DeckardVoice.NEEDS_OVERLAY_PERMISSION)
                 startActivity(
                     Intent(this, MainActivity::class.java)
                         .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),

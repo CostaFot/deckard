@@ -40,26 +40,26 @@ class OcrContentScreenTextReader @Inject constructor(
         ocrRead(screenshotCapturer, engine, OcrPrompt.extractMainContent())
 }
 
-/** Shared OCR read: screenshot → [prompt] → cleaned text, mapping each failure to a user message. */
+/** Shared OCR read: screenshot → [prompt] → cleaned text, naming the condition on each failure. */
 private suspend fun ocrRead(
     screenshotCapturer: ScreenshotCapturer,
     engine: LlmEngine,
     prompt: String,
 ): ScreenReadResult {
     if (!screenshotCapturer.isAvailable) {
-        return ScreenReadResult.Unavailable("Turn on the accessibility service so I can read your screen.")
+        return ScreenReadResult.Unavailable(ScreenReadFailure.NoAccessibilityService)
     }
     if (engine.engineOrNull() == null) {
-        return ScreenReadResult.Unavailable("My brain isn't loaded yet (no model). Give me a sec.")
+        return ScreenReadResult.Unavailable(ScreenReadFailure.ModelNotReady)
     }
     val jpeg = screenshotCapturer.capture()
-        ?: return ScreenReadResult.Unavailable("I couldn't grab the screen, awkward.")
+        ?: return ScreenReadResult.Unavailable(ScreenReadFailure.ScreenshotFailed)
     val raw = engine.generateWithImage(jpeg, prompt)
-        ?: return ScreenReadResult.Unavailable("I couldn't read the screen. Try again.")
+        ?: return ScreenReadResult.Unavailable(ScreenReadFailure.TranscriptionFailed)
     logDebug { "ocr raw: $raw" }
     val text = OcrPrompt.clean(raw)
     return if (text.isEmpty()) {
-        ScreenReadResult.Unavailable("I didn't find any text to check.")
+        ScreenReadResult.Unavailable(ScreenReadFailure.NoTextFound)
     } else {
         ScreenReadResult.Text(text)
     }

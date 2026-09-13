@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,15 +42,19 @@ private const val CARD_WIDTH_DP = 300
 
 /**
  * Deckard's verdict, printed like a marked-up document: the judgement lands as a stamp across the
- * top, the passage he judged sits underneath it, and the machine's own readings — composition,
- * word count, model version, confidence — run along the bottom in monospace.
+ * top, his [note] sits in the margin under it, the passage he judged follows, and the machine's own
+ * readings — composition, word count, model version, confidence — run along the bottom in monospace.
  *
  * The stamp carries the whole verdict on its own, so the card still reads at thumbnail size.
  * Closed via the overlay's close control, not by tapping the card.
+ *
+ * [note] arrives as a string rather than being looked up here, so the card stays ignorant of what
+ * Deckard sounds like and a preview can drive it.
  */
 @Composable
 fun SlopReportCard(
     verdict: UiSlopVerdict,
+    note: String,
     onViewAnalysis: (String) -> Unit,
     onCopyLink: (String) -> Unit,
 ) {
@@ -66,11 +71,14 @@ fun SlopReportCard(
             modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 22.dp, bottom = 10.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
-            Stamp(
-                label = verdict.headline.ifBlank { verdict.label.stampText },
-                percentHuman = percentHuman,
-                stamp = stamp,
-            )
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Stamp(
+                    label = verdict.headline.ifBlank { verdict.label.stampText },
+                    percentHuman = percentHuman,
+                    stamp = stamp,
+                )
+                MarginNote(text = note)
+            }
 
             Excerpt(text = verdict.analyzedText, stamp = stamp)
 
@@ -125,6 +133,22 @@ private fun Stamp(label: String, percentHuman: Int, stamp: Color) {
             Text(text = "HUMAN", style = MetaTextStyle, color = stamp)
         }
     }
+}
+
+/**
+ * What Deckard makes of it, written in the margin under the stamp.
+ *
+ * Muted rather than stamp-inked, so it reads as a hand annotating the page instead of a second
+ * verdict arguing with the first; sans rather than monospace, because monospace on this card means
+ * the machine's readings and this is the one line that isn't data.
+ */
+@Composable
+private fun MarginNote(text: String) {
+    Text(
+        text = "— $text",
+        style = BodyTextStyle.copy(fontStyle = FontStyle.Italic),
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
 }
 
 /** The passage under examination, ruled down the side the way a quoted excerpt is marked. */
@@ -228,32 +252,58 @@ private fun metaLine(verdict: UiSlopVerdict): String = buildString {
     }
 }
 
-@Preview
+/**
+ * Every verdict the card can show, with the line Deckard writes under each. This is where the voice
+ * is read and reviewed — the alternative is three installs and three Pangram calls.
+ */
+@Preview(name = "Verdict — AI")
 @Composable
-private fun SlopReportCardPreview() {
+private fun SlopReportCardAiPreview() = CardPreview(SlopLabel.AI)
+
+@Preview(name = "Verdict — assisted")
+@Composable
+private fun SlopReportCardAssistedPreview() = CardPreview(SlopLabel.ASSISTED)
+
+@Preview(name = "Verdict — human")
+@Composable
+private fun SlopReportCardHumanPreview() = CardPreview(SlopLabel.HUMAN)
+
+@Composable
+private fun CardPreview(label: SlopLabel) {
+    val verdict = previewVerdict(label)
     AppTheme {
         SlopReportCard(
-            verdict = UiSlopVerdict(
-                label = SlopLabel.AI,
-                summary = "AI Generated",
-                predictionShort = "AI",
-                headline = "AI Generated",
-                prediction = "We believe that this document is fully AI-generated",
-                fractionAi = 1.0,
-                fractionAiAssisted = 0.0,
-                fractionHuman = 0.0,
-                numAiSegments = 1,
-                numAiAssistedSegments = 0,
-                numHumanSegments = 0,
-                dashboardLink = "https://www.pangram.com/history/abc",
-                version = "3.3.2",
-                wordCount = 137,
-                analyzedText = "After the conclusion of Posidonia 2026, we continue to reflect on a " +
-                        "highly productive and rewarding experience for the Department of Maritime Studies",
-                confidence = "High",
-            ),
+            verdict = verdict,
+            note = DeckardVoice.remark(verdict),
             onViewAnalysis = {},
             onCopyLink = {},
         )
     }
+}
+
+private fun previewVerdict(label: SlopLabel): UiSlopVerdict {
+    val (ai, assisted, human) = when (label) {
+        SlopLabel.AI -> Triple(0.92, 0.08, 0.0)
+        SlopLabel.ASSISTED -> Triple(0.21, 0.54, 0.25)
+        SlopLabel.HUMAN -> Triple(0.0, 0.06, 0.94)
+    }
+    return UiSlopVerdict(
+        label = label,
+        summary = label.stampText,
+        predictionShort = label.name,
+        headline = label.stampText,
+        prediction = "",
+        fractionAi = ai,
+        fractionAiAssisted = assisted,
+        fractionHuman = human,
+        numAiSegments = 1,
+        numAiAssistedSegments = 1,
+        numHumanSegments = 1,
+        dashboardLink = "https://www.pangram.com/history/abc",
+        version = "4.0",
+        wordCount = 137,
+        analyzedText = "After the conclusion of Posidonia 2026, we continue to reflect on a " +
+            "highly productive and rewarding experience for the Department of Maritime Studies",
+        confidence = "High",
+    )
 }

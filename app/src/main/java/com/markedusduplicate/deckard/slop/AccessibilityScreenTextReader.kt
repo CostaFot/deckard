@@ -18,11 +18,11 @@ class AccessibilityScreenTextReader @Inject constructor(
 
     override suspend fun read(): ScreenReadResult {
         if (!screenTextCapturer.isAvailable) {
-            return ScreenReadResult.Unavailable("Turn on the accessibility service so I can read your screen.")
+            return ScreenReadResult.Unavailable(ScreenReadFailure.NoAccessibilityService)
         }
         val text = screenTextCapturer.capture()
         return if (text.isNullOrEmpty()) {
-            ScreenReadResult.Unavailable("I didn't find any text to check.")
+            ScreenReadResult.Unavailable(ScreenReadFailure.NoTextFound)
         } else {
             ScreenReadResult.Text(text)
         }

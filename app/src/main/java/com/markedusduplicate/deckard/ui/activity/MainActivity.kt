@@ -41,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -49,6 +50,7 @@ import com.markedusduplicate.deckard.accessibility.DeckardAccessibilityService
 import com.markedusduplicate.deckard.mascot.BodyTextStyle
 import com.markedusduplicate.deckard.mascot.DeckardOverlayService
 import com.markedusduplicate.deckard.mascot.DeckardPlate
+import com.markedusduplicate.deckard.mascot.DeckardVoice
 import com.markedusduplicate.deckard.mascot.DisplayTextStyle
 import com.markedusduplicate.deckard.mascot.MetaTextStyle
 import com.markedusduplicate.deckard.mascot.TitleTextStyle
@@ -178,6 +180,12 @@ private fun Masthead() {
             Text(
                 text = "ON-DEVICE AI-SLOP DETECTOR",
                 style = MetaTextStyle,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Spacer(modifier = Modifier.height(6.dp))
+            Text(
+                text = DeckardVoice.CATCHPHRASE,
+                style = BodyTextStyle.copy(fontStyle = FontStyle.Italic),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }

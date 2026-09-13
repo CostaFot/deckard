@@ -28,7 +28,6 @@ import com.markedusduplicate.deckard.di.AccessibilityScreenText
 import com.markedusduplicate.deckard.di.OcrContentScreenText
 import com.markedusduplicate.deckard.mascot.DeckardOverlayService.Companion.detectText
 import com.markedusduplicate.deckard.slop.DetectSlopUseCase
-import com.markedusduplicate.deckard.slop.MIN_WORDS_TO_DETECT
 import com.markedusduplicate.deckard.slop.ScreenReadResult
 import com.markedusduplicate.deckard.slop.ScreenTextReader
 import com.markedusduplicate.deckard.slop.SlopCheck
@@ -189,23 +188,28 @@ class DeckardOverlayService :
     override fun onBind(intent: Intent?): IBinder? = null
 
     /** Summon Deckard via the a11y-tree read (swipe / tap): fast, no model, per-app extractors. */
-    private fun summonViaAccessibilityRead() = runDetection(accessibilityReader)
+    private fun summonViaAccessibilityRead() = runDetection(accessibilityReader, ReadMethod.Tree)
 
     /** Summon Deckard via the screenshot + OCR "pick the post" read (long-press): slower, model-backed. */
-    private fun summonViaScreenshotOcr() = runDetection(screenshotOcrReader)
+    private fun summonViaScreenshotOcr() = runDetection(screenshotOcrReader, ReadMethod.Screenshot)
 
     /** Show Deckard, read the screen's text with [reader], and surface the verdict (stays until closed). */
-    private fun runDetection(reader: ScreenTextReader) = runDetecting { readScreenAndJudge(reader) }
+    private fun runDetection(reader: ScreenTextReader, how: ReadMethod) =
+        runDetecting(how) { readScreenAndJudge(reader) }
 
     /** Show Deckard and judge already-captured [text] (e.g. text shared into the app) — no screen read. */
-    private fun runDetectionOnText(text: String) = runDetecting { judge(text) }
+    private fun runDetectionOnText(text: String) = runDetecting(ReadMethod.SharedText) { judge(text) }
 
-    /** Show Deckard, run [produce] to get a verdict, and surface it (stays until closed). */
-    private fun runDetecting(produce: suspend () -> DeckardState) {
+    /**
+     * Show Deckard, run [produce] to get a verdict, and surface it (stays until closed). [how] is
+     * only ever announced — it says which wait the user is in for, since the three cost wildly
+     * different amounts.
+     */
+    private fun runDetecting(how: ReadMethod, produce: suspend () -> DeckardState) {
         tapJob?.cancel()
         setOverlayFocusable(true)
         tapJob = scope.launch {
-            state.value = DeckardState.Thinking
+            state.value = DeckardState.Thinking(how)
             state.value = produce()
         }
     }
@@ -234,7 +238,7 @@ class DeckardOverlayService :
 
     private suspend fun readScreenAndJudge(reader: ScreenTextReader): DeckardState =
         when (val result = reader.read()) {
-            is ScreenReadResult.Unavailable -> DeckardState.Unavailable(result.reason)
+            is ScreenReadResult.Unavailable -> DeckardState.Unavailable(NoVerdict.CouldNotRead(result.reason))
             is ScreenReadResult.Text -> judge(result.value)
         }
 
@@ -243,10 +247,8 @@ class DeckardOverlayService :
         logDebug { "slop: judging ${text.length} chars" }
         return when (val check = detectSlopUseCase(text)) {
             is SlopCheck.Judged -> DeckardState.Verdict(check.verdict)
-            SlopCheck.NotEnoughText ->
-                DeckardState.Unavailable("Not enough text here to judge — I need about $MIN_WORDS_TO_DETECT words.")
-
-            SlopCheck.Failed -> DeckardState.Unavailable("Couldn't reach the slop oracle")
+            SlopCheck.NotEnoughText -> DeckardState.Unavailable(NoVerdict.NotEnoughText)
+            SlopCheck.Failed -> DeckardState.Unavailable(NoVerdict.DetectorUnreachable)
         }
     }
 

@@ -12,6 +12,7 @@ import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -32,10 +33,13 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.markedusduplicate.deckard.slop.ScreenReadFailure
+import com.markedusduplicate.design.theme.AppTheme
 
 private const val MASCOT_EMOJI = "🧙"
 private const val PLATE_SIZE_DP = 52
@@ -186,6 +190,35 @@ private fun PulsingDots() {
                     .clip(CircleShape)
                     .background(ink),
             )
+        }
+    }
+}
+
+/**
+ * Everything Deckard says when he has no report — the three reads he can be part-way through, and
+ * the seven ways he can come back with nothing. One preview per line, because a voice you can't
+ * read side by side is a voice that drifts.
+ */
+@Preview(name = "Thinking")
+@Composable
+private fun DeckardThinkingPreview() {
+    AppTheme {
+        Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.padding(16.dp)) {
+            ReadMethod.entries.forEach { how ->
+                DeckardThinkingBubble(text = DeckardVoice.thinking(how))
+            }
+        }
+    }
+}
+
+@Preview(name = "Nothing to report")
+@Composable
+private fun DeckardSetbackPreview() {
+    val setbacks = ScreenReadFailure.entries.map { NoVerdict.CouldNotRead(it) } +
+        listOf(NoVerdict.NotEnoughText, NoVerdict.DetectorUnreachable)
+    AppTheme {
+        Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.padding(16.dp)) {
+            setbacks.forEach { DeckardBubble(text = DeckardVoice.setback(it)) }
         }
     }
 }
