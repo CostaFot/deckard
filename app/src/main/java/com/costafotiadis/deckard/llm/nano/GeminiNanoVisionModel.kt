@@ -20,6 +20,7 @@ import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.time.TimeSource
 
 /**
  * The screen read through the phone's own Gemini Nano, served by AICore over the ML Kit Prompt API.
@@ -33,6 +34,11 @@ import javax.inject.Singleton
  *
  * Status checks are allowed from the background; warm-up is not, and a warm-up right before the
  * read it would warm is no warm-up at all, so there is none.
+ *
+ * The read is as fast as it is going to get: prefill of image and prompt is half a second, the rest
+ * is decoding the post at about 22 tokens a second, and no request setting moves either
+ * (`docs/gemini-nano-speed.md`, measured with [NanoBench]). The read logs its own time so a slow
+ * summon can be told apart from a slow oracle.
  */
 @Singleton
 class GeminiNanoVisionModel internal constructor(
@@ -99,11 +105,14 @@ class GeminiNanoVisionModel internal constructor(
         .getOrDefault(FeatureStatus.UNAVAILABLE)
 
     private suspend fun generate(jpeg: ByteArray, prompt: String): VisionReply = runCatching {
+        val mark = TimeSource.Monotonic.markNow()
         val candidate = client.generateContent(request(jpeg, prompt)).candidates.firstOrNull()
+        val text = candidate?.text.orEmpty()
+        logDebug { "nano: read ${text.length} chars in ${mark.elapsedNow().inWholeMilliseconds}ms" }
         if (candidate?.finishReason == Candidate.FinishReason.OTHER) {
             logDebug { "nano: reply finished for a reason other than the end of the text" }
         }
-        VisionReply.Text(candidate?.text.orEmpty())
+        VisionReply.Text(text)
     }.getOrElse {
         if (it is CancellationException) throw it
         logDebug { "nano: inference failed: ${it.describe()}" }

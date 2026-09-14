@@ -30,6 +30,7 @@ import com.costafotiadis.common.FlagProvider
 import com.costafotiadis.common.coroutine.DispatcherProvider
 import com.costafotiadis.deckard.R
 import com.costafotiadis.deckard.di.OcrContentScreenText
+import com.costafotiadis.deckard.llm.nano.NanoBench
 import com.costafotiadis.deckard.mascot.DeckardOverlayService.Companion.detectText
 import com.costafotiadis.deckard.shutter.DeckardShutterView
 import com.costafotiadis.deckard.shutter.ShutterEffect
@@ -101,6 +102,9 @@ class DeckardOverlayService :
 
     @Inject
     lateinit var flagProvider: FlagProvider
+
+    @Inject
+    lateinit var nanoBench: NanoBench
 
     private val lifecycleRegistry = LifecycleRegistry(this)
     override val lifecycle: Lifecycle get() = lifecycleRegistry
@@ -202,6 +206,14 @@ class DeckardOverlayService :
         override fun onReceive(context: Context?, intent: Intent?) = previewShutter()
     }
 
+    /** Debug only, like [shutterPreviewReceiver]: one Gemini Nano read under a chosen configuration, timed. */
+    private val nanoBenchReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            val spec = NanoBench.spec(intent ?: return)
+            scope.launch { nanoBench.run(spec) }
+        }
+    }
+
     private fun dp(value: Int): Int = (value * resources.displayMetrics.density).toInt()
 
     override fun onCreate() {
@@ -238,6 +250,12 @@ class DeckardOverlayService :
                 this,
                 shutterPreviewReceiver,
                 IntentFilter(ACTION_PREVIEW_SHUTTER),
+                ContextCompat.RECEIVER_EXPORTED,
+            )
+            ContextCompat.registerReceiver(
+                this,
+                nanoBenchReceiver,
+                IntentFilter(NanoBench.ACTION),
                 ContextCompat.RECEIVER_EXPORTED,
             )
         }
@@ -421,6 +439,7 @@ class DeckardOverlayService :
         tapJob?.cancel()
         if (flagProvider.isDebugEnabled) {
             runCatching { unregisterReceiver(shutterPreviewReceiver) }
+            runCatching { unregisterReceiver(nanoBenchReceiver) }
         }
         overlayView?.let { runCatching { windowManager.removeView(it) } }
         edgeHandleView?.let { runCatching { windowManager.removeView(it) } }

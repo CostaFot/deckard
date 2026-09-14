@@ -15,6 +15,7 @@
 #   scripts/deckard summon                              hold the tab: screenshot OCR read
 #   scripts/deckard effect [name]                       pick the shutter effect (no name lists them)
 #   scripts/deckard shutter [package]                   play it over an app, no model needed
+#   scripts/deckard nano-bench [key=value...]           time one Gemini Nano read over the current screen
 #   scripts/deckard dismiss                             send him away
 #   scripts/deckard shot [file.png]                     screencap to a file
 #   scripts/deckard log                                 the app's own logcat lines
@@ -34,6 +35,8 @@ readonly SETTINGS_DOOR="What you can change"
 readonly SETTINGS_MARK="WHEN HE TAKES THE PICTURE"
 readonly SETUP_MARK="WHAT HE NEEDS"
 readonly SHUTTER_ACTION=com.costafotiadis.deckard.action.PREVIEW_SHUTTER
+readonly BENCH_ACTION=com.costafotiadis.deckard.action.NANO_BENCH
+benches_before=0
 judgments_before=0
 
 readonly REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -62,6 +65,8 @@ stopped()   { ! running; }
 judgments() { adb logcat -d | grep -c 'slop: judging' || true; }
 foreground() { adb shell dumpsys activity activities | grep -q "topResumedActivity.*$1/"; }
 judged()    { [ "$(judgments)" -gt "$judgments_before" ]; }
+benches()   { adb logcat -d | grep -c 'bench: done' || true; }
+benched()   { [ "$(benches)" -gt "$benches_before" ]; }
 
 require_device() {
     adb get-state >/dev/null 2>&1 || die "no device; check 'adb devices'"
@@ -249,6 +254,36 @@ cmd_shutter() {
         grep -o 'topResumedActivity.*' | grep -o '[a-zA-Z0-9_.]*/' | head -1 | tr -d /)"
 }
 
+# One Gemini Nano read over whatever is on screen, under a configuration given as
+# key=value pairs, timed step by step in the log (COS-263; the findings are in
+# docs/gemini-nano-speed.md). Keys and defaults:
+# dim=1024 (longest side of the image) prompt=user|system max=0 (output cap, 0 for
+# the model's default) pref=default|fast|full runs=1 warm=false. Three probes say
+# where the time goes: ask="..." replaces the rules with a prompt of your own,
+# image=false sends no screenshot, stream=true times the read to its first token.
+# Nothing is judged and no Pangram call is made; the read's text is logged so a
+# faster configuration that drops words shows up as such.
+cmd_nano_bench() {
+    require_device
+    running || die "the overlay is not running; scripts/deckard start"
+    local extras=() kv key value
+    for kv in "$@"; do
+        key=${kv%%=*}; value=${kv#*=}
+        case $key in
+            dim|max|runs)      extras+=(--ei "$key" "$value") ;;
+            warm|image|stream) extras+=(--ez "$key" "$value") ;;
+            prompt|pref|ask)   extras+=(--es "$key" "'$value'") ;;   # quoted again for the phone's shell
+            *) die "unknown key '$key' (dim, prompt, max, pref, runs, warm, ask, image, stream)" ;;
+        esac
+    done
+    cmd_dismiss
+    benches_before=$(benches)
+    adb shell am broadcast -a "$BENCH_ACTION" -p "$PKG" "${extras[@]}" >/dev/null
+    wait_for 180 "the bench to finish" benched
+    adb logcat -d | grep 'bench: ' | awk -v n="$benches_before" '
+        /bench: start/ { seen++ } seen > n { sub(/.*D /, ""); print }'
+}
+
 cmd_shot() {
     require_device
     local out=${1:-deckard-$(date +%H%M%S).png}
@@ -258,7 +293,7 @@ cmd_shot() {
 
 cmd_log() {
     require_device
-    adb logcat -d | grep -E "Deckard|DetectSlopUseCase|LlmEngine|GeminiNanoVisionModel|ForegroundStage|AiDetectorRepository"
+    adb logcat -d | grep -E "Deckard|DetectSlopUseCase|LlmEngine|GeminiNanoVisionModel|ForegroundStage|NanoBench|AiDetectorRepository"
 }
 
 case ${1:-} in
@@ -268,6 +303,7 @@ case ${1:-} in
     stop)    cmd_stop ;;
     summon)  cmd_summon ;;
     effect)  shift; cmd_effect "$@" ;;
+    nano-bench) shift; cmd_nano_bench "$@" ;;
     shutter) shift; cmd_shutter "$@" ;;
     dismiss) cmd_dismiss ;;
     shot)    shift; cmd_shot "$@" ;;

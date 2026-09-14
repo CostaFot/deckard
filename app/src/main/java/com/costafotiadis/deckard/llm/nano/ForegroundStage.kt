@@ -8,6 +8,7 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.withTimeoutOrNull
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.time.TimeSource
 
 /**
  * Puts Deckard in front of the screen for as long as a block runs.
@@ -56,11 +57,13 @@ class ForegroundStage internal constructor(
                 .onFailure { logDebug { "foreground: could not step forward: $it" } }
                 .isSuccess
             if (!stepped) return null
+            val mark = TimeSource.Monotonic.markNow()
             val arrived = withTimeoutOrNull(STEP_FORWARD_MILLIS) { turn.arrived.await() } != null
             if (!arrived) {
                 logDebug { "foreground: nothing came forward in ${STEP_FORWARD_MILLIS}ms" }
                 return null
             }
+            logDebug { "foreground: in front after ${mark.elapsedNow().inWholeMilliseconds}ms" }
             return block()
         } finally {
             turn.over.complete(Unit)

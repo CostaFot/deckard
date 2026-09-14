@@ -67,9 +67,10 @@ what fails when one is missing.
 change working: `install [ai|assisted|human|mixed]` (build, install, re-grant, wait for the
 accessibility service to bind), `grant`, `start` / `stop` / `dismiss`, `summon` (a hold on the
 tab), `effect [name]` / `shutter [package]` (pick and fire the screenshot effect — see *The shutter*
-below), `shot`, `log`. It is *On a device* below, automated — including both traps that make the
-accessibility setting silently revert, and the rebind after every reinstall. Every wait polls for
-the state it wants rather than sleeping a guessed number of seconds.
+below), `nano-bench [key=value...]` (time one Gemini Nano read under a chosen configuration — see
+*Gemini Nano* below), `shot`, `log`. It is *On a device* below, automated — including both traps
+that make the accessibility setting silently revert, and the rebind after every reinstall. Every
+wait polls for the state it wants rather than sleeping a guessed number of seconds.
 
 To use it after install, open the app and work through `MainActivity`'s setup screen: enable the
 accessibility service (it takes the screenshot), grant draw-over-apps, then start Deckard. A
@@ -327,7 +328,8 @@ they name an effect, they are not something he says, so they never go through `D
   `slop/DomainSlopVerdict` (API → domain only, no UI knowledge). Backed by **Pangram**
   (`net/PangramService`, base URL + `x-api-key` auth interceptor in `di/NetworkModule.kt`, key from
   `BuildConfig.AI_DETECTOR_API_KEY`). Pangram is async: `detect()` does `POST /task` then polls
-  `GET /task/{id}` until a terminal stage, mapping success via `slop/SlopVerdictMapper`
+  `GET /task/{id}` every 500 ms until a terminal stage (Pangram takes about 3 s; the old 1.5 s poll
+  wasted up to a second of it), mapping success via `slop/SlopVerdictMapper`
   (`ApiPangramDetection` → `DomainSlopVerdict`). Both repo and use case are main-safe
   (`withContext(io)`).
 - **The detector is pinned to `pangram-4`**, sent as `model` on every `POST /task`. Sending no model
@@ -414,6 +416,17 @@ COS-259 was the spike, COS-260 the feature. The non-obvious bits:
 - **Testing**: the client is the `GenerativeModel` interface, so `GeminiNanoVisionModelTest` mocks
   it and the request builder is a constructor seam (`ImagePart(bytes)` decodes a bitmap, which no
   JVM test can). `ForegroundStageTest` drives the stage with a lambda in place of `startActivity`.
+- **Speed (COS-263, `docs/gemini-nano-speed.md`)**: the read is decode-bound. Prefill of image plus
+  prompt is half a second whatever the image size (the image is a fixed token cost, 512 px or 1024),
+  then the post comes out at about 22 tokens a second, so a 74-word post is 5 s and a 160-word one
+  11.5 s. No request setting changes that: system instruction, output cap, warm-up, image size all
+  measured the same; the fast model preference is not on the Magic V5 (`FEATURE_NOT_FOUND`) and a
+  cached prompt prefix is refused on a request with an image. The first read of a process pays ~3 s
+  of AICore session setup plus ~1.4 s more on its first generate, and the session then stays warm
+  through at least six idle minutes. `NanoBench` is the debug-only receiver (registered next to the
+  shutter preview) that `scripts/deckard nano-bench` drives, one lever per run, with the text logged
+  so a faster read that drops words is caught; the real path logs `foreground: in front after` and
+  `nano: read … in` so a slow summon can be split into stage, model and oracle.
 
 ### LiteRT-LM / on-device GPU (hard-won, easy to get wrong)
 
