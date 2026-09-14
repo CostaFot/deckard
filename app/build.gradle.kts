@@ -109,6 +109,8 @@ dependencies {
 
     // on-device LLM inference
     implementation(libs.litertlm.android)
+    // COS-259 spike: Gemini Nano through AICore
+    implementation(libs.mlkit.genai.prompt)
 
     // networking
     implementation(libs.kotlinx.serialization.json)

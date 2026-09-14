@@ -30,6 +30,7 @@ import com.costafotiadis.common.FlagProvider
 import com.costafotiadis.common.coroutine.DispatcherProvider
 import com.costafotiadis.deckard.R
 import com.costafotiadis.deckard.di.OcrContentScreenText
+import com.costafotiadis.deckard.llm.NanoSpike
 import com.costafotiadis.deckard.mascot.DeckardOverlayService.Companion.detectText
 import com.costafotiadis.deckard.shutter.DeckardShutterView
 import com.costafotiadis.deckard.shutter.ShutterEffect
@@ -101,6 +102,9 @@ class DeckardOverlayService :
 
     @Inject
     lateinit var flagProvider: FlagProvider
+
+    @Inject
+    lateinit var nanoSpike: NanoSpike
 
     private val lifecycleRegistry = LifecycleRegistry(this)
     override val lifecycle: Lifecycle get() = lifecycleRegistry
@@ -240,10 +244,30 @@ class DeckardOverlayService :
                 IntentFilter(ACTION_PREVIEW_SHUTTER),
                 ContextCompat.RECEIVER_EXPORTED,
             )
+            nanoSpike.register(this, setOf("service", "trampoline"), ::nanoRead)
         }
 
         isRunning = true
         logDebug { "deckard overlay + edge handle added" }
+    }
+
+    /** COS-259 spike: a Nano read from the service itself, or bounced through the trampoline. */
+    private fun nanoRead(where: String, path: String?, untouchable: Boolean) {
+        scope.launch {
+            if (where == "service") {
+                nanoSpike.run(where, path)
+                return@launch
+            }
+            val jpeg = nanoSpike.jpeg(path)
+            if (jpeg == null) {
+                logDebug { "nano[trampoline]: no screenshot" }
+                return@launch
+            }
+            val stashed = nanoSpike.stash(jpeg)
+            logDebug { "nano[trampoline]: starting activity from the service" }
+            runCatching { startActivity(nanoSpike.trampoline(this@DeckardOverlayService, stashed, untouchable)) }
+                .onFailure { logDebug { "nano[trampoline]: startActivity threw $it" } }
+        }
     }
 
     /** Make the service the owner of [view]'s tree so Compose can find a lifecycle / saved state. */

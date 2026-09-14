@@ -60,6 +60,15 @@
         </activity>
 
 
+        <!-- COS-259 spike: a transparent Activity that runs a Gemini Nano read while it is on top -->
+        <activity
+            android:name=".llm.NanoTrampolineActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:taskAffinity=""
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+
         <!-- takes the screenshot the slop detector reads; only an accessibility service can -->
         <service
             android:name=".accessibility.DeckardAccessibilityService"
