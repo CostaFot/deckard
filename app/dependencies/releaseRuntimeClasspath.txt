@@ -56,7 +56,6 @@ androidx.compose.ui:ui-util-android:1.11.0
 androidx.compose.ui:ui-util:1.11.0
 androidx.compose.ui:ui:1.11.0
 androidx.compose:compose-bom:2026.01.01
-androidx.concurrent:concurrent-futures-ktx:1.1.0
 androidx.concurrent:concurrent-futures:1.1.0
 androidx.constraintlayout:constraintlayout-solver:2.0.1
 androidx.constraintlayout:constraintlayout:2.0.1
@@ -75,8 +74,6 @@ androidx.emoji2:emoji2:1.4.0
 androidx.exifinterface:exifinterface:1.4.1
 androidx.fragment:fragment:1.5.4
 androidx.graphics:graphics-path:1.0.1
-androidx.hilt:hilt-common:1.2.0
-androidx.hilt:hilt-work:1.2.0
 androidx.interpolator:interpolator:1.0.0
 androidx.legacy:legacy-support-core-utils:1.0.0
 androidx.lifecycle:lifecycle-common-java8:2.11.0
@@ -117,18 +114,12 @@ androidx.print:print:1.0.0
 androidx.profileinstaller:profileinstaller:1.4.1
 androidx.recyclerview:recyclerview:1.1.0
 androidx.resourceinspection:resourceinspection-annotation:1.0.1
-androidx.room:room-common:2.6.1
-androidx.room:room-ktx:2.6.1
-androidx.room:room-runtime:2.6.1
 androidx.savedstate:savedstate-android:1.4.0
 androidx.savedstate:savedstate-compose-android:1.4.0
 androidx.savedstate:savedstate-compose:1.4.0
 androidx.savedstate:savedstate-ktx:1.4.0
 androidx.savedstate:savedstate:1.4.0
-androidx.sqlite:sqlite-framework:2.4.0
-androidx.sqlite:sqlite:2.4.0
 androidx.startup:startup-runtime:1.2.0
-androidx.tracing:tracing-ktx:1.2.0
 androidx.tracing:tracing-perfetto:1.0.1
 androidx.tracing:tracing:1.2.0
 androidx.transition:transition:1.6.0
@@ -140,9 +131,6 @@ androidx.viewpager:viewpager:1.0.0
 androidx.window:window-core-android:1.5.0
 androidx.window:window-core:1.5.0
 androidx.window:window:1.5.0
-androidx.work:work-runtime-ktx:2.10.3
-androidx.work:work-runtime:2.10.3
-androidx.work:work-testing:2.10.3
 com.caverock:androidsvg-aar:1.4
 com.google.accompanist:accompanist-drawablepainter:0.37.3
 com.google.ai.edge.litertlm:litertlm-android:0.11.0

@@ -82,7 +82,6 @@ dependencies {
     implementation(project(":auth"))
     implementation(project(":design"))
     implementation(project(":common"))
-    implementation(project(":work"))
     implementation(project(":logging"))
     implementation(project(":textresource"))
 
@@ -108,7 +107,6 @@ dependencies {
     implementation(libs.androidx.navigation3.ui)
     implementation(libs.androidx.lifecycle.viewmodel.navigation3)
 
-    implementation(libs.androidx.startup)
 
     // on-device LLM inference
     implementation(libs.litertlm.android)

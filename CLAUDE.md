@@ -30,7 +30,7 @@ with a settings screen behind it.
 - `app` — the slop detector (overlay + accessibility services) + the setup/settings `MainActivity`
 - `design` — theme/UI (`AppTheme`)
 - `textresource` — `TextResource`, a string that resolves at the draw site (see *Copy* below)
-- `common`, `common-test`, `logging`, `work`, `auth`, `testing` — shared libs
+- `common`, `common-test`, `logging`, `auth`, `testing` — shared libs
   (one namespace root across the whole repo: the app is `com.costafotiadis.deckard`, each lib is
   `com.costafotiadis.<module>`)
 - `build-logic/convention` — Gradle convention plugins (`application.common`,

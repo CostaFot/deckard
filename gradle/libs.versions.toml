@@ -14,7 +14,6 @@ androidxLifecycle = "2.11.0"
 androidxMacroBenchmark = "1.1.0"
 androidxMetrics = "1.0.0-beta01"
 androidxProfileinstaller = "1.3.1"
-androidxStartup = "1.2.0"
 androidxWindowManager = "1.4.0"
 androidxTestCore = "1.7.0"
 androidxTestExt = "1.3.0"
@@ -22,10 +21,8 @@ androidxTestRunner = "1.7.0"
 androidxTestRules = "1.7.0"
 androidxTracing = "1.3.0"
 androidxUiAutomator = "2.3.0"
-androidxWork = "2.10.3"
 coil = "3.3.0"
 hilt = "2.59"
-hiltExt = "1.2.0"
 androidxLintGradle = "1.0.0-alpha03"
 dependencyGuard = "0.5.0"
 ktlint = "1.4.0"
@@ -90,7 +87,6 @@ androidx-navigation3-ui = { module = "androidx.navigation3:navigation3-ui", vers
 
 
 androidx-profileinstaller = { group = "androidx.profileinstaller", name = "profileinstaller", version.ref = "androidxProfileinstaller" }
-androidx-startup = { group = "androidx.startup", name = "startup-runtime", version.ref = "androidxStartup" }
 androidx-window-manager = { module = "androidx.window:window", version.ref = "androidxWindowManager" }
 androidx-test-core = { group = "androidx.test", name = "core", version.ref = "androidxTestCore" }
 androidx-test-ext = { group = "androidx.test.ext", name = "junit-ktx", version.ref = "androidxTestExt" }
@@ -99,15 +95,11 @@ androidx-test-runner = { group = "androidx.test", name = "runner", version.ref =
 androidx-test-rules = { group = "androidx.test", name = "rules", version.ref = "androidxTestRules" }
 androidx-test-uiautomator = { group = "androidx.test.uiautomator", name = "uiautomator", version.ref = "androidxUiAutomator" }
 androidx-tracing-ktx = { group = "androidx.tracing", name = "tracing-ktx", version.ref = "androidxTracing" }
-androidx-work-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "androidxWork" }
-androidx-work-testing = { group = "androidx.work", name = "work-testing", version.ref = "androidxWork" }
 coil-kt-okhttp = { group = "io.coil-kt.coil3", name = "coil-network-okhttp", version.ref = "coil" }
 coil-kt-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil" }
 coil-kt-svg = { group = "io.coil-kt.coil3", name = "coil-svg", version.ref = "coil" }
 coil-kt-gif = { group = "io.coil-kt.coil3", name = "coil-gif", version.ref = "coil" }
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
-hilt-ext-work = { group = "androidx.hilt", name = "hilt-work", version.ref = "hiltExt" }
-hilt-ext-compiler = { group = "androidx.hilt", name = "hilt-compiler", version.ref = "hiltExt" }
 hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
 hilt-android-testing = { group = "com.google.dagger", name = "hilt-android-testing", version.ref = "hilt" }
 junit4 = { group = "junit", name = "junit", version.ref = "junit4" }
