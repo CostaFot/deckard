@@ -9,9 +9,10 @@ import com.costafotiadis.textresource.TextResource
  * The ways Deckard can say he just photographed your screen, and the one where he doesn't.
  *
  * Four of these exist at once on purpose: an effect drawn over an arbitrary app cannot be judged in
- * a preview or argued about in the abstract, so they are all built, all selectable from the
- * settings screen, and one of them wins on a real screen. [None] is not a placeholder — a
- * comparison without a baseline is not a comparison.
+ * a preview or argued about in the abstract, so they are all built and all selectable from the
+ * settings screen. They stay that way — the choice is the user's, not one winner's (COS-244 wanted
+ * to cull them to one and was dropped). [None] is not a placeholder — a comparison without a
+ * baseline is not a comparison.
  *
  * [key] is what gets persisted and what `scripts/deckard effect` names, so it outlives any renaming
  * of the constant. The labels are constructor arguments rather than constants because

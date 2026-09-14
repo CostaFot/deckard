@@ -172,9 +172,10 @@ tree and takes no picture, so it stays silent, and the two summons looking diffe
   `scripts/deckard effect <name>` picks one and `scripts/deckard shutter [package]` fires it: the
   read that normally triggers one wants the 2.4–3.5GB `.litertlm`, so debug builds carry a
   runtime-registered broadcast receiver that just plays it.
-- **Open, and the thing to settle when picking a winner**: the ink follows the *device* theme, not
-  the app's. An effect reads over an app whose ground matches the device theme and washes out when
-  they diverge — a light-themed phone over a dark app draws near-black on near-black.
+- **Open**: the ink follows the *device* theme, not the app's. An effect reads over an app whose
+  ground matches the device theme and washes out when they diverge — a light-themed phone over a
+  dark app draws near-black on near-black. Whatever fixes that applies to all four, since all four
+  are staying (COS-247).
 
 ### Deckard's look — `design/theme/` + `mascot/DeckardLook.kt`
 
@@ -482,7 +483,7 @@ with the chosen `shutter/` effect) → **Pangram detection** → the bubble show
 Done: the API→domain→UI wiring (`AiDetectorRepository` + `DetectSlopUseCase`, base URL/auth in
 `NetworkModule`), the report-card UI, Deckard's look (see above), content isolation on the
 screenshot path, two per-app extractors (LinkedIn, X), the four screenshot effects and the picker
-that chooses between them (see *The shutter* above — one of them still has to win), the settings
+that chooses between them (see *The shutter* above), the settings
 screen the picker now lives on and the Navigation 3 back stack behind it (see *The Activity's two
 screens* above), and every word the app says now living in `strings.xml` behind `:textresource`
 (see *Copy* above).
