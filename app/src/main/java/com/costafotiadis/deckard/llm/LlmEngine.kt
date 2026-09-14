@@ -18,7 +18,8 @@ import javax.inject.Singleton
 
 /**
  * Owns the LiteRT-LM [Engine] for the app session: resolves the model file and initialises the
- * engine once (trying NPU → GPU → CPU), keeping it alive.
+ * engine once (trying GPU → CPU → NPU), keeping it alive. It is the [VisionModel] the screen read
+ * uses, bound in `di/VisionModelModule`.
  *
  * Warm-up runs on the application scope so it can't be cancelled and restarted by callers.
  * [engineOrNull] is non-blocking: it returns `null` while the model is still loading (or if no model
@@ -33,7 +34,7 @@ class LlmEngine @Inject constructor(
     @ApplicationContext private val context: Context,
     @ApplicationCoroutineScope private val scope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
-) {
+) : VisionModel {
     @Volatile
     private var engine: Engine? = null
 
@@ -47,12 +48,15 @@ class LlmEngine @Inject constructor(
         return engine
     }
 
+    override val isReady: Boolean
+        get() = engineOrNull() != null
+
     /**
      * One-shot multimodal generation: sends [jpeg] (image bytes) plus [prompt] to the model and
      * returns the raw reply, or null if the engine isn't ready or inference fails. Runs on the IO
      * dispatcher, so it's safe to call from any context.
      */
-    suspend fun generateWithImage(jpeg: ByteArray, prompt: String): String? =
+    override suspend fun read(jpeg: ByteArray, prompt: String): String? =
         withContext(dispatcherProvider.io) {
             val activeEngine = engineOrNull() ?: return@withContext null
             runCatching {

@@ -293,11 +293,14 @@ they name an effect, they are not something he says, so they never go through `D
 - `slop/ScreenTextReader` is the seam (returns `slop/ScreenReadResult`). Two impls behind Hilt
   qualifiers in `di/ScreenTextModule.kt`, both over one screenshot path (they share `ocrRead()`):
     - **`OcrContentScreenTextReader`** (`@OcrContentScreenText`, **in use**): grabs a screenshot
-      via `accessibility/ScreenshotCapturer` and asks `LlmEngine.generateWithImage` to **isolate
+      via `accessibility/ScreenshotCapturer` and asks the `llm/VisionModel` to **isolate
       the single main post verbatim** out of it (`OcrPrompt.extractMainContent()`) — content
       isolation at the vision step, no per-app knowledge needed. The verbatim rule is load-bearing:
       if the model rewrote the text it'd bias Pangram toward "AI". Slow (a vision inference per
-      summon) and hard-requires a loaded model.
+      summon) and hard-requires a loaded model. The readers see only the two-member
+      `VisionModel` interface (`isReady`, `read(jpeg, prompt)`); `di/VisionModelModule` binds it
+      to `LlmEngine`, so a second model (COS-259) is a binding change and `ocrRead()` has a unit
+      test with a fake model (`OcrScreenTextReaderTest`).
     - **`OcrScreenTextReader`** (`@OcrScreenText`, fallback): same screenshot, but the prompt
       (`OcrPrompt.transcribe()`) dumps **all** the readable text rather than isolating one post. A
       screenshot is the visible viewport only, so it captures just what the user sees. Nothing
