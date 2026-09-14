@@ -38,8 +38,10 @@ with a settings screen behind it.
 
 ## Build / run
 
-Gradle uses the Android Studio JBR — **`JAVA_HOME` must be set** or `./gradlew` fails with
-"JAVA_HOME is not set". The user sets it themselves.
+Gradle runs on the Android Studio JBR, pointed at by `org.gradle.java.home` in
+`~/.gradle/gradle.properties`, and finds the SDK through `sdk.dir` in `local.properties`. Neither
+needs an environment variable; if `./gradlew` complains about `JAVA_HOME` or the SDK location, one
+of those two files is missing its line.
 
 - Compile: `./gradlew :app:compileDebugKotlin`
 - Build APK: `./gradlew :app:assembleDebug`
