@@ -14,5 +14,4 @@ class ApplicationComposeCommonPlugin : Plugin<Project> {
             configureAndroidCompose(extension)
         }
     }
-
 }

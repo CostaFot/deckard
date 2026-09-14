@@ -29,7 +29,7 @@ class MainActivityTest {
         // prefer TestInstallIn imo
         EntryPoints.get(
             composeTestRule.activity.application,
-            ApplicationEntryPoint::class.java
+            ApplicationEntryPoint::class.java,
         ).appInitializer()
     }
 

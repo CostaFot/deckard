@@ -30,5 +30,4 @@ class HiltCommonPlugin : Plugin<Project> {
             }
         }
     }
-
 }

@@ -22,6 +22,4 @@ object DispatcherModule {
     @Singleton
     @Provides
     fun providesDispatcherProvider(): DispatcherProvider = DefaultDispatcherProvider
-
 }
-

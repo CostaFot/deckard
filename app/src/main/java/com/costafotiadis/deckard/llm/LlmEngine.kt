@@ -1,14 +1,14 @@
 package com.costafotiadis.deckard.llm
 
 import android.content.Context
+import com.costafotiadis.common.coroutine.DispatcherProvider
+import com.costafotiadis.common.di.ApplicationCoroutineScope
+import com.costafotiadis.logging.logDebug
 import com.google.ai.edge.litertlm.Backend
 import com.google.ai.edge.litertlm.Content
 import com.google.ai.edge.litertlm.Contents
 import com.google.ai.edge.litertlm.Engine
 import com.google.ai.edge.litertlm.EngineConfig
-import com.costafotiadis.common.coroutine.DispatcherProvider
-import com.costafotiadis.common.di.ApplicationCoroutineScope
-import com.costafotiadis.logging.logDebug
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch

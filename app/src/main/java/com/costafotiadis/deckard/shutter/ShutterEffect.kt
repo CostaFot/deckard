@@ -27,7 +27,8 @@ enum class ShutterEffect(
     CropMarks("crop_marks", TextResource.simple(R.string.settings_shutter_crop_marks), CropMarksPainter),
     Bloom("bloom", TextResource.simple(R.string.settings_shutter_bloom), EdgeBloomPainter),
     Highlight("highlight", TextResource.simple(R.string.settings_shutter_highlight), TravellingHighlightPainter),
-    Stamp("stamp", TextResource.simple(R.string.settings_shutter_stamp), ScreenStampPainter);
+    Stamp("stamp", TextResource.simple(R.string.settings_shutter_stamp), ScreenStampPainter),
+    ;
 
     companion object {
         /** What a fresh install gets: the cheapest to draw, and the one most clearly about paper. */

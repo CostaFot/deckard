@@ -31,25 +31,25 @@ import com.costafotiadis.common.coroutine.DispatcherProvider
 import com.costafotiadis.deckard.R
 import com.costafotiadis.deckard.di.OcrContentScreenText
 import com.costafotiadis.deckard.mascot.DeckardOverlayService.Companion.detectText
-import com.costafotiadis.deckard.slop.DetectSlopUseCase
-import com.costafotiadis.deckard.slop.ScreenReadResult
 import com.costafotiadis.deckard.shutter.DeckardShutterView
 import com.costafotiadis.deckard.shutter.ShutterEffect
 import com.costafotiadis.deckard.shutter.ShutterEffectStore
+import com.costafotiadis.deckard.slop.DetectSlopUseCase
+import com.costafotiadis.deckard.slop.ScreenReadResult
 import com.costafotiadis.deckard.slop.ScreenTextReader
 import com.costafotiadis.deckard.slop.SlopCheck
 import com.costafotiadis.logging.logDebug
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.withContext
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 /**
@@ -129,8 +129,8 @@ class DeckardOverlayService :
         WindowManager.LayoutParams.WRAP_CONTENT,
         WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
         WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
-                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
-                WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+            WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
+            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
         PixelFormat.TRANSLUCENT,
     ).apply {
         gravity = buildGravity
@@ -152,10 +152,10 @@ class DeckardOverlayService :
             WindowManager.LayoutParams.MATCH_PARENT,
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
-                    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE or
-                    WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
-                    WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS or
-                    WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE or
+                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
+                WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS or
+                WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
             PixelFormat.TRANSLUCENT,
         ).apply {
             gravity = Gravity.TOP or Gravity.START

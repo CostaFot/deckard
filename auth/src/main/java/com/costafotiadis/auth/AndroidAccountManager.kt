@@ -10,7 +10,7 @@ import javax.inject.Singleton
 
 @Singleton
 class AndroidAccountManager @Inject constructor(
-    private val accountManager: AccountManager
+    private val accountManager: AccountManager,
 ) {
     val userState: StateFlow<User>
         get() = _userState
@@ -23,7 +23,7 @@ class AndroidAccountManager @Inject constructor(
         data object LoggedOut : User()
         data class LoggedIn(
             val uniqueId: String?,
-            val email: String?
+            val email: String?,
         ) : User()
     }
 
@@ -31,7 +31,7 @@ class AndroidAccountManager @Inject constructor(
         accountManager.addAccountExplicitly(
             Account(username, ACCOUNT_TYPE),
             null,
-            null
+            null,
         )
     }
 
@@ -49,8 +49,8 @@ class AndroidAccountManager @Inject constructor(
                 it,
                 mapOf(
                     KEY_ID to uniqueId,
-                    KEY_EMAIL to email
-                )
+                    KEY_EMAIL to email,
+                ),
             )
             true
         } ?: run {
@@ -60,7 +60,7 @@ class AndroidAccountManager @Inject constructor(
 
     private fun updateUserData(
         account: Account,
-        map: Map<String, String>
+        map: Map<String, String>,
     ) {
         map.forEach {
             accountManager.setUserData(account, it.key, it.value)
@@ -71,7 +71,7 @@ class AndroidAccountManager @Inject constructor(
         return getAccount()?.let {
             User.LoggedIn(
                 accountManager.getUserData(it, KEY_ID).orEmpty(),
-                accountManager.getUserData(it, KEY_EMAIL)
+                accountManager.getUserData(it, KEY_EMAIL),
             )
         } ?: run {
             User.LoggedOut
@@ -83,7 +83,6 @@ class AndroidAccountManager @Inject constructor(
             _userState.update { getUser() }
         }
     }
-
 
     private fun getAccount(): Account? = accountManager.getAccountsByType(ACCOUNT_TYPE).firstOrNull()
 

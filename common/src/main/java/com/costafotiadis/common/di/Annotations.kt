@@ -6,7 +6,6 @@ import javax.inject.Qualifier
 @Retention(AnnotationRetention.RUNTIME)
 annotation class ApplicationCoroutineScope
 
-
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME)
 annotation class DebugFlag

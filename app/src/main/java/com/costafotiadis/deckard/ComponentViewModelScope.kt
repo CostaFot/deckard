@@ -17,8 +17,7 @@ fun ComponentViewModelScope(
         val storeOwner = rememberViewModelStoreOwner()
         CompositionLocalProvider(
             LocalViewModelStoreOwner provides storeOwner,
-            content = content
+            content = content,
         )
     }
-
 }

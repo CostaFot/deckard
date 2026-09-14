@@ -7,10 +7,9 @@ import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import javax.inject.Singleton
 
-
 @Singleton
 class AppInitializer @Inject constructor(
-    private val featureFlagProvider: FlagProvider
+    private val featureFlagProvider: FlagProvider,
 ) {
 
     private val isInitialized = AtomicBoolean(false)
@@ -27,5 +26,4 @@ class AppInitializer @Inject constructor(
             logDebug { "Logger initialised" }
         }
     }
-
 }

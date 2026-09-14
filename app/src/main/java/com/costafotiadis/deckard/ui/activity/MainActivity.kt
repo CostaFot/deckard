@@ -8,8 +8,8 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.costafotiadis.deckard.shutter.ShutterEffectStore
 import com.costafotiadis.deckard.ui.DeckardApp
-import com.costafotiadis.logging.logDebug
 import com.costafotiadis.design.theme.AppTheme
+import com.costafotiadis.logging.logDebug
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

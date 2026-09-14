@@ -15,9 +15,8 @@ class AuthenticatorService : Service() {
     override fun onBind(intent: Intent): IBinder? {
         return if (intent.action == AccountManager.ACTION_AUTHENTICATOR_INTENT) {
             accountAuthenticator.impl.iBinder
-        } else null
-
+        } else {
+            null
+        }
     }
-
-
 }

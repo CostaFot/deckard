@@ -15,7 +15,7 @@ object FlagModule {
     @Provides
     fun providesFlagProvider(
         @DebugFlag debugFlag: Boolean,
-        @RunningUiTestFlag uiTestFlag: Boolean
+        @RunningUiTestFlag uiTestFlag: Boolean,
     ): FlagProvider = object : FlagProvider {
         override val isDebugEnabled: Boolean
             get() = debugFlag

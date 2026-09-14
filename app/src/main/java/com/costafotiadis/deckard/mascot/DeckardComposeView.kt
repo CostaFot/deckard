@@ -8,11 +8,11 @@ import android.window.OnBackInvokedCallback
 import android.window.OnBackInvokedDispatcher
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -110,9 +110,9 @@ class DeckardComposeView(
             AnimatedVisibility(
                 visible = s != DeckardState.Hidden,
                 enter = fadeIn(tween(140)) +
-                        scaleIn(tween(180), initialScale = 0.88f, transformOrigin = MascotOrigin),
+                    scaleIn(tween(180), initialScale = 0.88f, transformOrigin = MascotOrigin),
                 exit = fadeOut(tween(100)) +
-                        scaleOut(tween(120), targetScale = 0.9f, transformOrigin = MascotOrigin),
+                    scaleOut(tween(120), targetScale = 0.9f, transformOrigin = MascotOrigin),
             ) {
                 Column(
                     modifier = Modifier

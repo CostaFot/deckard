@@ -1,6 +1,5 @@
 package com.costafotiadis.deckard
 
-
 import com.android.build.api.dsl.CommonExtension
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
@@ -15,7 +14,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
  * Configure base Kotlin with Android options
  */
 internal fun Project.configureKotlinAndroid(
-    commonExtension: CommonExtension
+    commonExtension: CommonExtension,
 ) {
     commonExtension.apply {
         compileSdk = 37
@@ -44,6 +43,7 @@ internal fun Project.configureKotlinAndroid(
         add("coreLibraryDesugaring", libs.findLibrary("android.desugarJdkLibs").get())
     }
 }
+
 /**
  * Configure base Kotlin options
  */
@@ -59,7 +59,7 @@ private fun Project.configureKotlin() {
                 "-opt-in=kotlinx.coroutines.FlowPreview",
                 "-opt-in=kotlinx.serialization.ExperimentalSerializationApi",
                 "-opt-in=androidx.compose.foundation.ExperimentalFoundationApi",
-                "-opt-in=androidx.compose.material3.ExperimentalMaterial3Api"
+                "-opt-in=androidx.compose.material3.ExperimentalMaterial3Api",
             )
         }
     }

@@ -14,5 +14,4 @@ class LibraryComposeCommonPlugin : Plugin<Project> {
             configureAndroidCompose(extension)
         }
     }
-
 }

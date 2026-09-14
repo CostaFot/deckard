@@ -1,10 +1,10 @@
 package com.costafotiadis.deckard.di
 
 import android.content.Context
-import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.costafotiadis.common.FlagProvider
 import com.costafotiadis.deckard.BuildConfig
 import com.costafotiadis.deckard.net.PangramService
+import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -37,7 +37,7 @@ object NetworkModule {
     @Provides
     @Singleton
     fun providesHttpLoggingInterceptor(
-        flagProvider: FlagProvider
+        flagProvider: FlagProvider,
     ): HttpLoggingInterceptor {
         return HttpLoggingInterceptor().apply {
             redactHeader(API_KEY_HEADER)
@@ -52,7 +52,7 @@ object NetworkModule {
     @Singleton
     fun providesOkHttpClient(
         cache: Cache,
-        httpLoggingInterceptor: HttpLoggingInterceptor
+        httpLoggingInterceptor: HttpLoggingInterceptor,
     ): OkHttpClient {
         return OkHttpClient().newBuilder()
             .apply {
@@ -76,14 +76,14 @@ object NetworkModule {
     @Provides
     fun providesRetrofit(
         okHttpClient: OkHttpClient,
-        json: Json
+        json: Json,
     ): Retrofit {
         return Retrofit.Builder()
             .apply {
                 baseUrl("https://text.external-api.pangram.com/")
                 client(okHttpClient)
                 addConverterFactory(
-                    json.asConverterFactory("application/json".toMediaType())
+                    json.asConverterFactory("application/json".toMediaType()),
                 )
             }.build()
     }
