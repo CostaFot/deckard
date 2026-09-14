@@ -48,19 +48,19 @@ Gradle uses the Android Studio JBR — **`JAVA_HOME` must be set** or `./gradlew
 
 **`scripts/deckard` drives the debug build on a connected device** and is the fast way to see a
 change working: `install [ai|assisted|human|mixed]` (build, install, re-grant, wait for the
-accessibility service to bind), `grant`, `start` / `stop` / `dismiss`, `summon [swipe|hold]`,
-`effect [name]` / `shutter [package]` (pick and fire the screenshot effect — see *The shutter*
-below), `shot`, `dump`, `log`. It is the runbook below, automated — including both traps that make the
+accessibility service to bind), `grant`, `start` / `stop` / `dismiss`, `summon` (a hold on the
+tab), `effect [name]` / `shutter [package]` (pick and fire the screenshot effect — see *The shutter*
+below), `shot`, `log`. It is *On a device* below, automated — including both traps that make the
 accessibility setting silently revert, and the rebind after every reinstall. Every wait polls for
 the state it wants rather than sleeping a guessed number of seconds.
 
 To use it after install, open the app and work through `MainActivity`'s setup screen: enable the
-accessibility service (screen reading), grant draw-over-apps, then start Deckard. A left→right swipe
-on the left-edge tab summons the mascot (a11y-tree read); a **long-press** on the tab summons via
-screenshot OCR content-isolation instead.
+accessibility service (it takes the screenshot), grant draw-over-apps, then start Deckard. A
+**long-press** on the left-edge tab summons the mascot: a screenshot, and the on-device model
+isolates the main post out of it.
 
-The on-device LLM is required for OCR (the in-use screen reader), but optional to
-*launch*: with no model present, summoning Deckard reports it has no brain yet. To enable it,
+The on-device LLM is required for the read, but optional to
+*launch*: with no model present, summoning Deckard reports it has no eyes yet. To enable it,
 `adb push` a `.litertlm` into `/sdcard/Android/data/<applicationId>/files/models/` (≈2.4–3.5 GB; the
 `LlmEngine` loads the first `.litertlm` it finds there). For the **debug** build `<applicationId>`
 is
@@ -70,6 +70,35 @@ is
 if `models/` doesn't exist yet). `LlmEngine` warms up once per process and caches the loaded engine,
 so after pushing a new model `am force-stop` (or reinstall) to reload it. Local `.litertlm` files
 under `model/` are gitignored.
+
+### On a device
+
+`scripts/deckard install` does this whole step. By hand it is `./gradlew :app:installDebug` plus
+granting overlay + accessibility (once per install) via adb — note this **overwrites** the
+enabled-a11y-services list, so re-enable any others (e.g. TalkBack) afterwards:
+
+```
+PKG=com.costafotiadis.deckard.debug
+SVC=$PKG/com.costafotiadis.deckard.accessibility.DeckardAccessibilityService
+adb shell appops set $PKG SYSTEM_ALERT_WINDOW allow
+adb shell appops set $PKG ACCESS_RESTRICTED_SETTINGS allow
+adb shell monkey -p $PKG -c android.intent.category.LAUNCHER 1   # launch FIRST, see below
+adb shell "settings put secure enabled_accessibility_services $SVC"
+adb shell "settings put secure accessibility_enabled 1"
+```
+
+Two traps, both of which make the setting **silently revert to `null`** on Android 14+ (verified
+on API 37):
+
+- Without `ACCESS_RESTRICTED_SETTINGS allow`, Enhanced Confirmation Mode reverts the write within
+  a second or two. `adb shell dumpsys accessibility | grep "Bound services"` is the real check —
+  `settings get` can still read back the value it is about to lose.
+- **`am force-stop` on the package disables the service**, so enable it *after* the app is
+  running, never before. To make `MainActivity` re-read the state, background and foreground it
+  (`input keyevent KEYCODE_HOME`, then launch again) rather than force-stopping.
+
+Changing `accessibility_service_config.xml` only takes effect after the service re-binds — toggle
+it off/on by re-running the `settings put` lines. Then open the app → **Start Deckard**.
 
 ## Architecture notes (the non-obvious bits)
 
@@ -87,18 +116,14 @@ under `model/` are gitignored.
   `LifecycleOwner` + `ViewModelStoreOwner` + `SavedStateRegistryOwner` itself, drives its own
   `LifecycleRegistry` to RESUMED, and sets the view-tree owners directly on each overlay view — all
   required for Compose to compose and recompose.
-- `mascot/DeckardEdgeHandleView.kt` declares `setSystemGestureExclusionRects` so its left→right
-  swipe
-  isn't eaten by the Android 10+ system back gesture (exclusion budget is ~200dp/edge, so the tab is
-  short).
-- The edge tab carries **two gestures**: a left→right **swipe** summons via the a11y-tree read
-  (`@AccessibilityScreenText`); a **long-press** (with a haptic tick) summons via the screenshot OCR
-  read (`@OcrContentScreenText`). The service injects both readers and routes each gesture through
-  `runDetection(reader)` → `readScreenAndJudge(reader)`. The two `pointerInput`s don't collide — a
-  swipe
-  moves past touch slop (cancelling the long-press), a hold stays put (no drag).
+- The edge tab (`mascot/DeckardEdgeHandleView.kt`) carries **one gesture**: a **long-press** (with
+  a haptic tick) summons via the screenshot OCR read (`@OcrContentScreenText`), through
+  `summon()` → `readScreenAndJudge()`. It no longer declares `setSystemGestureExclusionRects`: a
+  hold never moves, so the Android 10+ back gesture has nothing to take, and a swipe on the tab is
+  the app's back gesture like anywhere else on the edge. The mascot himself takes no tap — he
+  would be in the picture a summon takes.
 - Requires the draw-over-apps permission (checked in `onCreate`) and the accessibility service
-  (for reading the screen). Started/stopped from `MainActivity`'s setup screen.
+  (for the screenshot). Started/stopped from `MainActivity`'s setup screen.
 
 ### The Activity's two screens — `ui/`
 
@@ -131,9 +156,8 @@ settings screen is meant to grow a section at a time.
 
 ### The shutter — `shutter/`
 
-A read that photographs your screen says so. Only the **long-press** does: the swipe reads the a11y
-tree and takes no picture, so it stays silent, and the two summons looking different is the point
-(it bears on COS-235).
+A read that photographs your screen says so, and every summon photographs it, so every summon
+says so. (Shared text — `ShareTextActivity` — reads no screen and stays silent.)
 
 - **The constraint that shapes it**: the effect must not be in the screenshot, which is of the whole
   display, overlay windows included. So the window goes up inside `ScreenTextReader.read`'s
@@ -249,143 +273,29 @@ they name an effect, they are not something he says, so they never go through `D
 
 ### Screen reading — `slop/` + `accessibility/`
 
-- `slop/ScreenTextReader` is the seam (returns `slop/ScreenReadResult`). Three impls behind Hilt
-  qualifiers in `di/ScreenTextModule.kt`:
-    - **`AccessibilityScreenTextReader`** (`@AccessibilityScreenText`, **in use — swipe**): pulls
-      the
-      visible
-      on-screen text straight from the foreground app's a11y node tree via
-      `accessibility/ScreenTextCapturer`. No model, no screenshot — returns in milliseconds. The
-      chrome-trimming lives in the service (see below).
-    - **`OcrContentScreenTextReader`** (`@OcrContentScreenText`, **in use — long-press**): grabs a
-      screenshot via `accessibility/ScreenshotCapturer` and asks `LlmEngine.generateWithImage` to
-      **isolate the single main post verbatim** out of it (`OcrPrompt.extractMainContent()`) —
-      content
-      isolation at the vision step, no per-app extractor needed. The verbatim rule is load-bearing:
-      if
-      the model rewrote the text it'd bias Pangram toward "AI". Slow (a vision inference per summon)
-      and hard-requires a loaded model.
-    - **`OcrScreenTextReader`** (`@OcrScreenText`, fallback): same screenshot path (the two OCR
-      readers
-      share one `ocrRead()`), but the prompt (`OcrPrompt.transcribe()`) dumps **all** the readable
-      text
-      rather than isolating one post. A screenshot is the visible viewport only, so it captures just
-      what the user sees. Swap it onto a gesture by flipping a qualifier in the service.
-- `accessibility/DeckardAccessibilityService` registers both on-demand bridges (only an
-  `AccessibilityService` can `takeScreenshot` or read `rootInActiveWindow`): `ScreenshotCapturer`
-  (JPEG for OCR) and `ScreenTextCapturer` (tree text). Its `captureScreenText` snapshots
-  `rootInActiveWindow` into a framework-free `accessibility/tree/ScreenNode` (via
-  `ScreenNodeSnapshot`)
-  and dispatches by foreground package to a **per-app extractor**. The user must enable it under
-  Settings → Accessibility; capture stays on-device.
-- **Per-app extraction** — `accessibility/extract/`. Each app the user reads in lays its a11y tree
-  out differently, so each gets a `ScreenContentExtractor` (pure function over a `ScreenNode`
-  snapshot, so it unit-tests against captured trees — no Robolectric/mockk).
-  `ScreenContentExtractors`
-  picks the first extractor whose `handles(packageName)` is true, else `GenericContentExtractor`
-  (viewport-clipped whole-tree / WebView-only walk — the unknown-app fallback). Extractors are
-  contributed via Hilt `@IntoSet` in `di/ScreenTextExtractorsModule`. **The set is frozen at these
-  two — do not add a third** (see the runbook below for why). Shared helpers (`viewport`,
-  `collectVisibleText`, `find`/`findAll`, `mostVisible`) live in
-  `accessibility/extract/NodeText.kt`.
-    - **`LinkedInContentExtractor`** (`com.linkedin.android`): the feed is Jetpack Compose
-      (`sdui:lazyColumn`, mostly bare `android.view.View`s with no ids). A post body is one large
-      node but its class varies (`TextView` *or* clickable `Button`), so it matches on **content,
-      not
-      class** — any visible node carrying text. A collapsed post's visible `text` ends in "… more"
-      while the full post sits in `contentDescription`, so it reads the **fuller of text /
-      contentDescription**. Selection follows what the user centres: the content node under the
-      **screen centre**, falling back to largest viewport overlap (so a big neighbour can't steal a
-      centred post). Author/timestamp and comment/post-detail screens are TODO.
-  - **`XContentExtractor`** (`com.twitter.android`): the hostile case. On the timeline a tweet
-    exposes **no per-element text nodes** — X concatenates the whole card (name, `@handle`,
-    "Verified", "Replying to …", body, "Reposted by …", timestamp, engagement counts) into the card
-    node's single `contentDescription`, so the body is parsed *out of that one blob* with
-    end-/start-anchored regexes: strip the trailing metrics/timestamp/"Reposted by …" and the
-    leading byline (verified **and** unverified) + "Replying to …". Selection mirrors LinkedIn
-    (centred card, else largest overlap); promoted cards ("Promoted.") are skipped. A **quote
-    tweet** packs two authors into one desc and X embeds only a *truncated preview* of the quoted
-    original, so we judge the quoter's **own comment** (the text after "Added"), falling back to the
-    preview only when there's none. Detail screens reuse the same path. **This single-blob layout
-    makes perfect extraction a long-tail game, so it's frozen at good-enough** (the common centred
-    tweet, locked by fixture tests). Known gaps: absolute timestamps ("Jun 14") aren't stripped, and
-    a display name containing a "." can defeat the byline strip.
-- **Discovery loop**: on summon (debug builds only) `DeckardAccessibilityService.dumpTree` writes
-  the
-  active-window tree + every window's tree to `…/files/deckard_tree.txt`, which we `adb pull` and
-  read. It's a file (not logcat) because **some devices encrypt logcat** (e.g. Honor) and because
-  the
-  file is the exact `ScreenNode` snapshot the extractor saw. `adb shell uiautomator dump` is a
-  zero-code cross-check. See the runbook below.
-- `slop/ContentExtractor` (+ `ContentExtractionPrompt`) is dormant: it would isolate the main
-  post/article text from a noisy **a11y** capture **verbatim** (the model selects which captured
-  lines
-  are content; it never rewrites them, which would bias detection toward "AI") before handing it to
-  the detector. The **long-press OCR path now does this same isolation at the vision step** (over a
-  screenshot instead of a text capture) — see `OcrContentScreenTextReader` above.
-
-### Debugging a screen read (runbook)
-
-**The extractors are frozen. No new ones, and no tuning of the two that exist** (Costa, 2026-09-14:
-per-app extraction is unreliable and not worth the long tail — every app is a fresh
-reverse-engineering job against a tree that changes when the app ships, and a wrong read hands the
-detector chrome, which is worse than no read). COS-227/228/229 (Reddit, Substack, Medium) and
-COS-230 (polishing LinkedIn) are cancelled on the board with that reason on each. The
-content-isolation answer is the OCR path, which needs no per-app knowledge at all.
-
-So `LinkedInContentExtractor` and `XContentExtractor` stay as they are, good enough on the centred
-common case and locked by fixture tests. **Do not add an extractor for a new app**, and do not read
-a bad read on some other app as a bug to fix here — the a11y path is kept for the comparison with
-the OCR read (COS-235), not because per-app extraction is going anywhere.
-
-What the loop below is still for: seeing what either reader actually got off a screen. The dump is
-the exact `ScreenNode` snapshot the extractor saw, so it is the tool for answering "why did the
-verdict judge *that* text", for the summon-UX work, and for the post. Needs a connected device
-(`adb devices`) and a debug build.
-
-1. **Install & enable.** `scripts/deckard install` does this whole step. By hand it is
-   `./gradlew :app:installDebug` plus granting overlay + accessibility (once per
-   install) via adb — note this **overwrites** the enabled-a11y-services list, so re-enable any
-   others (e.g. TalkBack) afterwards:
-   ```
-   PKG=com.costafotiadis.deckard.debug
-   SVC=$PKG/com.costafotiadis.deckard.accessibility.DeckardAccessibilityService
-   adb shell appops set $PKG SYSTEM_ALERT_WINDOW allow
-   adb shell appops set $PKG ACCESS_RESTRICTED_SETTINGS allow
-   adb shell monkey -p $PKG -c android.intent.category.LAUNCHER 1   # launch FIRST, see below
-   adb shell "settings put secure enabled_accessibility_services $SVC"
-   adb shell "settings put secure accessibility_enabled 1"
-   ```
-   Two traps, both of which make the setting **silently revert to `null`** on Android 14+ (verified
-   on API 37):
-   - Without `ACCESS_RESTRICTED_SETTINGS allow`, Enhanced Confirmation Mode reverts the write within
-     a second or two. `adb shell dumpsys accessibility | grep "Bound services"` is the real check —
-     `settings get` can still read back the value it is about to lose.
-   - **`am force-stop` on the package disables the service**, so enable it *after* the app is
-     running, never before. To make `MainActivity` re-read the state, background and foreground it
-     (`input keyevent KEYCODE_HOME`, then launch again) rather than force-stopping.
-
-   (Changing `accessibility_service_config.xml` only takes effect after the service re-binds —
-   toggle it off/on by re-running the `settings put` lines.) Then open the app → **Start Deckard**.
-2. **Capture.** On the device, navigate to the exact screen/state to debug (e.g. a post with
-   "… more"), centre it, and **summon Deckard** (left-edge swipe, or `scripts/deckard summon`).
-   That writes the dump. Pull it with `scripts/deckard dump`, or by hand:
-   ```
-   adb pull /sdcard/Android/data/$PKG/files/deckard_tree.txt
-   ```
-   The file has the **extracted** text (what the user got), the **active-window** tree (what the
-   extractor saw), and **all windows** (reveals content in a separate window, e.g. a bottom sheet).
-3. **Read it.** The dump answers what was read and why. Find the node holding the real content
-   (check `class`, the `viewId`, `text` vs `desc` — LinkedIn hides the full post in `desc`) and
-   compare it with the extracted text at the top of the file. That is the finding; it does not
-   become an extractor change.
-4. **Cross-check.** `adb shell uiautomator dump` is a zero-code second opinion on the same tree.
-
-If a change to the two existing extractors is ever genuinely warranted, it needs a board issue
-first (the freeze above), and then it is: adjust the `ScreenContentExtractor`, hand-build a
-`ScreenNode` fixture from the dump (the `node(…)` helper in
-`app/src/test/.../accessibility/TestNodes.kt`), assert the output, and run
-`./gradlew :app:testDebugUnitTest --tests "*<App>ContentExtractorTest"`.
+- `slop/ScreenTextReader` is the seam (returns `slop/ScreenReadResult`). Two impls behind Hilt
+  qualifiers in `di/ScreenTextModule.kt`, both over one screenshot path (they share `ocrRead()`):
+    - **`OcrContentScreenTextReader`** (`@OcrContentScreenText`, **in use**): grabs a screenshot
+      via `accessibility/ScreenshotCapturer` and asks `LlmEngine.generateWithImage` to **isolate
+      the single main post verbatim** out of it (`OcrPrompt.extractMainContent()`) — content
+      isolation at the vision step, no per-app knowledge needed. The verbatim rule is load-bearing:
+      if the model rewrote the text it'd bias Pangram toward "AI". Slow (a vision inference per
+      summon) and hard-requires a loaded model.
+    - **`OcrScreenTextReader`** (`@OcrScreenText`, fallback): same screenshot, but the prompt
+      (`OcrPrompt.transcribe()`) dumps **all** the readable text rather than isolating one post. A
+      screenshot is the visible viewport only, so it captures just what the user sees. Nothing
+      injects it today; swap it in by flipping the qualifier in the service.
+- `accessibility/DeckardAccessibilityService` exists for one call only an `AccessibilityService`
+  can make, `takeScreenshot`, and registers `ScreenshotCapturer`'s handler for it (JPEG,
+  downscaled). It reads no window content and listens to no events, and
+  `accessibility_service_config.xml` declares only `canTakeScreenshot`. The user must enable it
+  under Settings → Accessibility; capture stays on-device.
+- **The accessibility-tree reader is gone** (COS-249, 2026-09-14). It read the foreground app's
+  a11y tree through per-app extractors (LinkedIn, X, a generic viewport walk) — fast and free, but
+  every app was a fresh reverse-engineering job against a tree that changes when the app ships, and
+  a wrong read hands the detector chrome, which is worse than no read. The last commit that has it
+  is tagged **`a11y-reader`**, kept for the post (COS-225). Do not bring it back; do not add a
+  per-app extractor. If a screen reads badly, it is the OCR prompt's problem, not a per-app one.
 
 ### Slop detection — `slop/AiDetectorRepository.kt`
 
@@ -475,14 +385,14 @@ bodies.
 ## Where it stands
 
 The pivot + rename are done and the build is green (`:app:compileDebugKotlin`,
-`:app:testDebugUnitTest`, `:app:lintDebug`). End to end today: summon Deckard → **a11y-tree screen
-read** (swipe) **or screenshot OCR content-isolation** (long-press, which now announces the shutter
-with the chosen `shutter/` effect) → **Pangram detection** → the bubble shows the verdict as a
-**report card** (`mascot/SlopReportCard`).
+`:app:testDebugUnitTest`, `:app:lintDebug`). End to end today: summon Deckard (a long-press on
+the edge tab) → **screenshot OCR content-isolation** (announced with the chosen `shutter/` effect)
+→ **Pangram detection** → the bubble shows the verdict as a **report card**
+(`mascot/SlopReportCard`).
 
 Done: the API→domain→UI wiring (`AiDetectorRepository` + `DetectSlopUseCase`, base URL/auth in
 `NetworkModule`), the report-card UI, Deckard's look (see above), content isolation on the
-screenshot path, two per-app extractors (LinkedIn, X), the four screenshot effects and the picker
+screenshot path, the four screenshot effects and the picker
 that chooses between them (see *The shutter* above), the settings
 screen the picker now lives on and the Navigation 3 back stack behind it (see *The Activity's two
 screens* above), and every word the app says now living in `strings.xml` behind `:textresource`

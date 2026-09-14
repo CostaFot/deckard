@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 #
 # Drive the debug build on a connected device: install it, grant what a fresh
-# install loses, start the overlay, summon Deckard, grab the screen or the tree
-# dump. The manual steps live in CLAUDE.md's runbook; this is them, automated,
+# install loses, start the overlay, summon Deckard, grab the screen. The manual
+# steps live in CLAUDE.md's "On a device" section; this is them, automated,
 # including the two traps that make the accessibility setting silently revert.
 #
 # Every wait here polls for the state it wants rather than sleeping a guessed
@@ -12,12 +12,11 @@
 #   scripts/deckard install [ai|assisted|human|mixed]   build, install, grant, wait
 #   scripts/deckard grant                               re-grant and wait for the bind
 #   scripts/deckard start | stop                        the overlay service, via the setup screen
-#   scripts/deckard summon [swipe|hold]                 swipe = a11y read, hold = screenshot OCR
+#   scripts/deckard summon                              hold the tab: screenshot OCR read
 #   scripts/deckard effect [name]                       pick the shutter effect (no name lists them)
 #   scripts/deckard shutter [package]                   play it over an app, no model needed
 #   scripts/deckard dismiss                             send him away
 #   scripts/deckard shot [file.png]                     screencap to a file
-#   scripts/deckard dump [file.txt]                     pull the a11y tree dump
 #   scripts/deckard log                                 the app's own logcat lines
 #
 set -euo pipefail
@@ -210,15 +209,11 @@ cmd_stop() {
 cmd_summon() {
     require_device
     running || die "the overlay is not running; scripts/deckard start"
-    local how=${1:-swipe} x y
+    local x y
     cmd_dismiss                      # else the read can catch his own bubble
     read -r x y < <(edge_tab_xy)
     judgments_before=$(judgments)
-    case $how in
-        swipe) adb shell input swipe "$x" "$y" $((x + 500)) "$y" 250 ;;
-        hold)  adb shell input swipe "$x" "$y" "$x" "$y" 1200 ;;   # a hold that never moves
-        *)     die "summon takes 'swipe' (a11y read) or 'hold' (screenshot OCR)" ;;
-    esac
+    adb shell input swipe "$x" "$y" "$x" "$y" 1200   # a hold that never moves
     wait_for 90 "a verdict (is the accessibility service bound?)" judged
     adb shell sleep 1 >/dev/null   # let the card compose before anyone screenshots it
     adb logcat -d | grep 'slop: judging' | tail -1 | sed 's/.*D //'
@@ -270,14 +265,6 @@ cmd_shot() {
     echo "$out"
 }
 
-cmd_dump() {
-    require_device
-    local out=${1:-deckard_tree.txt}
-    adb pull "/sdcard/Android/data/$PKG/files/deckard_tree.txt" "$out" >/dev/null ||
-        die "no dump yet — summon Deckard once on a debug build first"
-    echo "$out"
-}
-
 cmd_log() {
     require_device
     adb logcat -d | grep -E "Deckard|DetectSlopUseCase|LlmEngine|AiDetectorRepository"
@@ -288,12 +275,11 @@ case ${1:-} in
     grant)   cmd_grant ;;
     start)   cmd_start ;;
     stop)    cmd_stop ;;
-    summon)  shift; cmd_summon "$@" ;;
+    summon)  cmd_summon ;;
     effect)  shift; cmd_effect "$@" ;;
     shutter) shift; cmd_shutter "$@" ;;
     dismiss) cmd_dismiss ;;
     shot)    shift; cmd_shot "$@" ;;
-    dump)    shift; cmd_dump "$@" ;;
     log)     cmd_log ;;
     *)       sed -n '/^#   scripts/,/^#$/p' "${BASH_SOURCE[0]}" | sed 's/^#  *//;s/^#//'; exit 1 ;;
 esac

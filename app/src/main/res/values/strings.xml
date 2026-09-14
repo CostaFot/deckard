@@ -10,7 +10,6 @@
       is one thing, and it drifts a line at a time if you write it a line at a time.
     -->
     <string name="voice_catchphrase">Slop, my son.</string>
-    <string name="voice_thinking_tree">Skimming the screen</string>
     <string name="voice_thinking_screenshot">Squinting at the screen</string>
     <string name="voice_thinking_shared_text">Reading what you brought me</string>
     <string name="voice_too_thin">Too thin to judge. Bring me %1$d words.</string>
@@ -20,7 +19,7 @@
     <string name="voice_nothing_shared">You\'ve brought me nothing to read.</string>
     <string name="voice_needs_overlay_permission">Let me draw over other apps first.</string>
     <string name="voice_no_accessibility_service">You haven\'t let me read the screen yet. Until you do, I\'m decoration.</string>
-    <string name="voice_model_not_ready">No eyes for pictures yet. Swipe instead; that read needs no model.</string>
+    <string name="voice_model_not_ready">No eyes yet. Put a model in my pocket and ask again.</string>
     <string name="voice_screenshot_failed">I reached for the screen and came back holding nothing.</string>
     <string name="voice_transcription_failed">I stared at it a good while and made nothing of it.</string>
     <string name="voice_no_text_found">Not a word on this screen. Nothing to weigh.</string>
@@ -33,17 +32,15 @@
     <string name="setup_tagline">ON-DEVICE AI-SLOP DETECTOR</string>
     <string name="setup_section_what_he_needs">WHAT HE NEEDS</string>
     <string name="setup_step_screen_reading_title">Screen reading</string>
-    <string name="setup_step_screen_reading_detail">Deckard reads the text the app in front of you is already showing. The reading happens on your phone.</string>
+    <string name="setup_step_screen_reading_detail">Deckard photographs the screen in front of you and reads it on your phone. Nothing leaves it.</string>
     <string name="setup_step_overlay_title">Drawing over apps</string>
     <string name="setup_step_overlay_detail">Lets him float above whatever you\'re reading instead of asking you to switch apps.</string>
     <string name="setup_open_settings">Open settings</string>
     <string name="setup_start_deckard">Start Deckard</string>
     <string name="setup_stop_deckard">Stop Deckard</string>
     <string name="setup_section_summoning_him">SUMMONING HIM</string>
-    <string name="setup_gesture_swipe_title">Swipe the left-edge tab</string>
-    <string name="setup_gesture_swipe_detail">Reads the text the app is already exposing. Comes back instantly.</string>
     <string name="setup_gesture_hold_title">Hold the left-edge tab</string>
-    <string name="setup_gesture_hold_detail">Reads a screenshot with the on-device model instead. Slower, but it works on apps that expose nothing.</string>
+    <string name="setup_gesture_hold_detail">He photographs the screen and reads it with the on-device model. Takes a few seconds.</string>
     <string name="setup_section_how_he_works">HOW HE WORKS</string>
     <string name="setup_settings_title">What you can change</string>
     <string name="setup_settings_detail">How he announces the photograph. The only choice he gives you, so far.</string>

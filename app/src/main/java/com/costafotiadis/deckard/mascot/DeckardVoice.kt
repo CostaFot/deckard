@@ -33,12 +33,10 @@ object DeckardVoice {
     val CATCHPHRASE: TextResource = TextResource.simple(R.string.voice_catchphrase)
 
     /**
-     * The looking-at-your-screen line. Skimming and squinting are the honest words for the two
-     * screen reads — one takes what the app already exposes, the other stares at a picture of it
-     * for a few seconds — so the wait each implies is the right one.
+     * The looking-at-your-screen line. Squinting is the honest word for a read that stares at a
+     * picture of the screen for a few seconds, so the wait it implies is the right one.
      */
     fun thinking(how: ReadMethod): TextResource = when (how) {
-        ReadMethod.Tree -> TextResource.simple(R.string.voice_thinking_tree)
         ReadMethod.Screenshot -> TextResource.simple(R.string.voice_thinking_screenshot)
         ReadMethod.SharedText -> TextResource.simple(R.string.voice_thinking_shared_text)
     }

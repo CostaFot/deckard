@@ -15,13 +15,11 @@ sealed interface NoVerdict {
 }
 
 /**
- * How the text in front of Deckard got to him. The three differ in what they cost and what they can
- * fail at — the tree read is instant and free, the screenshot read takes seconds and needs the
- * on-device model, and shared text involves no screen read at all — so he doesn't announce them the
- * same way.
+ * How the text in front of Deckard got to him. The two differ in what they cost and what they can
+ * fail at — the screenshot read takes seconds and needs the on-device model, shared text involves
+ * no screen read at all — so he doesn't announce them the same way.
  */
 enum class ReadMethod {
-    Tree,
     Screenshot,
     SharedText,
 }

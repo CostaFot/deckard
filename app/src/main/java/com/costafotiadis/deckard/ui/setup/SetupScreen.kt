@@ -55,8 +55,8 @@ import com.costafotiadis.design.theme.stampInks
 import com.costafotiadis.textresource.asString
 
 /**
- * Hand Deckard the two permissions he can't grant himself, start him, and learn the gestures that
- * summon him. Everything after this happens in the overlay.
+ * Hand Deckard the two permissions he can't grant himself, start him, and learn the gesture that
+ * summons him. Everything after this happens in the overlay.
  *
  * It is a checklist, which is why the preferences are not on it: you work down this screen once and
  * never come back, where [com.costafotiadis.deckard.ui.settings.SettingsScreen] is the one you
@@ -126,10 +126,6 @@ internal fun SetupScreen(onOpenSettings: () -> Unit) {
 
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 SectionLabel(text = stringResource(R.string.setup_section_summoning_him))
-                Gesture(
-                    gesture = stringResource(R.string.setup_gesture_swipe_title),
-                    detail = stringResource(R.string.setup_gesture_swipe_detail),
-                )
                 Gesture(
                     gesture = stringResource(R.string.setup_gesture_hold_title),
                     detail = stringResource(R.string.setup_gesture_hold_detail),

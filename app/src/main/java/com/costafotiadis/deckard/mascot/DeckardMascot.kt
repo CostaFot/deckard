@@ -9,7 +9,6 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectDragGestures
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -61,7 +60,6 @@ private const val CLOSE_SIZE_DP = 22
  */
 @Composable
 fun DeckardMascot(
-    onTap: () -> Unit,
     onDrag: (dx: Float, dy: Float) -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
@@ -70,7 +68,6 @@ fun DeckardMascot(
     Box(modifier = modifier.size(PLATE_SIZE_DP.dp)) {
         DeckardPlate(
             modifier = Modifier
-                .pointerInput(Unit) { detectTapGestures(onTap = { onTap() }) }
                 .pointerInput(Unit) {
                     detectDragGestures { change, amount ->
                         change.consume()
@@ -145,8 +142,8 @@ fun DeckardBubble(text: String, modifier: Modifier = Modifier) {
 }
 
 /**
- * The looking-at-your-screen state. The a11y read returns in milliseconds but the screenshot-OCR
- * read takes seconds, so this needs to show progress rather than a frozen "…".
+ * The looking-at-your-screen state. The screenshot-OCR read takes seconds, so this needs to show
+ * progress rather than a frozen "…".
  */
 @Composable
 fun DeckardThinkingBubble(text: String, modifier: Modifier = Modifier) {
@@ -198,7 +195,7 @@ private fun PulsingDots() {
 }
 
 /**
- * Everything Deckard says when he has no report — the three reads he can be part-way through, and
+ * Everything Deckard says when he has no report — the two reads he can be part-way through, and
  * the seven ways he can come back with nothing. One preview per line, because a voice you can't
  * read side by side is a voice that drifts.
  */

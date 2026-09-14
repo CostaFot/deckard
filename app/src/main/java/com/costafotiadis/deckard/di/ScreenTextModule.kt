@@ -1,6 +1,5 @@
 package com.costafotiadis.deckard.di
 
-import com.costafotiadis.deckard.slop.AccessibilityScreenTextReader
 import com.costafotiadis.deckard.slop.OcrContentScreenTextReader
 import com.costafotiadis.deckard.slop.OcrScreenTextReader
 import com.costafotiadis.deckard.slop.ScreenTextReader
@@ -20,8 +19,4 @@ interface ScreenTextModule {
     @Binds
     @OcrContentScreenText
     fun bindsOcrContentScreenTextReader(impl: OcrContentScreenTextReader): ScreenTextReader
-
-    @Binds
-    @AccessibilityScreenText
-    fun bindsAccessibilityScreenTextReader(impl: AccessibilityScreenTextReader): ScreenTextReader
 }

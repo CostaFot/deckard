@@ -41,7 +41,6 @@ import kotlinx.coroutines.flow.StateFlow
 class DeckardComposeView(
     context: Context,
     private val state: StateFlow<DeckardState>,
-    private val onTap: () -> Unit,
     private val onDrag: (dx: Float, dy: Float) -> Unit,
     private val onDismiss: () -> Unit,
     private val onViewAnalysis: (url: String) -> Unit,
@@ -122,7 +121,7 @@ class DeckardComposeView(
                     horizontalAlignment = Alignment.Start,
                     verticalArrangement = Arrangement.spacedBy(2.dp),
                 ) {
-                    DeckardMascot(onTap = onTap, onDrag = onDrag, onDismiss = onDismiss)
+                    DeckardMascot(onDrag = onDrag, onDismiss = onDismiss)
 
                     when (val current = s) {
                         DeckardState.Hidden -> Unit

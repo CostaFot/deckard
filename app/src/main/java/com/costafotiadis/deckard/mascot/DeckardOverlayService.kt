@@ -29,7 +29,6 @@ import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.costafotiadis.common.FlagProvider
 import com.costafotiadis.common.coroutine.DispatcherProvider
 import com.costafotiadis.deckard.R
-import com.costafotiadis.deckard.di.AccessibilityScreenText
 import com.costafotiadis.deckard.di.OcrContentScreenText
 import com.costafotiadis.deckard.mascot.DeckardOverlayService.Companion.detectText
 import com.costafotiadis.deckard.slop.DetectSlopUseCase
@@ -55,17 +54,15 @@ import javax.inject.Inject
 
 /**
  * Hosts the floating Deckard mascot in a system overlay window so it lives over every app. Deckard is
- * hidden until summoned by a left→right swipe on the [DeckardEdgeHandleView] tab pinned to the left
- * edge; summoning reads the text on the current screen (via the `@AccessibilityScreenText`
- * [ScreenTextReader] — accessibility-tree extraction), judges whether it's AI-generated "slop" via
- * [DetectSlopUseCase] (backed by
- * [com.costafotiadis.deckard.slop.AiDetectorRepository]), and shows the verdict in a speech
- * bubble, then auto-hides. **Long-pressing** the tab runs the alternative `@OcrContentScreenText`
- * read instead — a screenshot the model isolates the main post out of. Tapping the mascot re-runs the
- * a11y check; tapping the bubble dismisses it.
+ * hidden until summoned by a **long-press** on the [DeckardEdgeHandleView] tab pinned to the left
+ * edge; summoning photographs the current screen and has the on-device model isolate the main post
+ * out of it (the `@OcrContentScreenText` [ScreenTextReader]), judges whether it's AI-generated
+ * "slop" via [DetectSlopUseCase] (backed by [com.costafotiadis.deckard.slop.AiDetectorRepository]),
+ * and shows the verdict beneath him until the X dismisses it. The mascot himself takes no tap: he
+ * would be in the picture the summon takes.
  *
- * The long-press also puts up a third, untouchable window for the length of the read — the
- * [com.costafotiadis.deckard.shutter.ShutterEffect] the setup screen has chosen — because a read
+ * A summon also puts up a third, untouchable window for the length of the read — the
+ * [com.costafotiadis.deckard.shutter.ShutterEffect] the settings screen has chosen — because a read
  * that photographs your screen should say so, and because the vision inference it is covering takes
  * seconds. It goes up inside the reader's own "done with the screen" callback and not before:
  * anything drawn earlier is in the picture.
@@ -88,10 +85,6 @@ class DeckardOverlayService :
     ViewModelStoreOwner,
     HasDefaultViewModelProviderFactory,
     SavedStateRegistryOwner {
-
-    @Inject
-    @AccessibilityScreenText
-    lateinit var accessibilityReader: ScreenTextReader
 
     @Inject
     @OcrContentScreenText
@@ -225,7 +218,6 @@ class DeckardOverlayService :
         val view = DeckardComposeView(
             context = this,
             state = state.asStateFlow(),
-            onTap = ::summonViaAccessibilityRead,
             onDrag = ::onDrag,
             onDismiss = ::dismiss,
             onViewAnalysis = ::openAnalysis,
@@ -236,8 +228,7 @@ class DeckardOverlayService :
 
         val handle = DeckardEdgeHandleView(
             context = this,
-            onSummon = ::summonViaAccessibilityRead,
-            onLongPress = ::summonViaScreenshotOcr,
+            onLongPress = ::summon,
         ).also(::attachOwners)
         edgeHandleView = handle
         windowManager.addView(handle, handleParams)
@@ -271,15 +262,8 @@ class DeckardOverlayService :
 
     override fun onBind(intent: Intent?): IBinder? = null
 
-    /** Summon Deckard via the a11y-tree read (swipe / tap): fast, no model, per-app extractors. */
-    private fun summonViaAccessibilityRead() = runDetection(accessibilityReader, ReadMethod.Tree)
-
-    /** Summon Deckard via the screenshot + OCR "pick the post" read (long-press): slower, model-backed. */
-    private fun summonViaScreenshotOcr() = runDetection(screenshotOcrReader, ReadMethod.Screenshot)
-
-    /** Show Deckard, read the screen's text with [reader], and surface the verdict (stays until closed). */
-    private fun runDetection(reader: ScreenTextReader, how: ReadMethod) =
-        runDetecting { readScreenAndJudge(reader, how) }
+    /** Show Deckard, read the screen with the screenshot + OCR "pick the post" read, and surface the verdict. */
+    private fun summon() = runDetecting { readScreenAndJudge() }
 
     /** Show Deckard and judge already-captured [text] (e.g. text shared into the app) — no screen read. */
     private fun runDetectionOnText(text: String) = runDetecting {
@@ -340,25 +324,20 @@ class DeckardOverlayService :
     }
 
     /**
-     * Read the screen with [reader], then judge what comes back. Deckard stays off-screen until the
-     * reader reports it is done with the screen itself: on the screenshot paths he would otherwise be
-     * in the shot the vision model is asked to read the post out of. [how] only names the wait.
+     * Read the screen, then judge what comes back. Deckard stays off-screen until the reader reports
+     * it is done with the screen itself: he would otherwise be in the shot the vision model is asked
+     * to read the post out of.
      */
-    private suspend fun readScreenAndJudge(reader: ScreenTextReader, how: ReadMethod): DeckardState =
-        when (val result = reader.read { onScreenCaptured(how) }) {
+    private suspend fun readScreenAndJudge(): DeckardState =
+        when (val result = screenshotOcrReader.read(::onScreenCaptured)) {
             is ScreenReadResult.Unavailable -> DeckardState.Unavailable(NoVerdict.CouldNotRead(result.reason))
             is ScreenReadResult.Text -> judge(result.value)
         }
 
-    /**
-     * The screen is ours again: put Deckard on it, and — on a read that photographed it — say so.
-     *
-     * The swipe reads the tree and takes no picture, so it stays silent. The two summons looking
-     * different is the point, not an oversight.
-     */
-    private fun onScreenCaptured(how: ReadMethod) {
-        if (how == ReadMethod.Screenshot) openShutter()
-        show(DeckardState.Thinking(how))
+    /** The screen is ours again: say it was photographed, and put Deckard on it. */
+    private fun onScreenCaptured() {
+        openShutter()
+        show(DeckardState.Thinking(ReadMethod.Screenshot))
     }
 
     /**

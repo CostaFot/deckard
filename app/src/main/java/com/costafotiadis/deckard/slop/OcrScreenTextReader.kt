@@ -11,8 +11,8 @@ import javax.inject.Singleton
  * [ScreenTextReader] backed by screenshot OCR: grabs the screen (via the accessibility service's
  * [ScreenshotCapturer]) and asks the on-device multimodal model ([LlmEngine.generateWithImage]) to
  * transcribe **all** of it. A screenshot is inherently the visible viewport only, so this captures
- * just what the user can see — no off-screen feed scrollback. Slower than reading the tree (a vision
- * inference per summon) but accurate, and it hard-requires a loaded model.
+ * just what the user can see — no off-screen feed scrollback. Slow (a vision inference per summon)
+ * but accurate, and it hard-requires a loaded model.
  */
 @Singleton
 class OcrScreenTextReader @Inject constructor(
