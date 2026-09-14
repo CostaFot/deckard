@@ -5,10 +5,10 @@ plugins {
 }
 
 android {
-    namespace = "com.markedusduplicate.testing"
+    namespace = "com.costafotiadis.testing"
 
     defaultConfig {
-        testInstrumentationRunner = "com.markedusduplicate.testing.CustomTestRunner"
+        testInstrumentationRunner = "com.costafotiadis.testing.CustomTestRunner"
     }
 
 }

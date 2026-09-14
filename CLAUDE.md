@@ -20,7 +20,7 @@ a small setup screen (`MainActivity`) for granting permissions and starting/stop
 > been removed. Only the on-device LLM layer (`LlmEngine`) survives from that era, reused for OCR.
 > If you find lingering keyboard references, they're stragglers worth cleaning up.
 
-- applicationId / namespace: `com.markedusduplicate.deckard` (debug variant: `.debug`)
+- applicationId / namespace: `com.costafotiadis.deckard` (debug variant: `.debug`)
 - Build variants: `debug` / `release` only (no product flavors)
 - DI: Hilt. App class: `DeckardApplication` (`@HiltAndroidApp`)
 
@@ -30,8 +30,8 @@ a small setup screen (`MainActivity`) for granting permissions and starting/stop
 - `design` — theme/UI (`AppTheme`)
 - `textresource` — `TextResource`, a string that resolves at the draw site (see *Copy* below)
 - `common`, `common-test`, `logging`, `work`, `auth`, `testing` — shared libs
-  (namespaces stay `com.markedusduplicate.*`; only the app/template packages were renamed to
-  deckard)
+  (one namespace root across the whole repo: the app is `com.costafotiadis.deckard`, each lib is
+  `com.costafotiadis.<module>`)
 - `build-logic/convention` — Gradle convention plugins (`application.common`,
   `application.compose.common`, `hilt.common`, `library.common`, `library.compose.common`)
 
@@ -55,8 +55,8 @@ The on-device LLM is required for OCR (the in-use screen reader), but optional t
 `adb push` a `.litertlm` into `/sdcard/Android/data/<applicationId>/files/models/` (≈2.4–3.5 GB; the
 `LlmEngine` loads the first `.litertlm` it finds there). For the **debug** build `<applicationId>`
 is
-`com.markedusduplicate.deckard.debug`, so the dir is
-`/sdcard/Android/data/com.markedusduplicate.deckard.debug/files/models/` — create it with
+`com.costafotiadis.deckard.debug`, so the dir is
+`/sdcard/Android/data/com.costafotiadis.deckard.debug/files/models/` — create it with
 `adb shell mkdir -p` and push to a full filename (a trailing-slash dest fails with "Is a directory"
 if `models/` doesn't exist yet). `LlmEngine` warms up once per process and caches the loaded engine,
 so after pushing a new model `am force-stop` (or reinstall) to reload it. Local `.litertlm` files
@@ -259,8 +259,8 @@ verdict judge *that* text", for the summon-UX work, and for the post. Needs a co
    install) via adb — note this **overwrites** the enabled-a11y-services list, so re-enable any
    others (e.g. TalkBack) afterwards:
    ```
-   PKG=com.markedusduplicate.deckard.debug
-   SVC=$PKG/com.markedusduplicate.deckard.accessibility.DeckardAccessibilityService
+   PKG=com.costafotiadis.deckard.debug
+   SVC=$PKG/com.costafotiadis.deckard.accessibility.DeckardAccessibilityService
    adb shell appops set $PKG SYSTEM_ALERT_WINDOW allow
    adb shell appops set $PKG ACCESS_RESTRICTED_SETTINGS allow
    adb shell monkey -p $PKG -c android.intent.category.LAUNCHER 1   # launch FIRST, see below
@@ -377,7 +377,7 @@ bodies.
 
 ## Logging
 
-`logDebug { … }` (`com.markedusduplicate.logging`) is the standard logger. It plants Timber's
+`logDebug { … }` (`com.costafotiadis.logging`) is the standard logger. It plants Timber's
 `DebugTree` (in `AppInitializer`, debug builds only), so the tag is the calling class's simple name
 (e.g. `LlmEngine`, `DeckardOverlayService`). The native LiteRT runtime logs under `litert` /
 `litert-lm`.

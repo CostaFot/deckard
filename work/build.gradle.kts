@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.markedusduplicate.work"
+    namespace = "com.costafotiadis.work"
 }
 
 dependencies {

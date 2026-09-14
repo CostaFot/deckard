@@ -22,11 +22,11 @@ val mockVerdict: String = (findProperty("mockVerdict") as String?).orEmpty().ifB
 
 android {
     defaultConfig {
-        applicationId = "com.markedusduplicate.deckard"
+        applicationId = "com.costafotiadis.deckard"
         versionCode = 1
         versionName = "0.0.1"
 
-        testInstrumentationRunner = "com.markedusduplicate.testing.CustomTestRunner"
+        testInstrumentationRunner = "com.costafotiadis.testing.CustomTestRunner"
 
         vectorDrawables {
             useSupportLibrary = true
@@ -71,7 +71,7 @@ android {
         }
     }
 
-    namespace = "com.markedusduplicate.deckard"
+    namespace = "com.costafotiadis.deckard"
 }
 
 dependencies {

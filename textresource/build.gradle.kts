@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.markedusduplicate.textresource"
+    namespace = "com.costafotiadis.textresource"
 }
 
 dependencies {

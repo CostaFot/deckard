@@ -94,7 +94,7 @@
             android:exported="false" />
 
         <service
-            android:name="com.markedusduplicate.auth.AuthenticatorService"
+            android:name="com.costafotiadis.auth.AuthenticatorService"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator" />

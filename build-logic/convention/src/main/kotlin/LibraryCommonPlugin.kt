@@ -1,8 +1,8 @@
 import com.android.build.api.dsl.LibraryExtension
 import com.android.build.api.variant.LibraryAndroidComponentsExtension
-import com.markedusduplicate.deckard.configureKotlinAndroid
-import com.markedusduplicate.deckard.disableUnnecessaryAndroidTests
-import com.markedusduplicate.deckard.libs
+import com.costafotiadis.deckard.configureKotlinAndroid
+import com.costafotiadis.deckard.disableUnnecessaryAndroidTests
+import com.costafotiadis.deckard.libs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply

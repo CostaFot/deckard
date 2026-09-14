@@ -37,7 +37,7 @@ edge and stays there.
 To feed him a model:
 
 ```bash
-PKG=com.markedusduplicate.deckard.debug
+PKG=com.costafotiadis.deckard.debug
 adb shell mkdir -p /sdcard/Android/data/$PKG/files/models/
 adb push gemma.litertlm /sdcard/Android/data/$PKG/files/models/gemma.litertlm
 ```

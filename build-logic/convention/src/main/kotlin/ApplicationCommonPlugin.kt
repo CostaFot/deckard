@@ -1,6 +1,6 @@
 import com.android.build.api.dsl.ApplicationExtension
-import com.markedusduplicate.deckard.configureKotlinAndroid
-import com.markedusduplicate.deckard.libs
+import com.costafotiadis.deckard.configureKotlinAndroid
+import com.costafotiadis.deckard.libs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply

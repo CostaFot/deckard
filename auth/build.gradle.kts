@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.markedusduplicate.auth"
+    namespace = "com.costafotiadis.auth"
 }
 
 dependencies {

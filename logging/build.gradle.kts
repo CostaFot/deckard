@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace = "com.markedusduplicate.logging"
+    namespace = "com.costafotiadis.logging"
 }
 
 dependencies {

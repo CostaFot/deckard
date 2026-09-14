@@ -2,7 +2,7 @@
 
 ## TextResource
 
-`textresource/src/main/java/com/markedusduplicate/textresource/TextResource.kt` is adapted from
+`textresource/src/main/java/com/costafotiadis/textresource/TextResource.kt` is adapted from
 [TextResource](https://github.com/dkmarkell/textresource) by Derek Markell, used under the MIT
 License. The library is not depended on — its core is one small file, so it is vendored and trimmed:
 only the `raw` and `simple` factories are kept (upstream also has `plural`), `resolveString` is

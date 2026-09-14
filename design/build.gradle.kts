@@ -8,7 +8,7 @@ android {
         checkDependencies = true
     }
 
-    namespace = "com.markedusduplicate.design"
+    namespace = "com.costafotiadis.design"
 }
 
 dependencies {

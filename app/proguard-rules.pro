@@ -4,7 +4,7 @@
 # arrives with LiteRT-LM).
 
 # The Pangram API models are deserialized straight off the wire.
--keep class com.markedusduplicate.deckard.net.model.** { *; }
+-keep class com.costafotiadis.deckard.net.model.** { *; }
 
 # okhttp reads the public-suffix list as a resource sitting next to this class, so
 # the class's package has to survive. okhttp 5 no longer ships this rule itself.
