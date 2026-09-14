@@ -12,9 +12,8 @@ import org.jetbrains.kotlin.compose.compiler.gradle.ComposeCompilerGradlePluginE
  */
 
 internal fun Project.configureAndroidCompose(
-    commonExtension: CommonExtension
+    commonExtension: CommonExtension,
 ) {
-
     commonExtension.apply {
         buildFeatures.apply {
             compose = true
@@ -34,7 +33,9 @@ internal fun Project.configureAndroidCompose(
     }
 
     extensions.configure<ComposeCompilerGradlePluginExtension> {
-        stabilityConfigurationFiles.add(rootProject.layout.projectDirectory.file("compose_compiler_config.conf"))
+        @Suppress("UnstableApiUsage")
+        stabilityConfigurationFiles
+            .add(isolated.rootProject.projectDirectory.file("compose_compiler_config.conf"))
     }
 }
 
@@ -46,7 +47,7 @@ private fun Project.buildComposeMetricsParameters(): List<String> {
         val metricsFolder = project.layout.buildDirectory.dir("compose-metrics").get().asFile
         metricParameters.add("-P")
         metricParameters.add(
-            "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=" + metricsFolder.absolutePath
+            "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=" + metricsFolder.absolutePath,
         )
     }
 
@@ -56,7 +57,7 @@ private fun Project.buildComposeMetricsParameters(): List<String> {
         val reportsFolder = project.layout.buildDirectory.dir("compose-reports").get().asFile
         metricParameters.add("-P")
         metricParameters.add(
-            "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=" + reportsFolder.absolutePath
+            "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=" + reportsFolder.absolutePath,
         )
     }
     return metricParameters.toList()

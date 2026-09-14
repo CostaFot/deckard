@@ -4,7 +4,7 @@ plugins {
     id("application.common")
     id("application.compose.common")
     id("hilt.common")
-    id("kotlinx-serialization")
+    alias(libs.plugins.kotlin.serialization)
 }
 
 // Resolve the AI-detector API key from the environment first (CI / GitHub Actions secret), then fall
@@ -72,6 +72,10 @@ android {
     }
 
     namespace = "com.costafotiadis.deckard"
+}
+
+dependencyGuard {
+    configuration("releaseRuntimeClasspath")
 }
 
 dependencies {

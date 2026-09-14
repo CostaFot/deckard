@@ -26,7 +26,11 @@ androidxWork = "2.10.3"
 coil = "3.3.0"
 hilt = "2.59"
 hiltExt = "1.2.0"
-jacoco = "0.8.7"
+androidxLintGradle = "1.0.0-alpha03"
+dependencyGuard = "0.5.0"
+ktlint = "1.4.0"
+spotless = "8.3.0"
+truth = "1.4.4"
 junit4 = "4.13.2"
 kotlin = "2.2.10"
 kotlinxCoroutines = "1.10.2"
@@ -134,12 +138,18 @@ androidx-ui = { group = "androidx.compose.ui", name = "ui" }
 androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
 compose-gradlePlugin = { module = "org.jetbrains.kotlin:compose-compiler-gradle-plugin", version.ref = "kotlin" }
 ksp-gradlePlugin = { group = "com.google.devtools.ksp", name = "com.google.devtools.ksp.gradle.plugin", version.ref = "ksp" }
+spotless-gradlePlugin = { group = "com.diffplug.spotless", name = "spotless-plugin-gradle", version.ref = "spotless" }
+truth = { group = "com.google.truth", name = "truth", version.ref = "truth" }
+androidx-lint-gradle = { group = "androidx.lint", name = "lint-gradle", version.ref = "androidxLintGradle" }
 
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
 android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
 android-test = { id = "com.android.test", version.ref = "androidGradlePlugin" }
+android-lint = { id = "com.android.lint", version.ref = "androidGradlePlugin" }
+dependencyGuard = { id = "com.dropbox.dependency-guard", version.ref = "dependencyGuard" }
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

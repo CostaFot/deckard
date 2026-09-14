@@ -48,6 +48,19 @@ two is missing its line.
 - Install: `./gradlew :app:installDebug`
 - Unit tests: `./gradlew :app:testDebugUnitTest`
 
+**The checks CI runs, in the order it runs them** (`.github/workflows/ci.yml`, borrowed from
+nowinandroid and wired through the convention plugins so every module gets them):
+`./gradlew :build-logic:convention:check` (strict `validatePlugins` plus androidx's Gradle-plugin
+lint on build-logic), `spotlessCheck` (ktlint, Android style, rules in `.editorconfig`, no licence
+headers; `spotlessApply` fixes), `dependencyGuard` (the app's release runtime classpath against
+`app/dependencies/releaseRuntimeClasspath.txt`; `dependencyGuardBaseline` refreshes it, and read
+the diff before you do), `testDebugUnitTest`, `:app:assembleDebug :app:assembleRelease`,
+`:app:lintRelease lint` (every library too, with `checkDependencies`), and
+`:app:checkReleaseBadging` (aapt2's badging of the release APK against `app/release-badging.txt`,
+so a permission or component arriving through a library shows in a diff; `:app:updateReleaseBadging`
+refreshes it). Library modules enforce a `<module>_` resource prefix, and lint's `ResourceName` is
+what fails when one is missing.
+
 **`scripts/deckard` drives the debug build on a connected device** and is the fast way to see a
 change working: `install [ai|assisted|human|mixed]` (build, install, re-grant, wait for the
 accessibility service to bind), `grant`, `start` / `stop` / `dismiss`, `summon` (a hold on the

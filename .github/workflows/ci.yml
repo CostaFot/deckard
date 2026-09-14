@@ -15,8 +15,9 @@ permissions:
 
 jobs:
   build:
-    name: Build & unit test
+    name: Check, test and build
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -36,13 +37,56 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Build debug + run unit tests
-        run: ./gradlew assembleDebug testDebugUnitTest --stacktrace
+      # The checks run before the build, cheapest first, so a formatting slip fails in a minute
+      # rather than after a ten-minute compile. Each one names its own fix in the failure.
+
+      - name: Check build-logic
+        run: ./gradlew :build-logic:convention:check
+
+      - name: Check formatting (spotless)
+        run: |
+          ./gradlew spotlessCheck \
+            || { echo "::error::Formatting is off. Run ./gradlew spotlessApply and commit the result."; exit 1; }
+
+      - name: Check the release classpath (dependency-guard)
+        run: |
+          ./gradlew dependencyGuard \
+            || { echo "::error::The release classpath changed. If that is intended, run ./gradlew dependencyGuardBaseline and commit app/dependencies/."; exit 1; }
+
+      - name: Unit tests
+        run: ./gradlew testDebugUnitTest
+
+      - name: Build debug and release
+        run: ./gradlew :app:assembleDebug :app:assembleRelease
+
+      - name: Lint
+        run: ./gradlew :app:lintRelease lint
+
+      - name: Check the manifest badging
+        run: |
+          ./gradlew :app:checkReleaseBadging \
+            || { echo "::error::The APK's badging (permissions, components, features) changed. If that is intended, run ./gradlew :app:updateReleaseBadging and commit app/release-badging.txt."; exit 1; }
+
+      - name: Upload APKs
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: apks
+          path: '**/build/outputs/apk/**/*.apk'
+          if-no-files-found: ignore
 
       - name: Upload test reports
-        if: always()
+        if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
           name: test-reports
           path: '**/build/reports/tests/'
+          if-no-files-found: ignore
+
+      - name: Upload lint reports
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: lint-reports
+          path: '**/build/reports/lint-results-*.html'
           if-no-files-found: ignore

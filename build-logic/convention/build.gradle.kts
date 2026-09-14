@@ -2,6 +2,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     `kotlin-dsl`
+    alias(libs.plugins.android.lint)
 }
 
 group = "com.costafotiadis.deckard.buildlogic"
@@ -22,6 +23,16 @@ dependencies {
     compileOnly(libs.kotlin.gradlePlugin)
     compileOnly(libs.compose.gradlePlugin)
     compileOnly(libs.ksp.gradlePlugin)
+    compileOnly(libs.spotless.gradlePlugin)
+    implementation(libs.truth)
+    lintChecks(libs.androidx.lint.gradle)
+}
+
+tasks {
+    validatePlugins {
+        enableStricterValidation = true
+        failOnWarning = true
+    }
 }
 
 gradlePlugin {

@@ -4,10 +4,6 @@ plugins {
 }
 
 android {
-    lint {
-        checkDependencies = true
-    }
-
     namespace = "com.costafotiadis.design"
 }
 
