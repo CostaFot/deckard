@@ -32,6 +32,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
@@ -47,6 +48,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.LifecycleResumeEffect
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.costafotiadis.deckard.R
 import com.costafotiadis.deckard.accessibility.DeckardAccessibilityService
 import com.costafotiadis.deckard.mascot.BodyTextStyle
@@ -56,22 +58,35 @@ import com.costafotiadis.deckard.mascot.DeckardVoice
 import com.costafotiadis.deckard.mascot.DisplayTextStyle
 import com.costafotiadis.deckard.mascot.MetaTextStyle
 import com.costafotiadis.deckard.mascot.TitleTextStyle
+import com.costafotiadis.deckard.shutter.ShutterEffect
+import com.costafotiadis.deckard.shutter.ShutterEffectStore
+import com.costafotiadis.deckard.shutter.ShutterLoop
+import com.costafotiadis.deckard.shutter.ShutterSurface
 import com.costafotiadis.design.theme.AppTheme
 import com.costafotiadis.design.theme.stampInks
 import com.costafotiadis.logging.logDebug
 import com.costafotiadis.textresource.asString
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
+
+    @Inject
+    lateinit var shutterEffects: ShutterEffectStore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
         setContent {
+            val shutter by shutterEffects.selected.collectAsStateWithLifecycle()
             AppTheme {
-                SetupScreen()
+                SetupScreen(
+                    shutter = shutter,
+                    onPickShutter = shutterEffects::select,
+                )
             }
         }
     }
@@ -87,8 +102,12 @@ class MainActivity : AppCompatActivity() {
  * and learn the two gestures that summon him. Everything after this happens in the overlay.
  */
 @Composable
-private fun SetupScreen() {
+private fun SetupScreen(
+    shutter: ShutterEffect,
+    onPickShutter: (ShutterEffect) -> Unit,
+) {
     val context = LocalContext.current
+    var playing by remember { mutableStateOf<ShutterEffect?>(null) }
 
     var isAccessibilityEnabled by remember { mutableStateOf(false) }
     var canDrawOverlays by remember { mutableStateOf(false) }
@@ -104,71 +123,162 @@ private fun SetupScreen() {
     }
 
     Surface(modifier = Modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .safeDrawingPadding()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp, vertical = 32.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp),
-        ) {
-            Masthead()
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .safeDrawingPadding()
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 24.dp, vertical = 32.dp),
+                verticalArrangement = Arrangement.spacedBy(24.dp),
+            ) {
+                Masthead()
 
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                SectionLabel(text = stringResource(R.string.setup_section_what_he_needs))
-                Step(
-                    index = "01",
-                    title = stringResource(R.string.setup_step_screen_reading_title),
-                    detail = stringResource(R.string.setup_step_screen_reading_detail),
-                    done = isAccessibilityEnabled,
-                    onAction = {
-                        context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    SectionLabel(text = stringResource(R.string.setup_section_what_he_needs))
+                    Step(
+                        index = "01",
+                        title = stringResource(R.string.setup_step_screen_reading_title),
+                        detail = stringResource(R.string.setup_step_screen_reading_detail),
+                        done = isAccessibilityEnabled,
+                        onAction = {
+                            context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+                        },
+                    )
+                    Step(
+                        index = "02",
+                        title = stringResource(R.string.setup_step_overlay_title),
+                        detail = stringResource(R.string.setup_step_overlay_detail),
+                        done = canDrawOverlays,
+                        onAction = {
+                            context.startActivity(
+                                Intent(
+                                    Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                                    Uri.fromParts("package", context.packageName, null),
+                                ),
+                            )
+                        },
+                    )
+                }
+
+                StartButton(
+                    running = isDeckardRunning,
+                    enabled = canDrawOverlays && isAccessibilityEnabled,
+                    onClick = {
+                        if (isDeckardRunning) {
+                            DeckardOverlayService.stop(context)
+                            isDeckardRunning = false
+                        } else {
+                            DeckardOverlayService.start(context)
+                            isDeckardRunning = true
+                        }
                     },
                 )
-                Step(
-                    index = "02",
-                    title = stringResource(R.string.setup_step_overlay_title),
-                    detail = stringResource(R.string.setup_step_overlay_detail),
-                    done = canDrawOverlays,
-                    onAction = {
-                        context.startActivity(
-                            Intent(
-                                Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                                Uri.fromParts("package", context.packageName, null),
-                            ),
+
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    SectionLabel(text = stringResource(R.string.setup_section_summoning_him))
+                    Gesture(
+                        gesture = stringResource(R.string.setup_gesture_swipe_title),
+                        detail = stringResource(R.string.setup_gesture_swipe_detail),
+                    )
+                    Gesture(
+                        gesture = stringResource(R.string.setup_gesture_hold_title),
+                        detail = stringResource(R.string.setup_gesture_hold_detail),
+                    )
+                }
+
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    SectionLabel(text = stringResource(R.string.setup_section_the_shutter))
+                    Text(
+                        text = stringResource(R.string.setup_shutter_detail),
+                        style = BodyTextStyle.copy(fontSize = 13.sp, lineHeight = 18.sp),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    ShutterEffect.entries.forEach { effect ->
+                        ShutterRow(
+                            effect = effect,
+                            selected = effect == shutter,
+                            onClick = {
+                                onPickShutter(effect)
+                                playing = effect
+                            },
                         )
-                    },
-                )
+                    }
+                }
             }
 
-            StartButton(
-                running = isDeckardRunning,
-                enabled = canDrawOverlays && isAccessibilityEnabled,
-                onClick = {
-                    if (isDeckardRunning) {
-                        DeckardOverlayService.stop(context)
-                        isDeckardRunning = false
-                    } else {
-                        DeckardOverlayService.start(context)
-                        isDeckardRunning = true
-                    }
-                },
-            )
-
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                SectionLabel(text = stringResource(R.string.setup_section_summoning_him))
-                Gesture(
-                    gesture = stringResource(R.string.setup_gesture_swipe_title),
-                    detail = stringResource(R.string.setup_gesture_swipe_detail),
-                )
-                Gesture(
-                    gesture = stringResource(R.string.setup_gesture_hold_title),
-                    detail = stringResource(R.string.setup_gesture_hold_detail),
+            // Played at the size it is really drawn at: no model, no Pangram call, no other app.
+            playing?.let { effect ->
+                var running by remember(effect) { mutableStateOf(true) }
+                LaunchedEffect(effect) {
+                    delay(PREVIEW_MILLIS)
+                    running = false
+                }
+                ShutterSurface(
+                    effect = effect,
+                    running = running,
+                    modifier = Modifier.matchParentSize(),
+                    onFinished = { playing = null },
                 )
             }
         }
     }
 }
+
+/**
+ * One effect to choose from, with the effect itself running in the box beside its name. The
+ * miniature is not a picture of the variant, it is the variant — the same painter, told it is being
+ * drawn small — which is the only honest way to pick between four things that only exist in motion.
+ */
+@Composable
+private fun ShutterRow(
+    effect: ShutterEffect,
+    selected: Boolean,
+    onClick: () -> Unit,
+) {
+    val colors = MaterialTheme.colorScheme
+    val shape = RoundedCornerShape(14.dp)
+    Surface(
+        onClick = onClick,
+        shape = shape,
+        color = Color.Transparent,
+        contentColor = colors.onSurface,
+        border = BorderStroke(1.dp, if (selected) colors.onSurface else colors.outlineVariant),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = effect.label.asString(),
+                style = TitleTextStyle.copy(fontSize = 14.sp),
+                color = if (selected) colors.onSurface else colors.onSurfaceVariant,
+                modifier = Modifier.weight(1f),
+            )
+            Box(
+                modifier = Modifier
+                    .width(68.dp)
+                    .height(40.dp)
+                    .clip(RoundedCornerShape(5.dp))
+                    .background(colors.surfaceContainerHigh)
+                    .border(1.dp, colors.outlineVariant, RoundedCornerShape(5.dp)),
+            ) {
+                ShutterLoop(
+                    effect = effect,
+                    modifier = Modifier.matchParentSize(),
+                    scale = MINIATURE_SCALE,
+                )
+            }
+        }
+    }
+}
+
+/** How long a tapped effect holds its working state before letting go. */
+private const val PREVIEW_MILLIS = 2_400L
+
+/** A 68dp-wide screen against a phone: everything a painter measures in dp shrinks by this. */
+private const val MINIATURE_SCALE = 0.2f
 
 @Composable
 private fun Masthead() {

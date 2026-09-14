@@ -1,14 +1,17 @@
 package com.costafotiadis.deckard.mascot
 
+import android.content.BroadcastReceiver
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.graphics.PixelFormat
 import android.os.IBinder
 import android.provider.Settings
 import android.view.Gravity
 import android.view.WindowManager
+import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.lifecycle.HasDefaultViewModelProviderFactory
 import androidx.lifecycle.Lifecycle
@@ -23,6 +26,7 @@ import androidx.savedstate.SavedStateRegistry
 import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
+import com.costafotiadis.common.FlagProvider
 import com.costafotiadis.common.coroutine.DispatcherProvider
 import com.costafotiadis.deckard.R
 import com.costafotiadis.deckard.di.AccessibilityScreenText
@@ -30,6 +34,9 @@ import com.costafotiadis.deckard.di.OcrContentScreenText
 import com.costafotiadis.deckard.mascot.DeckardOverlayService.Companion.detectText
 import com.costafotiadis.deckard.slop.DetectSlopUseCase
 import com.costafotiadis.deckard.slop.ScreenReadResult
+import com.costafotiadis.deckard.shutter.DeckardShutterView
+import com.costafotiadis.deckard.shutter.ShutterEffect
+import com.costafotiadis.deckard.shutter.ShutterEffectStore
 import com.costafotiadis.deckard.slop.ScreenTextReader
 import com.costafotiadis.deckard.slop.SlopCheck
 import com.costafotiadis.logging.logDebug
@@ -38,8 +45,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -53,6 +63,12 @@ import javax.inject.Inject
  * bubble, then auto-hides. **Long-pressing** the tab runs the alternative `@OcrContentScreenText`
  * read instead — a screenshot the model isolates the main post out of. Tapping the mascot re-runs the
  * a11y check; tapping the bubble dismisses it.
+ *
+ * The long-press also puts up a third, untouchable window for the length of the read — the
+ * [com.costafotiadis.deckard.shutter.ShutterEffect] the setup screen has chosen — because a read
+ * that photographs your screen should say so, and because the vision inference it is covering takes
+ * seconds. It goes up inside the reader's own "done with the screen" callback and not before:
+ * anything drawn earlier is in the picture.
  *
  * Text can also be judged **without reading the screen**: [detectText] (driven by the share-sheet
  * [com.costafotiadis.deckard.ui.activity.ShareTextActivity]) feeds already-captured text straight
@@ -86,6 +102,12 @@ class DeckardOverlayService :
 
     @Inject
     lateinit var dispatcherProvider: DispatcherProvider
+
+    @Inject
+    lateinit var shutterEffects: ShutterEffectStore
+
+    @Inject
+    lateinit var flagProvider: FlagProvider
 
     private val lifecycleRegistry = LifecycleRegistry(this)
     override val lifecycle: Lifecycle get() = lifecycleRegistry
@@ -123,6 +145,32 @@ class DeckardOverlayService :
         this.y = y
     }
 
+    /**
+     * The shutter effect's own window: the whole display, and untouchable so it cannot take a
+     * gesture from the app it is drawn over.
+     *
+     * `FLAG_LAYOUT_IN_SCREEN` and the cutout mode are load-bearing rather than tidy-minded. Without
+     * them the window stops at the system bars, and an effect that runs round the edges of the
+     * screen but not the actual edges of the screen has nothing left to be.
+     */
+    private val shutterParams by lazy {
+        WindowManager.LayoutParams(
+            WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
+                    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE or
+                    WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
+                    WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS or
+                    WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
+            PixelFormat.TRANSLUCENT,
+        ).apply {
+            gravity = Gravity.TOP or Gravity.START
+            layoutInDisplayCutoutMode =
+                WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
+        }
+    }
+
     // The mascot is summoned next to the edge tab, so it speaks from the left-centre.
     private val layoutParams by lazy {
         overlayParams(Gravity.LEFT or Gravity.CENTER_VERTICAL, x = dp(30), y = 0)
@@ -133,7 +181,33 @@ class DeckardOverlayService :
 
     private var overlayView: DeckardComposeView? = null
     private var edgeHandleView: DeckardEdgeHandleView? = null
+    private var shutterView: DeckardShutterView? = null
+    private val shutterRunning = MutableStateFlow(false)
     private var tapJob: Job? = null
+
+    /**
+     * Which detection is the current one. A second summon cancels the first, and the first's teardown
+     * then runs *after* the second has already opened its own shutter — so a run only closes the
+     * shutter if it is still the run that owns it. Getting this wrong leaves a full-screen window
+     * over every app the user opens.
+     */
+    private var runToken = 0L
+
+    /**
+     * Debug builds only: plays the chosen effect over whatever app happens to be in front, with no
+     * screenshot and no model behind it.
+     *
+     * An effect drawn over an arbitrary app cannot be judged in a preview or over the setup screen —
+     * the edges only read correctly over the thing they are actually covering — and the read that
+     * normally triggers one costs a vision inference and needs a 3GB model on the device. So there
+     * is a way to just fire it: `scripts/deckard shutter`.
+     *
+     * Exported, because `adb shell am broadcast` runs as a different uid — which is why it is
+     * registered at all only when [FlagProvider.isDebugEnabled], and why it does nothing but draw.
+     */
+    private val shutterPreviewReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) = previewShutter()
+    }
 
     private fun dp(value: Int): Int = (value * resources.displayMetrics.density).toInt()
 
@@ -167,6 +241,15 @@ class DeckardOverlayService :
         ).also(::attachOwners)
         edgeHandleView = handle
         windowManager.addView(handle, handleParams)
+
+        if (flagProvider.isDebugEnabled) {
+            ContextCompat.registerReceiver(
+                this,
+                shutterPreviewReceiver,
+                IntentFilter(ACTION_PREVIEW_SHUTTER),
+                ContextCompat.RECEIVER_EXPORTED,
+            )
+        }
 
         isRunning = true
         logDebug { "deckard overlay + edge handle added" }
@@ -204,10 +287,23 @@ class DeckardOverlayService :
         judge(text)
     }
 
-    /** Run [produce] to get a verdict and surface it (stays until closed). */
+    /**
+     * Run [produce] to get a verdict and surface it (stays until closed).
+     *
+     * The `finally` is what guarantees the shutter is let go of: a verdict, a setback, or a
+     * cancellation part-way through all end the same way, which is the only reason a window nothing
+     * can touch is safe to put over the whole screen.
+     */
     private fun runDetecting(produce: suspend () -> DeckardState) {
         tapJob?.cancel()
-        tapJob = scope.launch { show(produce()) }
+        val token = ++runToken
+        tapJob = scope.launch {
+            try {
+                show(produce())
+            } finally {
+                withContext(NonCancellable) { closeShutter(token) }
+            }
+        }
     }
 
     /**
@@ -224,6 +320,7 @@ class DeckardOverlayService :
         tapJob?.cancel()
         state.value = DeckardState.Hidden
         setOverlayFocusable(false)
+        closeShutter(runToken)
     }
 
     /**
@@ -248,10 +345,66 @@ class DeckardOverlayService :
      * in the shot the vision model is asked to read the post out of. [how] only names the wait.
      */
     private suspend fun readScreenAndJudge(reader: ScreenTextReader, how: ReadMethod): DeckardState =
-        when (val result = reader.read { show(DeckardState.Thinking(how)) }) {
+        when (val result = reader.read { onScreenCaptured(how) }) {
             is ScreenReadResult.Unavailable -> DeckardState.Unavailable(NoVerdict.CouldNotRead(result.reason))
             is ScreenReadResult.Text -> judge(result.value)
         }
+
+    /**
+     * The screen is ours again: put Deckard on it, and — on a read that photographed it — say so.
+     *
+     * The swipe reads the tree and takes no picture, so it stays silent. The two summons looking
+     * different is the point, not an oversight.
+     */
+    private fun onScreenCaptured(how: ReadMethod) {
+        if (how == ReadMethod.Screenshot) openShutter()
+        show(DeckardState.Thinking(how))
+    }
+
+    /**
+     * Put the effect's window up and start it running. Called from the reader's own "done with the
+     * screen" callback and never a moment sooner: anything drawn before the shutter is in the JPEG
+     * the vision model is asked to read the post out of.
+     */
+    private fun openShutter() {
+        val effect = shutterEffects.selected.value
+        if (effect == ShutterEffect.None) return
+
+        if (shutterView?.effect != effect) removeShutterView()
+        shutterRunning.value = true
+        if (shutterView != null) return
+
+        val view = DeckardShutterView(
+            context = this,
+            effect = effect,
+            running = shutterRunning.asStateFlow(),
+            onFinished = ::removeShutterView,
+        ).also(::attachOwners)
+        shutterView = view.takeIf { runCatching { windowManager.addView(it, shutterParams) }.isSuccess }
+    }
+
+    /** Let the effect go, if [token] is still the run that opened it. The window leaves on its own. */
+    private fun closeShutter(token: Long) {
+        if (token != runToken) return
+        shutterRunning.value = false
+    }
+
+    /** The release has finished playing, so there is finally nothing left to draw. */
+    private fun removeShutterView() {
+        shutterView?.let { runCatching { windowManager.removeView(it) } }
+        shutterView = null
+        shutterRunning.value = false
+    }
+
+    /** Play the effect on its own, for as long as a short read would have taken. */
+    private fun previewShutter() {
+        val token = ++runToken
+        scope.launch {
+            openShutter()
+            delay(PREVIEW_HOLD_MILLIS)
+            closeShutter(token)
+        }
+    }
 
     /** Run [text] through the detector and map the outcome to a mascot state. */
     private suspend fun judge(text: String): DeckardState {
@@ -287,8 +440,12 @@ class DeckardOverlayService :
     override fun onDestroy() {
         isRunning = false
         tapJob?.cancel()
+        if (flagProvider.isDebugEnabled) {
+            runCatching { unregisterReceiver(shutterPreviewReceiver) }
+        }
         overlayView?.let { runCatching { windowManager.removeView(it) } }
         edgeHandleView?.let { runCatching { windowManager.removeView(it) } }
+        removeShutterView()
         overlayView = null
         edgeHandleView = null
         lifecycleRegistry.currentState = Lifecycle.State.DESTROYED
@@ -300,6 +457,13 @@ class DeckardOverlayService :
     companion object {
         private const val ACTION_DETECT_TEXT = "com.costafotiadis.deckard.action.DETECT_TEXT"
         private const val EXTRA_TEXT = "com.costafotiadis.deckard.extra.TEXT"
+
+        /** Debug only — see [shutterPreviewReceiver]. Named by `scripts/deckard shutter`. */
+        private const val ACTION_PREVIEW_SHUTTER =
+            "com.costafotiadis.deckard.action.PREVIEW_SHUTTER"
+
+        /** About as long as a vision inference on a warm engine, which is what it stands in for. */
+        private const val PREVIEW_HOLD_MILLIS = 2_600L
 
         /** True while the overlay is up; read by the setup screen to drive the start/stop toggle. */
         @Volatile

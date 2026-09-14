@@ -13,6 +13,8 @@
 #   scripts/deckard grant                               re-grant and wait for the bind
 #   scripts/deckard start | stop                        the overlay service, via the setup screen
 #   scripts/deckard summon [swipe|hold]                 swipe = a11y read, hold = screenshot OCR
+#   scripts/deckard effect [name]                       pick the shutter effect (no name lists them)
+#   scripts/deckard shutter [package]                   play it over an app, no model needed
 #   scripts/deckard dismiss                             send him away
 #   scripts/deckard shot [file.png]                     screencap to a file
 #   scripts/deckard dump [file.txt]                     pull the a11y tree dump
@@ -23,6 +25,10 @@ set -euo pipefail
 readonly PKG=com.costafotiadis.deckard.debug
 readonly SVC="$PKG/com.costafotiadis.deckard.accessibility.DeckardAccessibilityService"
 readonly SVC_LABEL="Deckard screen context"   # android:label, what dumpsys prints
+# The picker's own row labels, as setup_shutter_* spells them. Hardcoded the same
+# way the button labels below are: adb can only find a control by what it says.
+readonly EFFECTS=("Nothing at all" "Crop marks" "Edge bloom" "Travelling highlight" "Stamp")
+readonly SHUTTER_ACTION=com.costafotiadis.deckard.action.PREVIEW_SHUTTER
 judgments_before=0
 
 readonly REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -57,6 +63,7 @@ bound()     { adb shell dumpsys accessibility | grep -q "Bound services:.*$SVC_L
 running()   { adb shell dumpsys activity services "$PKG" | grep -q DeckardOverlayService; }
 stopped()   { ! running; }
 judgments() { adb logcat -d | grep -c 'slop: judging' || true; }
+foreground() { adb shell dumpsys activity activities | grep -q "topResumedActivity.*$1/"; }
 judged()    { [ "$(judgments)" -gt "$judgments_before" ]; }
 
 require_device() {
@@ -99,6 +106,21 @@ tap_button() {
 cmd_dismiss() {
     require_device
     tap_node "Dismiss Deckard" >/dev/null 2>&1 || true
+}
+
+# The shutter picker is the last section on the setup screen, so it is usually
+# below the fold. Scroll until the row is really on screen — uiautomator only
+# dumps what is drawn — rather than assuming a screen tall enough.
+scroll_to_node() {
+    local label=$1 size x y
+    size=$(adb shell wm size | grep -o '[0-9]*x[0-9]*' | tail -1)
+    x=$(( ${size%x*} / 2 ))
+    y=$(( ${size#*x} / 2 ))
+    for _ in $(seq 1 8); do
+        [ -n "$(node_bounds "$label")" ] && return 0
+        adb shell input swipe "$x" "$y" "$x" $(( y / 3 )) 220
+    done
+    [ -n "$(node_bounds "$label")" ]
 }
 
 # The edge tab's window is LEFT|CENTER_VERTICAL and its view is 36dp wide, so
@@ -179,6 +201,45 @@ cmd_summon() {
     adb logcat -d | grep 'slop: judging' | tail -1 | sed 's/.*D //'
 }
 
+# Picking is done on the setup screen, so this needs no overlay and no model —
+# and the tap plays the effect full-size over the Activity on its way past.
+cmd_effect() {
+    require_device
+    if [ $# -eq 0 ]; then
+        printf '%s\n' "${EFFECTS[@]}"
+        return
+    fi
+    local want=$1 label=""
+    for name in "${EFFECTS[@]}"; do
+        [ "${name,,}" = "${want,,}" ] && label=$name
+    done
+    [ -n "$label" ] || die "no effect called '$want'; try 'effect' with no name"
+    cmd_dismiss
+    open_setup
+    scroll_to_node "$label" || die "could not reach '$label' on the setup screen"
+    tap_node "$label"
+    echo "shutter effect: $label"
+}
+
+# The effect only fires on a read that photographs the screen, and that read
+# wants a 3GB model on the device — so debug builds take a broadcast instead.
+# The edges only read correctly over the app they are covering, so this plays it
+# over whatever is in front, or over [package] if you name one.
+cmd_shutter() {
+    require_device
+    running || die "the overlay is not running; scripts/deckard start"
+    local target=${1:-}
+    cmd_dismiss
+    if [ -n "$target" ]; then
+        adb shell monkey -p "$target" -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1 ||
+            die "could not launch '$target'"
+        wait_for 20 "$target to come forward" foreground "$target"
+    fi
+    adb shell am broadcast -a "$SHUTTER_ACTION" -p "$PKG" >/dev/null
+    echo "played over $(adb shell dumpsys activity activities |
+        grep -o 'topResumedActivity.*' | grep -o '[a-zA-Z0-9_.]*/' | head -1 | tr -d /)"
+}
+
 cmd_shot() {
     require_device
     local out=${1:-deckard-$(date +%H%M%S).png}
@@ -205,6 +266,8 @@ case ${1:-} in
     start)   cmd_start ;;
     stop)    cmd_stop ;;
     summon)  shift; cmd_summon "$@" ;;
+    effect)  shift; cmd_effect "$@" ;;
+    shutter) shift; cmd_shutter "$@" ;;
     dismiss) cmd_dismiss ;;
     shot)    shift; cmd_shot "$@" ;;
     dump)    shift; cmd_dump "$@" ;;

@@ -48,7 +48,8 @@ Gradle uses the Android Studio JBR — **`JAVA_HOME` must be set** or `./gradlew
 **`scripts/deckard` drives the debug build on a connected device** and is the fast way to see a
 change working: `install [ai|assisted|human|mixed]` (build, install, re-grant, wait for the
 accessibility service to bind), `grant`, `start` / `stop` / `dismiss`, `summon [swipe|hold]`,
-`shot`, `dump`, `log`. It is the runbook below, automated — including both traps that make the
+`effect [name]` / `shutter [package]` (pick and fire the screenshot effect — see *The shutter*
+below), `shot`, `dump`, `log`. It is the runbook below, automated — including both traps that make the
 accessibility setting silently revert, and the rebind after every reinstall. Every wait polls for
 the state it wants rather than sleeping a guessed number of seconds.
 
@@ -98,6 +99,53 @@ under `model/` are gitignored.
 - Requires the draw-over-apps permission (checked in `onCreate`) and the accessibility service
   (for reading the screen). Started/stopped from `MainActivity`'s setup screen.
 
+### The shutter — `shutter/`
+
+A read that photographs your screen says so. Only the **long-press** does: the swipe reads the a11y
+tree and takes no picture, so it stays silent, and the two summons looking different is the point
+(it bears on COS-235).
+
+- **The constraint that shapes it**: the effect must not be in the screenshot, which is of the whole
+  display, overlay windows included. So the window goes up inside `ScreenTextReader.read`'s
+  `onScreenCaptured` callback and never a moment earlier — the same seam `show(Thinking)` hangs off
+  (see `a7613cc`). Ordering: long-press, haptic, shutter, effect + Deckard, inference, verdict.
+- **The seam** — `ShutterPainter` is a painter over a rectangle: the size, where it is in the run
+  (`ShutterFrame`), and one ink. Knowing nothing else is what lets the same code draw full-screen
+  over another app and miniature in the setup screen's picker. `ShutterFrame.scale` is 1 at full
+  size and a fraction in the miniature, so every dp shrinks with it — **the picker is not a mock-up
+  of the effect, it is the effect**.
+- **Four at once, on purpose** (`ShutterEffect`): `CropMarks`, `Bloom`, `Highlight`, `Stamp`, and
+  `None`, because a comparison needs a baseline. All of them are ink (`onSurface`) at some alpha:
+  there are no accent roles here and each `StampInk` means one specific verdict, so borrowing one
+  would be a naming lie. Nothing blurs — the vision inference is on the same GPU, and an effect that
+  stutters exactly when it is meant to reassure is a failed effect. `key` is what is persisted, so
+  it outlives a renamed constant (`ShutterEffectTest`).
+- **`ShutterSurface`** drives a run: Snap → Working (loops while `running`) → Release →
+  `onFinished`. One `withFrameMillis` loop writes a frame that is read **only inside `drawBehind`**,
+  so sixty frames a second invalidate the draw and recompose nothing. Two traps, both load-bearing:
+    - `running` is read through a `State` inside `snapshotFlow`. A captured `Boolean` parameter is
+      fixed at the composition that started the effect, so the run never hears that it is over and
+      the window sits there until the safety release.
+    - Working self-releases after 30s. A full-screen overlay that never leaves is worse than an
+      effect that never plays.
+- **The window** (`DeckardShutterView` + `DeckardOverlayService.shutterParams`): `MATCH_PARENT`,
+  `FLAG_NOT_TOUCHABLE` so it cannot take a gesture from the app under it, and
+  `FLAG_LAYOUT_IN_SCREEN` + `LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS` — without those last two it stops
+  at the system bars, and an edge effect that misses the edges has nothing left to be. It is removed
+  on `onFinished`, not when the run is closed: the release has to finish playing first.
+- **The re-entrancy trap**: a second summon cancels the first, whose `finally` then runs *after* the
+  second has opened its own shutter. Each run carries a token and only closes the shutter while it
+  still owns it. Get this wrong and a full-screen window is left over every app the user opens.
+- **Trying them** — the picker on the setup screen, with a live miniature per row; tapping a row
+  selects it *and* plays it full-size over the Activity, so a variant costs no model and no Pangram
+  call. Over a real app, which is the only place the edges read correctly,
+  `scripts/deckard effect <name>` picks one and `scripts/deckard shutter [package]` fires it: the
+  read that normally triggers one wants the 2.4–3.5GB `.litertlm`, so debug builds carry a
+  runtime-registered broadcast receiver that just plays it.
+- **Open, and the thing to settle when picking a winner**: the ink follows the *device* theme, not
+  the app's. An effect reads over an app whose ground matches the device theme and washes out when
+  they diverge — a light-themed phone over a dark app draws near-black on near-black.
+
 ### Deckard's look — `design/theme/` + `mascot/DeckardLook.kt`
 
 The overlay draws on top of arbitrary apps, so it can't inherit its surroundings — it carries its
@@ -137,7 +185,9 @@ deliberate exceptions: **Pangram's own text** (`headline`, `confidence`, `predic
 (`"AI"`/`"Mixed"`/`"Human"`) are protocol, not copy; and glyph ornament (`"01"`, `"✓"`, `"—"`, the
 `%` after the human share, the vendor name `PANGRAM`) is not language.
 
-The resources group by where they're said: `voice_*`, `setup_*`, `card_*`, `stamp_*`.
+The resources group by where they're said: `voice_*`, `setup_*`, `card_*`, `stamp_*`. The shutter
+picker's row names are `setup_shutter_*` and belong to the setup screen, not to Deckard — they name
+an effect, they are not something he says, so they never go through `DeckardVoice`.
 
 - **`mascot/DeckardVoice.kt`** decides *which* line each fact gets; `strings.xml` decides *what* the
   line is. The `when`s are exhaustive over the sealed types, so an unwritten line is a compile error
@@ -395,13 +445,15 @@ bodies.
 
 The pivot + rename are done and the build is green (`:app:compileDebugKotlin`,
 `:app:testDebugUnitTest`, `:app:lintDebug`). End to end today: summon Deckard → **a11y-tree screen
-read** (swipe) **or screenshot OCR content-isolation** (long-press) → **Pangram detection** → the
-bubble shows the verdict as a **report card** (`mascot/SlopReportCard`).
+read** (swipe) **or screenshot OCR content-isolation** (long-press, which now announces the shutter
+with the chosen `shutter/` effect) → **Pangram detection** → the bubble shows the verdict as a
+**report card** (`mascot/SlopReportCard`).
 
 Done: the API→domain→UI wiring (`AiDetectorRepository` + `DetectSlopUseCase`, base URL/auth in
 `NetworkModule`), the report-card UI, Deckard's look (see above), content isolation on the
-screenshot path, two per-app extractors (LinkedIn, X), and every word the app says now living in
-`strings.xml` behind `:textresource` (see *Copy* above). His **voice** — the wording itself — is
+screenshot path, two per-app extractors (LinkedIn, X), the four screenshot effects and the picker
+that chooses between them (see *The shutter* above — one of them still has to win), and every word
+the app says now living in `strings.xml` behind `:textresource` (see *Copy* above). His **voice** — the wording itself — is
 still not written; only the thinking state was rewritten. It is now all in one file to rewrite.
 
 Cleared out along the way: the JSONPlaceholder/Todo demo (repository, mapper, domain/API models,

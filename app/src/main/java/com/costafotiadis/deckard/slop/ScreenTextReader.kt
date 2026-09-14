@@ -15,6 +15,8 @@ interface ScreenTextReader {
      * screen until then: on the screenshot paths that is the difference between the vision model
      * transcribing the post and transcribing Deckard's own speech bubble. A reader that fails before
      * it ever reads the screen never calls it.
+     *
+     * Called on the main thread: what the caller does with it puts windows on the screen.
      */
     suspend fun read(onScreenCaptured: () -> Unit): ScreenReadResult
 }
