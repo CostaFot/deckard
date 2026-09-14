@@ -1,0 +1,213 @@
+#!/usr/bin/env bash
+#
+# Drive the debug build on a connected device: install it, grant what a fresh
+# install loses, start the overlay, summon Deckard, grab the screen or the tree
+# dump. The manual steps live in CLAUDE.md's runbook; this is them, automated,
+# including the two traps that make the accessibility setting silently revert.
+#
+# Every wait here polls for the state it wants rather than sleeping a guessed
+# number of seconds: a reinstall takes a variable few seconds to rebind the
+# accessibility service, and a fixed sleep is either flaky or slow.
+#
+#   scripts/deckard install [ai|assisted|human|mixed]   build, install, grant, wait
+#   scripts/deckard grant                               re-grant and wait for the bind
+#   scripts/deckard start | stop                        the overlay service, via the setup screen
+#   scripts/deckard summon [swipe|hold]                 swipe = a11y read, hold = screenshot OCR
+#   scripts/deckard dismiss                             send him away
+#   scripts/deckard shot [file.png]                     screencap to a file
+#   scripts/deckard dump [file.txt]                     pull the a11y tree dump
+#   scripts/deckard log                                 the app's own logcat lines
+#
+set -euo pipefail
+
+readonly PKG=com.costafotiadis.deckard.debug
+readonly SVC="$PKG/com.costafotiadis.deckard.accessibility.DeckardAccessibilityService"
+readonly SVC_LABEL="Deckard screen context"   # android:label, what dumpsys prints
+judgments_before=0
+
+readonly REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+: "${ANDROID_HOME:=$HOME/Android/Sdk}"
+export ANDROID_HOME
+export PATH="$ANDROID_HOME/platform-tools:$PATH"
+
+# Gradle needs the Android Studio JBR. Respect a JAVA_HOME that is already set.
+if [ -z "${JAVA_HOME:-}" ]; then
+    for jbr in "$HOME/.local/share/JetBrains/Toolbox/apps/android-studio/jbr" \
+               /opt/android-studio/jbr "/Applications/Android Studio.app/Contents/jbr/Contents/Home"; do
+        [ -x "$jbr/bin/java" ] && export JAVA_HOME="$jbr" && break
+    done
+fi
+
+die() { echo "deckard: $*" >&2; exit 1; }
+
+# wait_for <seconds> <what> <predicate...> — poll twice a second until it holds.
+wait_for() {
+    local budget=$1 what=$2; shift 2
+    local tries=$((budget * 2))
+    for ((i = 0; i < tries; i++)); do
+        "$@" >/dev/null 2>&1 && return 0
+        adb shell sleep 0.5 >/dev/null 2>&1 || return 1
+    done
+    die "timed out after ${budget}s waiting for $what"
+}
+
+resumed()   { adb shell dumpsys activity activities | grep -q "topResumedActivity.*$PKG/.*MainActivity"; }
+bound()     { adb shell dumpsys accessibility | grep -q "Bound services:.*$SVC_LABEL"; }
+running()   { adb shell dumpsys activity services "$PKG" | grep -q DeckardOverlayService; }
+stopped()   { ! running; }
+judgments() { adb logcat -d | grep -c 'slop: judging' || true; }
+judged()    { [ "$(judgments)" -gt "$judgments_before" ]; }
+
+require_device() {
+    adb get-state >/dev/null 2>&1 || die "no device; check 'adb devices'"
+}
+
+open_setup() {
+    adb shell monkey -p "$PKG" -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1
+    wait_for 30 "the setup screen" resumed
+}
+
+# uiautomator only dumps the focused window, and Deckard's mascot takes focus
+# while he is on screen — so anything that reads the setup screen has to send
+# him away first.
+node_bounds() {
+    local label=$1
+    adb shell uiautomator dump /sdcard/deckard_ui.xml >/dev/null 2>&1 || return 1
+    adb shell cat /sdcard/deckard_ui.xml 2>/dev/null |
+        grep -o "\(text\|content-desc\)=\"$label\"[^>]*bounds=\"\[[0-9]*,[0-9]*\]\[[0-9]*,[0-9]*\]\"" |
+        grep -o 'bounds="[^"]*"' | head -1 | grep -o '[0-9]*' | tr '\n' ' ' || true
+}
+
+tap_node() {
+    local label=$1 bounds
+    bounds=$(node_bounds "$label")
+    [ -n "$bounds" ] || return 1
+    # shellcheck disable=SC2086
+    set -- $bounds
+    adb shell input tap $(( ($1 + $3) / 2 )) $(( ($2 + $4) / 2 ))
+}
+
+# The overlay service is exported="false", so adb cannot start it directly —
+# it has to go through the setup screen's one button. Find it by its label
+# rather than by a coordinate, which changes with every copy edit.
+tap_button() {
+    local label=$1
+    tap_node "$label" || die "no '$label' button on screen (is Deckard covering it? try 'dismiss')"
+}
+
+cmd_dismiss() {
+    require_device
+    tap_node "Dismiss Deckard" >/dev/null 2>&1 || true
+}
+
+# The edge tab's window is LEFT|CENTER_VERTICAL and its view is 36dp wide, so
+# the middle of the left edge hits it on any screen.
+edge_tab_xy() {
+    local size density
+    size=$(adb shell wm size | grep -o '[0-9]*x[0-9]*' | tail -1)
+    density=$(adb shell wm density | grep -o '[0-9]*' | tail -1)
+    echo "$(( 18 * density / 160 )) $(( ${size#*x} / 2 ))"
+}
+
+cmd_grant() {
+    require_device
+    adb shell appops set "$PKG" SYSTEM_ALERT_WINDOW allow
+    # Without this, Enhanced Confirmation Mode reverts the a11y write a second later.
+    adb shell appops set "$PKG" ACCESS_RESTRICTED_SETTINGS allow
+    # And the service has to be enabled while the app is running: a force-stop,
+    # or enabling before first launch, drops it straight back to null.
+    open_setup
+    adb shell "settings put secure enabled_accessibility_services $SVC"
+    adb shell "settings put secure accessibility_enabled 1"
+    wait_for 60 "the accessibility service to bind" bound
+    echo "granted: overlay + accessibility, service bound"
+}
+
+cmd_install() {
+    require_device
+    local mock=${1:-}
+    [ -n "$JAVA_HOME" ] || die "JAVA_HOME is not set and no Android Studio JBR was found"
+    if [ -n "$mock" ]; then
+        case $mock in
+            ai | assisted | human | mixed | off) ;;
+            *) die "mock verdict must be one of ai, assisted, human, mixed, off" ;;
+        esac
+        echo "installing with a canned '$mock' verdict (no Pangram call)"
+        (cd "$REPO" && ./gradlew -q :app:installDebug "-PmockVerdict=$mock")
+    else
+        (cd "$REPO" && ./gradlew -q :app:installDebug)
+    fi
+    # A reinstall kills the app, which unbinds the accessibility service.
+    cmd_grant
+}
+
+cmd_start() {
+    require_device
+    running && { echo "already running"; return; }
+    cmd_dismiss
+    open_setup
+    tap_button "Start Deckard"
+    wait_for 20 "the overlay service" running
+    echo "overlay started"
+}
+
+cmd_stop() {
+    require_device
+    running || { echo "not running"; return; }
+    cmd_dismiss
+    open_setup
+    tap_button "Stop Deckard"
+    wait_for 20 "the overlay service to stop" stopped
+    echo "overlay stopped"
+}
+
+cmd_summon() {
+    require_device
+    running || die "the overlay is not running; scripts/deckard start"
+    local how=${1:-swipe} x y
+    cmd_dismiss                      # else the read can catch his own bubble
+    read -r x y < <(edge_tab_xy)
+    judgments_before=$(judgments)
+    case $how in
+        swipe) adb shell input swipe "$x" "$y" $((x + 500)) "$y" 250 ;;
+        hold)  adb shell input swipe "$x" "$y" "$x" "$y" 1200 ;;   # a hold that never moves
+        *)     die "summon takes 'swipe' (a11y read) or 'hold' (screenshot OCR)" ;;
+    esac
+    wait_for 90 "a verdict (is the accessibility service bound?)" judged
+    adb shell sleep 1 >/dev/null   # let the card compose before anyone screenshots it
+    adb logcat -d | grep 'slop: judging' | tail -1 | sed 's/.*D //'
+}
+
+cmd_shot() {
+    require_device
+    local out=${1:-deckard-$(date +%H%M%S).png}
+    adb exec-out screencap -p > "$out"
+    echo "$out"
+}
+
+cmd_dump() {
+    require_device
+    local out=${1:-deckard_tree.txt}
+    adb pull "/sdcard/Android/data/$PKG/files/deckard_tree.txt" "$out" >/dev/null ||
+        die "no dump yet — summon Deckard once on a debug build first"
+    echo "$out"
+}
+
+cmd_log() {
+    require_device
+    adb logcat -d | grep -E "Deckard|DetectSlopUseCase|LlmEngine|AiDetectorRepository"
+}
+
+case ${1:-} in
+    install) shift; cmd_install "$@" ;;
+    grant)   cmd_grant ;;
+    start)   cmd_start ;;
+    stop)    cmd_stop ;;
+    summon)  shift; cmd_summon "$@" ;;
+    dismiss) cmd_dismiss ;;
+    shot)    shift; cmd_shot "$@" ;;
+    dump)    shift; cmd_dump "$@" ;;
+    log)     cmd_log ;;
+    *)       sed -n '/^#   scripts/,/^#$/p' "${BASH_SOURCE[0]}" | sed 's/^#  *//;s/^#//'; exit 1 ;;
+esac

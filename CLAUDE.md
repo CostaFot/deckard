@@ -45,6 +45,13 @@ Gradle uses the Android Studio JBR — **`JAVA_HOME` must be set** or `./gradlew
 - Install: `./gradlew :app:installDebug`
 - Unit tests: `./gradlew :app:testDebugUnitTest`
 
+**`scripts/deckard` drives the debug build on a connected device** and is the fast way to see a
+change working: `install [ai|assisted|human|mixed]` (build, install, re-grant, wait for the
+accessibility service to bind), `grant`, `start` / `stop` / `dismiss`, `summon [swipe|hold]`,
+`shot`, `dump`, `log`. It is the runbook below, automated — including both traps that make the
+accessibility setting silently revert, and the rebind after every reinstall. Every wait polls for
+the state it wants rather than sleeping a guessed number of seconds.
+
 To use it after install, open the app and work through `MainActivity`'s setup screen: enable the
 accessibility service (screen reading), grant draw-over-apps, then start Deckard. A left→right swipe
 on the left-edge tab summons the mascot (a11y-tree read); a **long-press** on the tab summons via
@@ -255,7 +262,8 @@ the exact `ScreenNode` snapshot the extractor saw, so it is the tool for answeri
 verdict judge *that* text", for the summon-UX work, and for the post. Needs a connected device
 (`adb devices`) and a debug build.
 
-1. **Install & enable.** `./gradlew :app:installDebug`. Grant overlay + accessibility (once per
+1. **Install & enable.** `scripts/deckard install` does this whole step. By hand it is
+   `./gradlew :app:installDebug` plus granting overlay + accessibility (once per
    install) via adb — note this **overwrites** the enabled-a11y-services list, so re-enable any
    others (e.g. TalkBack) afterwards:
    ```
@@ -279,7 +287,8 @@ verdict judge *that* text", for the summon-UX work, and for the post. Needs a co
    (Changing `accessibility_service_config.xml` only takes effect after the service re-binds —
    toggle it off/on by re-running the `settings put` lines.) Then open the app → **Start Deckard**.
 2. **Capture.** On the device, navigate to the exact screen/state to debug (e.g. a post with
-   "… more"), centre it, and **summon Deckard** (left-edge swipe). That writes the dump. Pull it:
+   "… more"), centre it, and **summon Deckard** (left-edge swipe, or `scripts/deckard summon`).
+   That writes the dump. Pull it with `scripts/deckard dump`, or by hand:
    ```
    adb pull /sdcard/Android/data/$PKG/files/deckard_tree.txt
    ```
