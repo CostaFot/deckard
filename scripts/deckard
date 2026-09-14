@@ -42,14 +42,6 @@ readonly REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 export ANDROID_HOME
 export PATH="$ANDROID_HOME/platform-tools:$PATH"
 
-# Gradle needs the Android Studio JBR. Respect a JAVA_HOME that is already set.
-if [ -z "${JAVA_HOME:-}" ]; then
-    for jbr in "$HOME/.local/share/JetBrains/Toolbox/apps/android-studio/jbr" \
-               /opt/android-studio/jbr "/Applications/Android Studio.app/Contents/jbr/Contents/Home"; do
-        [ -x "$jbr/bin/java" ] && export JAVA_HOME="$jbr" && break
-    done
-fi
-
 die() { echo "deckard: $*" >&2; exit 1; }
 
 # wait_for <seconds> <what> <predicate...> — poll twice a second until it holds.
@@ -171,7 +163,6 @@ cmd_grant() {
 cmd_install() {
     require_device
     local mock=${1:-}
-    [ -n "$JAVA_HOME" ] || die "JAVA_HOME is not set and no Android Studio JBR was found"
     if [ -n "$mock" ]; then
         case $mock in
             ai | assisted | human | mixed | off) ;;

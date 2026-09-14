@@ -38,10 +38,12 @@ with a settings screen behind it.
 
 ## Build / run
 
-Gradle runs on the Android Studio JBR: `JAVA_HOME` is exported in `~/.bashrc`, above the
-interactive check so agent and script shells get it too. The SDK comes from `sdk.dir` in
-`local.properties`. If `./gradlew` complains about `JAVA_HOME` or the SDK location, one of those
-two is missing its line.
+The daemon's JDK is pinned by `gradle/gradle-daemon-jvm.properties` (Java 21, any vendor), so the
+build does not depend on `JAVA_HOME`: the wrapper only needs *some* Java to launch, then finds a 21
+among the installed JDKs or downloads one into `~/.gradle/jdks` through the foojay resolver in
+`settings.gradle.kts`. `./gradlew --version` shows both the launcher JVM and the daemon criteria.
+To move the pin, run `./gradlew updateDaemonJvm --jvm-version=N` and commit the regenerated file
+rather than editing it by hand. The SDK comes from `sdk.dir` in `local.properties`.
 
 - Compile: `./gradlew :app:compileDebugKotlin`
 - Build APK: `./gradlew :app:assembleDebug`
