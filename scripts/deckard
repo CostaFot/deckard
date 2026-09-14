@@ -231,7 +231,7 @@ cmd_effect() {
 }
 
 # The effect only fires on a read that photographs the screen, and that read
-# wants a 3GB model on the device — so debug builds take a broadcast instead.
+# wants a vision model on the device — so debug builds take a broadcast instead.
 # The edges only read correctly over the app they are covering, so this plays it
 # over whatever is in front, or over [package] if you name one.
 cmd_shutter() {
@@ -258,7 +258,7 @@ cmd_shot() {
 
 cmd_log() {
     require_device
-    adb logcat -d | grep -E "Deckard|DetectSlopUseCase|LlmEngine|AiDetectorRepository"
+    adb logcat -d | grep -E "Deckard|DetectSlopUseCase|LlmEngine|GeminiNanoVisionModel|ForegroundStage|AiDetectorRepository"
 }
 
 case ${1:-} in

@@ -107,10 +107,9 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.navigation3)
 
 
-    // on-device LLM inference
-    implementation(libs.litertlm.android)
-    // COS-259 spike: Gemini Nano through AICore
+    // on-device vision: the phone's own Gemini Nano through AICore where it has one, LiteRT-LM otherwise
     implementation(libs.mlkit.genai.prompt)
+    implementation(libs.litertlm.android)
 
     // networking
     implementation(libs.kotlinx.serialization.json)

@@ -76,9 +76,10 @@ accessibility service (it takes the screenshot), grant draw-over-apps, then star
 **long-press** on the left-edge tab summons the mascot: a screenshot, and the on-device model
 isolates the main post out of it.
 
-The on-device LLM is required for the read, but optional to
-*launch*: with no model present, summoning Deckard reports it has no eyes yet. To enable it,
-`adb push` a `.litertlm` into `/sdcard/Android/data/<applicationId>/files/models/` (≈2.4–3.5 GB; the
+A vision model is required for the read, but optional to *launch*: with none present, summoning
+Deckard reports it has no eyes yet. On a phone with **Gemini Nano** (AICore present, locked
+bootloader) there is nothing to push — he reads with the phone's own model, see *Gemini Nano* below.
+Otherwise, `adb push` a `.litertlm` into `/sdcard/Android/data/<applicationId>/files/models/` (≈2.4–3.5 GB; the
 `LlmEngine` loads the first `.litertlm` it finds there). For the **debug** build `<applicationId>`
 is
 `com.costafotiadis.deckard.debug`, so the dir is
@@ -298,9 +299,12 @@ they name an effect, they are not something he says, so they never go through `D
       isolation at the vision step, no per-app knowledge needed. The verbatim rule is load-bearing:
       if the model rewrote the text it'd bias Pangram toward "AI". Slow (a vision inference per
       summon) and hard-requires a loaded model. The readers see only the two-member
-      `VisionModel` interface (`isReady`, `read(jpeg, prompt)`); `di/VisionModelModule` binds it
-      to `LlmEngine`, so a second model (COS-259) is a binding change and `ocrRead()` has a unit
-      test with a fake model (`OcrScreenTextReaderTest`).
+      `VisionModel` interface (`isReady`, `read(jpeg, prompt)` → `VisionReply`);
+      `di/VisionModelModule` binds it to `NanoOrLocalVisionModel`, the phone's Gemini Nano where
+      AICore has it and `LlmEngine` otherwise, and `ocrRead()` has a unit test with a fake model
+      (`OcrScreenTextReaderTest`). A model says why it said nothing in its own terms
+      (`VisionFailure`); `ocrRead()` maps those onto `ScreenReadFailure` and `DeckardVoice` words
+      them (the eyes lines: not in front, refused, out of quota).
     - **`OcrScreenTextReader`** (`@OcrScreenText`, fallback): same screenshot, but the prompt
       (`OcrPrompt.transcribe()`) dumps **all** the readable text rather than isolating one post. A
       screenshot is the visible viewport only, so it captures just what the user sees. Nothing
@@ -366,6 +370,51 @@ they name an effect, they are not something he says, so they never go through `D
   reason the word and the figure can't contradict each other. The three-part composition bar appears
   only when the text is actually a mixture; under a single-label verdict the stamp already says it.
 
+### Gemini Nano — `llm/nano/`
+
+`GeminiNanoVisionModel` is the same `VisionModel` over the ML Kit Prompt API
+(`com.google.mlkit:genai-prompt`), served by AICore: the model is the system's, so there is nothing
+to push and nothing to load, and a read takes about 10 s on the Magic V5 (nano-v3), verbatim.
+COS-259 was the spike, COS-260 the feature. The non-obvious bits:
+
+- **AICore serves only the app in front.** A read from the overlay service is refused as
+  background use (`BACKGROUND_USE_BLOCKED`) inside 100 ms, and so is `warmup()`. So every read
+  runs inside `ForegroundStage.inFront { }`: the stage starts the see-through `ForegroundActivity`
+  (`Theme.Deckard.Foreground`: translucent, no animation, no preview window), waits for it to
+  report in from `onResume`, runs the read while it is on top, and lets it finish. Android 16
+  allows the launch from the service because the overlay window is up; the system refuses a
+  background launch *silently*, so the stage's 5 s wait is the check, and a wait that runs out is
+  `VisionFailure.NotInFront`. The app underneath is paused for the read, touches and all, which is
+  the ten seconds the shutter effect is there to cover.
+- **The turn token** (`ForegroundStage`): a second summon cancels the first mid-read, and the
+  first's Activity can still be arriving after the second has started its own. An Activity that
+  arrives for a turn that is over, or was never the current one, is sent away on the spot; get this
+  wrong and a see-through Activity sits over the user's app. The Activity is `noHistory` +
+  `excludeFromRecents` + `taskAffinity=""` so it never outlives its turn or shows in recents.
+- **Readiness is polled, not listened for.** `download()`'s flow emitted nothing on the Magic V5
+  while Private Compute Services fetched the model in the background; the status just turned
+  AVAILABLE a few minutes later. So the model checks `checkStatus()` on construction (which is
+  "Start Deckard", the first injection) and again on every `isReady`, and asks for a DOWNLOADABLE
+  model when it sees one. Status checks are allowed from the background; only inference and
+  warm-up are not. There is no warm-up: a warm-up right before the read it would warm is none.
+- **Error codes → `VisionFailure`**: `BACKGROUND_USE_BLOCKED` → `NotInFront`;
+  `RESPONSE_PROCESSING_ERROR` (the safety filter) → `Refused`; `PER_APP_BATTERY_USE_QUOTA_EXCEEDED`
+  → `OutOfQuota`; not-available / not-supported / incompatible / needs-update / no-disk → `NotReady`
+  (and the status is dropped so the chooser falls through to the local engine next time);
+  anything else → `Failed`. Each has a line in `DeckardVoice`.
+- **The notice.** ML Kit's terms make the app responsible for telling users Google receives
+  performance and utilization metrics; the input never leaves the device. It is the second
+  section of the settings screen (`settings_section_his_eyes`), not a dialog.
+- **Costs accepted in the baselines**: `BIND_SERVICE` for AICore in the release badging; ML Kit,
+  play-services, the datatransport telemetry stack, full Guava and kotlin-stdlib 2.3.21 (the AAR's
+  pin, against the repo's Kotlin 2.2.10; it compiles, and forcing a *lower* stdlib than a library
+  was built against is the unsafe direction) in the dependency guard. Input is capped at 4000
+  tokens including the image; there is a per-app daily quota. No emulator path: AICore is not on
+  the emulator, and unlocked bootloaders are excluded.
+- **Testing**: the client is the `GenerativeModel` interface, so `GeminiNanoVisionModelTest` mocks
+  it and the request builder is a constructor seam (`ImagePart(bytes)` decodes a bitmap, which no
+  JVM test can). `ForegroundStageTest` drives the stage with a lambda in place of `startActivity`.
+
 ### LiteRT-LM / on-device GPU (hard-won, easy to get wrong)
 
 `llm/LlmEngine.kt` wraps the LiteRT-LM `Engine`. The non-obvious constraints:
@@ -411,7 +460,8 @@ the edge tab) → **screenshot OCR content-isolation** (announced with the chose
 (`mascot/SlopReportCard`).
 
 Done: the API→domain→UI wiring (`AiDetectorRepository` + `DetectSlopUseCase`, base URL/auth in
-`NetworkModule`), the report-card UI, Deckard's look (see above), content isolation on the
+`NetworkModule`), the report-card UI, Deckard's look (see above), Gemini Nano through the foreground
+stage (see above), content isolation on the
 screenshot path, the four screenshot effects and the picker
 that chooses between them (see *The shutter* above), the settings
 screen the picker now lives on and the Navigation 3 back stack behind it (see *The Activity's two

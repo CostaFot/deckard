@@ -2,7 +2,9 @@ package com.costafotiadis.deckard.slop
 
 import com.costafotiadis.deckard.accessibility.ScreenshotCapturer
 import com.costafotiadis.deckard.llm.OcrPrompt
+import com.costafotiadis.deckard.llm.VisionFailure
 import com.costafotiadis.deckard.llm.VisionModel
+import com.costafotiadis.deckard.llm.VisionReply
 import com.costafotiadis.logging.logDebug
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -60,8 +62,10 @@ internal suspend fun ocrRead(
     val jpeg = screenshotCapturer.capture()
         ?: return ScreenReadResult.Unavailable(ScreenReadFailure.ScreenshotFailed)
     onScreenCaptured()
-    val raw = model.read(jpeg, prompt)
-        ?: return ScreenReadResult.Unavailable(ScreenReadFailure.TranscriptionFailed)
+    val raw = when (val reply = model.read(jpeg, prompt)) {
+        is VisionReply.Failed -> return ScreenReadResult.Unavailable(reply.reason.asScreenReadFailure())
+        is VisionReply.Text -> reply.value
+    }
     logDebug { "ocr raw: $raw" }
     val text = OcrPrompt.clean(raw)
     return if (text.isEmpty()) {
@@ -69,4 +73,12 @@ internal suspend fun ocrRead(
     } else {
         ScreenReadResult.Text(text)
     }
+}
+
+private fun VisionFailure.asScreenReadFailure(): ScreenReadFailure = when (this) {
+    VisionFailure.NotReady -> ScreenReadFailure.ModelNotReady
+    VisionFailure.NotInFront -> ScreenReadFailure.ModelNotInFront
+    VisionFailure.Refused -> ScreenReadFailure.ModelRefused
+    VisionFailure.OutOfQuota -> ScreenReadFailure.ModelOutOfQuota
+    VisionFailure.Failed -> ScreenReadFailure.TranscriptionFailed
 }

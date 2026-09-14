@@ -2,7 +2,9 @@ package com.costafotiadis.deckard.slop
 
 import com.costafotiadis.deckard.accessibility.ScreenshotCapturer
 import com.costafotiadis.deckard.llm.OcrPrompt
+import com.costafotiadis.deckard.llm.VisionFailure
 import com.costafotiadis.deckard.llm.VisionModel
+import com.costafotiadis.deckard.llm.VisionReply
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -73,7 +75,7 @@ class OcrScreenTextReaderTest {
     @Test
     fun `reports a model that produced nothing`() = runTest {
         screenshotCapturer.setHandler { JPEG }
-        model.reply = null
+        model.reply = VisionReply.Failed(VisionFailure.Failed)
 
         val result = ocrRead(screenshotCapturer, model, PROMPT) {}
 
@@ -81,9 +83,28 @@ class OcrScreenTextReaderTest {
     }
 
     @Test
+    fun `names the model's own reasons for saying nothing`() = runTest {
+        screenshotCapturer.setHandler { JPEG }
+        val expected = mapOf(
+            VisionFailure.NotReady to ScreenReadFailure.ModelNotReady,
+            VisionFailure.NotInFront to ScreenReadFailure.ModelNotInFront,
+            VisionFailure.Refused to ScreenReadFailure.ModelRefused,
+            VisionFailure.OutOfQuota to ScreenReadFailure.ModelOutOfQuota,
+            VisionFailure.Failed to ScreenReadFailure.TranscriptionFailed,
+        )
+        assertEquals(VisionFailure.entries.toSet(), expected.keys)
+
+        for ((reason, failure) in expected) {
+            model.reply = VisionReply.Failed(reason)
+            val result = ocrRead(screenshotCapturer, model, PROMPT) {}
+            assertEquals(ScreenReadResult.Unavailable(failure), result)
+        }
+    }
+
+    @Test
     fun `reports no text when the cleaned reply is empty`() = runTest {
         screenshotCapturer.setHandler { JPEG }
-        model.reply = "  \"\"  "
+        model.reply = VisionReply.Text("  \"\"  ")
 
         val result = ocrRead(screenshotCapturer, model, PROMPT) {}
 
@@ -93,7 +114,7 @@ class OcrScreenTextReaderTest {
     @Test
     fun `returns the cleaned text`() = runTest {
         screenshotCapturer.setHandler { JPEG }
-        model.reply = "  \"Hello world\" "
+        model.reply = VisionReply.Text("  \"Hello world\" ")
 
         val result = ocrRead(screenshotCapturer, model, PROMPT) {}
 
@@ -120,12 +141,12 @@ class OcrScreenTextReaderTest {
 
     private class FakeVisionModel : VisionModel {
         override var isReady: Boolean = true
-        var reply: String? = "some text"
+        var reply: VisionReply = VisionReply.Text("some text")
         var lastJpeg: ByteArray? = null
         var lastPrompt: String? = null
         var onRead: () -> Unit = {}
 
-        override suspend fun read(jpeg: ByteArray, prompt: String): String? {
+        override suspend fun read(jpeg: ByteArray, prompt: String): VisionReply {
             lastJpeg = jpeg
             lastPrompt = prompt
             onRead()

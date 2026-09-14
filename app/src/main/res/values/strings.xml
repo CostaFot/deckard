@@ -22,6 +22,9 @@
     <string name="voice_model_not_ready">No eyes yet. Put a model in my pocket and ask again.</string>
     <string name="voice_screenshot_failed">I reached for the screen and came back holding nothing.</string>
     <string name="voice_transcription_failed">I stared at it a good while and made nothing of it.</string>
+    <string name="voice_model_not_in_front">The phone won\'t lend me its eyes from back here.</string>
+    <string name="voice_model_refused">I read it. I\'ve been asked not to repeat it.</string>
+    <string name="voice_model_out_of_quota">The phone has lent me its eyes enough for one day. Ask again tomorrow.</string>
     <string name="voice_no_text_found">Not a word on this screen. Nothing to weigh.</string>
 
     <!--
@@ -58,6 +61,8 @@
     <string name="settings_shutter_bloom">Edge bloom</string>
     <string name="settings_shutter_highlight">Travelling highlight</string>
     <string name="settings_shutter_stamp">Stamp</string>
+    <string name="settings_section_his_eyes">WHOSE EYES HE READS WITH</string>
+    <string name="settings_eyes_detail">On a phone that has Gemini Nano, Deckard reads with the phone\'s own model, through Google\'s AICore. What he photographs stays on the phone; Google receives metrics on how the model performed and how often it was asked. On any other phone he reads with a model file you put in his pocket.</string>
 
     <!--
       The report card. Everything Pangram authors — the headline, the confidence, the judged passage

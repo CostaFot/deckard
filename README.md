@@ -21,9 +21,10 @@ service that does the reading. He will not start without them.
 <!-- shot: MainActivity with both permissions granted, emulator on API 37, cropped below the summoning section -->
 <img src="assets/screenshots/setup.png" width="340" alt="what he needs before he will get out of bed">
 
-Optionally an on-device model — a `.litertlm` Gemma build, 2.4–3.5GB, run through LiteRT-LM. Only
-the screenshot path uses it. Without one that gesture says he has no brain yet and the rest carries
-on as normal.
+A vision model, for the screenshot path. On a phone that has Gemini Nano he borrows the phone's own,
+through Google's AICore, and there is nothing to install. On any other phone, optionally a
+`.litertlm` Gemma build, 2.4–3.5GB, run through LiteRT-LM. With neither that gesture says he has
+no eyes yet and the rest carries on as normal.
 
 ## Install
 
@@ -34,7 +35,7 @@ on as normal.
 Open the app, work through the setup screen, then hit Start Deckard. A thin tab appears on the left
 edge and stays there.
 
-To feed him a model:
+To feed him a model where the phone has no Nano:
 
 ```bash
 PKG=com.costafotiadis.deckard.debug

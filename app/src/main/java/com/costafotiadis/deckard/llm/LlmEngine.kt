@@ -10,6 +10,7 @@ import com.google.ai.edge.litertlm.Contents
 import com.google.ai.edge.litertlm.Engine
 import com.google.ai.edge.litertlm.EngineConfig
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -19,7 +20,7 @@ import javax.inject.Singleton
 /**
  * Owns the LiteRT-LM [Engine] for the app session: resolves the model file and initialises the
  * engine once (trying GPU → CPU → NPU), keeping it alive. It is the [VisionModel] the screen read
- * uses, bound in `di/VisionModelModule`.
+ * falls back to when the phone has no Gemini Nano of its own (`di/VisionModelModule`).
  *
  * Warm-up runs on the application scope so it can't be cancelled and restarted by callers.
  * [engineOrNull] is non-blocking: it returns `null` while the model is still loading (or if no model
@@ -53,22 +54,27 @@ class LlmEngine @Inject constructor(
 
     /**
      * One-shot multimodal generation: sends [jpeg] (image bytes) plus [prompt] to the model and
-     * returns the raw reply, or null if the engine isn't ready or inference fails. Runs on the IO
-     * dispatcher, so it's safe to call from any context.
+     * returns the raw reply, or why there is none. Runs on the IO dispatcher, so it's safe to call
+     * from any context.
      */
-    override suspend fun read(jpeg: ByteArray, prompt: String): String? =
+    override suspend fun read(jpeg: ByteArray, prompt: String): VisionReply =
         withContext(dispatcherProvider.io) {
-            val activeEngine = engineOrNull() ?: return@withContext null
+            val activeEngine = engineOrNull()
+                ?: return@withContext VisionReply.Failed(VisionFailure.NotReady)
             runCatching {
                 activeEngine.createConversation().use { conversation ->
                     conversation.sendMessage(
                         Contents.of(Content.ImageBytes(jpeg), Content.Text(prompt)),
                     ).toString()
                 }
-            }.getOrElse {
-                logDebug { "vision inference failed: ${it.message}" }
-                null
-            }
+            }.fold(
+                onSuccess = { VisionReply.Text(it) },
+                onFailure = {
+                    if (it is CancellationException) throw it
+                    logDebug { "vision inference failed: ${it.message}" }
+                    VisionReply.Failed(VisionFailure.Failed)
+                },
+            )
         }
 
     /**

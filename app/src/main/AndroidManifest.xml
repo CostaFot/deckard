@@ -60,14 +60,14 @@
         </activity>
 
 
-        <!-- COS-259 spike: a transparent Activity that runs a Gemini Nano read while it is on top -->
+        <!-- see-through and on top for the length of a Gemini Nano read: AICore serves only the app in front -->
         <activity
-            android:name=".llm.NanoTrampolineActivity"
+            android:name=".llm.nano.ForegroundActivity"
             android:exported="false"
             android:excludeFromRecents="true"
             android:noHistory="true"
             android:taskAffinity=""
-            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+            android:theme="@style/Theme.Deckard.Foreground" />
 
         <!-- takes the screenshot the slop detector reads; only an accessibility service can -->
         <service

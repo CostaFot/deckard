@@ -2,9 +2,9 @@ package com.costafotiadis.deckard.llm
 
 /**
  * The on-device vision model as the screen read sees it: whether it can answer right now, and what
- * it says about a screenshot. This is all the OCR readers ever needed, so it is all they get — the
- * runtime behind it (LiteRT-LM today, something the system already ships tomorrow) is a detail of
- * `di/`, and the read stays testable with a fake.
+ * it says about a screenshot. This is all the OCR readers ever needed, so it is all they get — which
+ * runtime is behind it (the phone's own Gemini Nano, the LiteRT-LM engine over a pushed file, or
+ * the one that picks between them) is a detail of `di/`, and the read stays testable with a fake.
  */
 interface VisionModel {
 
@@ -16,8 +16,8 @@ interface VisionModel {
     val isReady: Boolean
 
     /**
-     * Sends [jpeg] (image bytes) plus [prompt] to the model and returns the raw reply, or null if
-     * the model isn't ready or inference fails. Main-safe.
+     * Sends [jpeg] (image bytes) plus [prompt] to the model and returns what it said, or why it
+     * said nothing. Main-safe.
      */
-    suspend fun read(jpeg: ByteArray, prompt: String): String?
+    suspend fun read(jpeg: ByteArray, prompt: String): VisionReply
 }

@@ -72,6 +72,9 @@ object DeckardVoice {
         ScreenReadFailure.TranscriptionFailed ->
             TextResource.simple(R.string.voice_transcription_failed)
 
+        ScreenReadFailure.ModelNotInFront -> TextResource.simple(R.string.voice_model_not_in_front)
+        ScreenReadFailure.ModelRefused -> TextResource.simple(R.string.voice_model_refused)
+        ScreenReadFailure.ModelOutOfQuota -> TextResource.simple(R.string.voice_model_out_of_quota)
         ScreenReadFailure.NoTextFound -> TextResource.simple(R.string.voice_no_text_found)
     }
 }
