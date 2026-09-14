@@ -20,8 +20,8 @@ class OcrScreenTextReader @Inject constructor(
     private val engine: LlmEngine,
 ) : ScreenTextReader {
 
-    override suspend fun read(): ScreenReadResult =
-        ocrRead(screenshotCapturer, engine, OcrPrompt.transcribe())
+    override suspend fun read(onScreenCaptured: () -> Unit): ScreenReadResult =
+        ocrRead(screenshotCapturer, engine, OcrPrompt.transcribe(), onScreenCaptured)
 }
 
 /**
@@ -36,15 +36,20 @@ class OcrContentScreenTextReader @Inject constructor(
     private val engine: LlmEngine,
 ) : ScreenTextReader {
 
-    override suspend fun read(): ScreenReadResult =
-        ocrRead(screenshotCapturer, engine, OcrPrompt.extractMainContent())
+    override suspend fun read(onScreenCaptured: () -> Unit): ScreenReadResult =
+        ocrRead(screenshotCapturer, engine, OcrPrompt.extractMainContent(), onScreenCaptured)
 }
 
-/** Shared OCR read: screenshot → [prompt] → cleaned text, naming the condition on each failure. */
+/**
+ * Shared OCR read: screenshot → [prompt] → cleaned text, naming the condition on each failure.
+ * [onScreenCaptured] fires the instant the shutter closes and before the vision inference, so the
+ * caller can draw over a screen it no longer owns — anything drawn earlier is in the JPEG.
+ */
 private suspend fun ocrRead(
     screenshotCapturer: ScreenshotCapturer,
     engine: LlmEngine,
     prompt: String,
+    onScreenCaptured: () -> Unit,
 ): ScreenReadResult {
     if (!screenshotCapturer.isAvailable) {
         return ScreenReadResult.Unavailable(ScreenReadFailure.NoAccessibilityService)
@@ -54,6 +59,7 @@ private suspend fun ocrRead(
     }
     val jpeg = screenshotCapturer.capture()
         ?: return ScreenReadResult.Unavailable(ScreenReadFailure.ScreenshotFailed)
+    onScreenCaptured()
     val raw = engine.generateWithImage(jpeg, prompt)
         ?: return ScreenReadResult.Unavailable(ScreenReadFailure.TranscriptionFailed)
     logDebug { "ocr raw: $raw" }

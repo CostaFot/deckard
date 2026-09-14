@@ -196,23 +196,28 @@ class DeckardOverlayService :
 
     /** Show Deckard, read the screen's text with [reader], and surface the verdict (stays until closed). */
     private fun runDetection(reader: ScreenTextReader, how: ReadMethod) =
-        runDetecting(how) { readScreenAndJudge(reader) }
+        runDetecting { readScreenAndJudge(reader, how) }
 
     /** Show Deckard and judge already-captured [text] (e.g. text shared into the app) — no screen read. */
-    private fun runDetectionOnText(text: String) = runDetecting(ReadMethod.SharedText) { judge(text) }
+    private fun runDetectionOnText(text: String) = runDetecting {
+        show(DeckardState.Thinking(ReadMethod.SharedText))
+        judge(text)
+    }
+
+    /** Run [produce] to get a verdict and surface it (stays until closed). */
+    private fun runDetecting(produce: suspend () -> DeckardState) {
+        tapJob?.cancel()
+        tapJob = scope.launch { show(produce()) }
+    }
 
     /**
-     * Show Deckard, run [produce] to get a verdict, and surface it (stays until closed). [how] is
-     * only ever announced — it says which wait the user is in for, since the three cost wildly
-     * different amounts.
+     * Put Deckard on screen in [newState], taking window focus so the back key/gesture dismisses him.
+     * Nothing calls this until whoever is reading the screen has finished with it — see
+     * [ScreenTextReader.read].
      */
-    private fun runDetecting(how: ReadMethod, produce: suspend () -> DeckardState) {
-        tapJob?.cancel()
+    private fun show(newState: DeckardState) {
         setOverlayFocusable(true)
-        tapJob = scope.launch {
-            state.value = DeckardState.Thinking(how)
-            state.value = produce()
-        }
+        state.value = newState
     }
 
     private fun dismiss() {
@@ -237,8 +242,13 @@ class DeckardOverlayService :
         runCatching { windowManager.updateViewLayout(view, layoutParams) }
     }
 
-    private suspend fun readScreenAndJudge(reader: ScreenTextReader): DeckardState =
-        when (val result = reader.read()) {
+    /**
+     * Read the screen with [reader], then judge what comes back. Deckard stays off-screen until the
+     * reader reports it is done with the screen itself: on the screenshot paths he would otherwise be
+     * in the shot the vision model is asked to read the post out of. [how] only names the wait.
+     */
+    private suspend fun readScreenAndJudge(reader: ScreenTextReader, how: ReadMethod): DeckardState =
+        when (val result = reader.read { show(DeckardState.Thinking(how)) }) {
             is ScreenReadResult.Unavailable -> DeckardState.Unavailable(NoVerdict.CouldNotRead(result.reason))
             is ScreenReadResult.Text -> judge(result.value)
         }
