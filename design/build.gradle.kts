@@ -14,7 +14,6 @@ android {
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.material.design)
-    api(libs.androidx.core.splashscreen)
     api(libs.androidx.compose.foundation)
     api(libs.androidx.compose.foundation.layout)
     api(libs.androidx.compose.material.iconsExtended)
