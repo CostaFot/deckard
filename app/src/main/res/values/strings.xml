@@ -44,13 +44,23 @@
     <string name="setup_gesture_swipe_detail">Reads the text the app is already exposing. Comes back instantly.</string>
     <string name="setup_gesture_hold_title">Hold the left-edge tab</string>
     <string name="setup_gesture_hold_detail">Reads a screenshot with the on-device model instead. Slower, but it works on apps that expose nothing.</string>
-    <string name="setup_section_the_shutter">WHEN HE TAKES THE PICTURE</string>
-    <string name="setup_shutter_detail">Holding the tab photographs your screen. Pick how it says so — tap one to see it play here.</string>
-    <string name="setup_shutter_none">Nothing at all</string>
-    <string name="setup_shutter_crop_marks">Crop marks</string>
-    <string name="setup_shutter_bloom">Edge bloom</string>
-    <string name="setup_shutter_highlight">Travelling highlight</string>
-    <string name="setup_shutter_stamp">Stamp</string>
+    <string name="setup_section_how_he_works">HOW HE WORKS</string>
+    <string name="setup_settings_title">What you can change</string>
+    <string name="setup_settings_detail">How he announces the photograph. The only choice he gives you, so far.</string>
+
+    <!--
+      The settings screen. These were setup_shutter_* while the picker lived on the setup screen;
+      they name an effect, so they are the screen\'s words and never go through DeckardVoice.
+    -->
+    <string name="settings_title">What you can change</string>
+    <string name="settings_back">Back to setup</string>
+    <string name="settings_section_the_shutter">WHEN HE TAKES THE PICTURE</string>
+    <string name="settings_shutter_detail">Holding the tab photographs your screen. Pick how it says so — tap one to see it play here.</string>
+    <string name="settings_shutter_none">Nothing at all</string>
+    <string name="settings_shutter_crop_marks">Crop marks</string>
+    <string name="settings_shutter_bloom">Edge bloom</string>
+    <string name="settings_shutter_highlight">Travelling highlight</string>
+    <string name="settings_shutter_stamp">Stamp</string>
 
     <!--
       The report card. Everything Pangram authors — the headline, the confidence, the judged passage

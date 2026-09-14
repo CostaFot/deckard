@@ -25,9 +25,15 @@ set -euo pipefail
 readonly PKG=com.costafotiadis.deckard.debug
 readonly SVC="$PKG/com.costafotiadis.deckard.accessibility.DeckardAccessibilityService"
 readonly SVC_LABEL="Deckard screen context"   # android:label, what dumpsys prints
-# The picker's own row labels, as setup_shutter_* spells them. Hardcoded the same
-# way the button labels below are: adb can only find a control by what it says.
+# The picker's own row labels, as settings_shutter_* spells them. Hardcoded the
+# same way the button labels below are: adb can only find a control by what it says.
 readonly EFFECTS=("Nothing at all" "Crop marks" "Edge bloom" "Travelling highlight" "Stamp")
+# The picker lives on the settings screen now. The door is the setup screen's row
+# into it; the mark is a line only the settings screen says, which is what tells
+# the two apart — the door's own title is on both.
+readonly SETTINGS_DOOR="What you can change"
+readonly SETTINGS_MARK="WHEN HE TAKES THE PICTURE"
+readonly SETUP_MARK="WHAT HE NEEDS"
 readonly SHUTTER_ACTION=com.costafotiadis.deckard.action.PREVIEW_SHUTTER
 judgments_before=0
 
@@ -70,9 +76,24 @@ require_device() {
     adb get-state >/dev/null 2>&1 || die "no device; check 'adb devices'"
 }
 
+# A relaunch resumes the back stack where it was left, so the app can come up on
+# the settings screen. Everything that taps the setup screen has to come back up
+# to it first.
 open_setup() {
     adb shell monkey -p "$PKG" -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1
     wait_for 30 "the setup screen" resumed
+    for _ in 1 2 3; do
+        showing "$SETTINGS_MARK" || break
+        adb shell input keyevent KEYCODE_BACK
+    done
+    wait_for 10 "the setup screen" showing "$SETUP_MARK"
+}
+
+open_settings() {
+    open_setup
+    scroll_to_node "$SETTINGS_DOOR" || die "no way through to the settings screen"
+    tap_node "$SETTINGS_DOOR"
+    wait_for 10 "the settings screen" showing "$SETTINGS_MARK"
 }
 
 # uiautomator only dumps the focused window, and Deckard's mascot takes focus
@@ -85,6 +106,8 @@ node_bounds() {
         grep -o "\(text\|content-desc\)=\"$label\"[^>]*bounds=\"\[[0-9]*,[0-9]*\]\[[0-9]*,[0-9]*\]\"" |
         grep -o 'bounds="[^"]*"' | head -1 | grep -o '[0-9]*' | tr '\n' ' ' || true
 }
+
+showing() { [ -n "$(node_bounds "$1")" ]; }
 
 tap_node() {
     local label=$1 bounds
@@ -108,9 +131,9 @@ cmd_dismiss() {
     tap_node "Dismiss Deckard" >/dev/null 2>&1 || true
 }
 
-# The shutter picker is the last section on the setup screen, so it is usually
-# below the fold. Scroll until the row is really on screen — uiautomator only
-# dumps what is drawn — rather than assuming a screen tall enough.
+# A row can sit below the fold on either screen. Scroll until it is really on
+# screen — uiautomator only dumps what is drawn — rather than assuming a screen
+# tall enough.
 scroll_to_node() {
     local label=$1 size x y
     size=$(adb shell wm size | grep -o '[0-9]*x[0-9]*' | tail -1)
@@ -201,7 +224,7 @@ cmd_summon() {
     adb logcat -d | grep 'slop: judging' | tail -1 | sed 's/.*D //'
 }
 
-# Picking is done on the setup screen, so this needs no overlay and no model —
+# Picking is done on the settings screen, so this needs no overlay and no model —
 # and the tap plays the effect full-size over the Activity on its way past.
 cmd_effect() {
     require_device
@@ -215,8 +238,8 @@ cmd_effect() {
     done
     [ -n "$label" ] || die "no effect called '$want'; try 'effect' with no name"
     cmd_dismiss
-    open_setup
-    scroll_to_node "$label" || die "could not reach '$label' on the setup screen"
+    open_settings
+    scroll_to_node "$label" || die "could not reach '$label' on the settings screen"
     tap_node "$label"
     echo "shutter effect: $label"
 }

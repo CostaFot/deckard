@@ -13,7 +13,8 @@ transcribed by Gemma via LiteRT-LM (OCR).
 The UI is Jetpack Compose, but it's rendered into `WindowManager` overlay windows from a plain
 `Service` (and driven by an `AccessibilityService`), **not** a normal Activity — the only Activity
 is
-a small setup screen (`MainActivity`) for granting permissions and starting/stopping the overlay.
+a small setup screen (`MainActivity`) for granting permissions and starting/stopping the overlay,
+with a settings screen behind it.
 
 > History: this started as a custom soft-keyboard (IME) and was pivoted to the slop detector. The
 > keyboard, its predictive-suggestion engine (dictionary + n-gram learning), and the Room DB have
@@ -26,7 +27,7 @@ a small setup screen (`MainActivity`) for granting permissions and starting/stop
 
 ## Module layout
 
-- `app` — the slop detector (overlay + accessibility services) + the setup `MainActivity`
+- `app` — the slop detector (overlay + accessibility services) + the setup/settings `MainActivity`
 - `design` — theme/UI (`AppTheme`)
 - `textresource` — `TextResource`, a string that resolves at the draw site (see *Copy* below)
 - `common`, `common-test`, `logging`, `work`, `auth`, `testing` — shared libs
@@ -99,6 +100,35 @@ under `model/` are gitignored.
 - Requires the draw-over-apps permission (checked in `onCreate`) and the accessibility service
   (for reading the screen). Started/stopped from `MainActivity`'s setup screen.
 
+### The Activity's two screens — `ui/`
+
+`MainActivity` is the only Activity and it hosts two destinations, not one: the **setup** checklist
+(`ui/setup/SetupScreen.kt`) and the **settings** screen behind it (`ui/settings/SettingsScreen.kt`),
+with `ui/DeckardApp.kt` holding the back stack and the display that renders the top of it. They are
+split because they are different kinds of screen — setup is a list you work down once and never
+return to, settings is a preference you come back to and change your mind about — and because the
+settings screen is meant to grow a section at a time.
+
+- **Navigation 3**, not `navigation-compose`. `Destination` is a sealed interface of
+  `@Serializable data object`s implementing `NavKey`, and `rememberNavBackStack` saves the stack
+  through kotlinx serialization rather than route strings, so a destination is an object you
+  construct and a wrong one is a compile error. Both nav3 artifacts were already declared in
+  `app/build.gradle.kts` by the template; `androidx.navigation.compose` is still declared there and
+  is now dead (COS-246).
+- The `entry<T> { }` builder inside `entryProvider { }` is a **member** of `EntryProviderScope`, not
+  a top-level function — importing `androidx.navigation3.runtime.entry` does not resolve.
+- The shutter choice is hoisted to `MainActivity`, which injects `ShutterEffectStore` and passes it
+  down, because that store is a process-wide singleton the overlay service reads too: the settings
+  screen is one of two things looking at the same value, not the place it lives.
+- The page frame both screens are written on is `ui/component/PageScaffolding.kt` (`DeckardPage`,
+  `SectionLabel`). It is a column rather than a Surface so a caller can draw over it — the settings
+  screen plays an effect full-size on top of its own page.
+- **`scripts/deckard` knows about the second screen.** A relaunch resumes the back stack where it
+  was left, so `open_setup` presses back out of settings before anything taps the setup screen, and
+  `open_settings` taps through to it before the `effect` verb can reach a row. The two are told
+  apart by a line only the settings screen says (`WHEN HE TAKES THE PICTURE`) — the door's own
+  title is on both.
+
 ### The shutter — `shutter/`
 
 A read that photographs your screen says so. Only the **long-press** does: the swipe reads the a11y
@@ -111,7 +141,7 @@ tree and takes no picture, so it stays silent, and the two summons looking diffe
   (see `a7613cc`). Ordering: long-press, haptic, shutter, effect + Deckard, inference, verdict.
 - **The seam** — `ShutterPainter` is a painter over a rectangle: the size, where it is in the run
   (`ShutterFrame`), and one ink. Knowing nothing else is what lets the same code draw full-screen
-  over another app and miniature in the setup screen's picker. `ShutterFrame.scale` is 1 at full
+  over another app and miniature in the settings screen's picker. `ShutterFrame.scale` is 1 at full
   size and a fraction in the miniature, so every dp shrinks with it — **the picker is not a mock-up
   of the effect, it is the effect**.
 - **Four at once, on purpose** (`ShutterEffect`): `CropMarks`, `Bloom`, `Highlight`, `Stamp`, and
@@ -136,7 +166,7 @@ tree and takes no picture, so it stays silent, and the two summons looking diffe
 - **The re-entrancy trap**: a second summon cancels the first, whose `finally` then runs *after* the
   second has opened its own shutter. Each run carries a token and only closes the shutter while it
   still owns it. Get this wrong and a full-screen window is left over every app the user opens.
-- **Trying them** — the picker on the setup screen, with a live miniature per row; tapping a row
+- **Trying them** — the picker on the settings screen, with a live miniature per row; tapping a row
   selects it *and* plays it full-size over the Activity, so a variant costs no model and no Pangram
   call. Over a real app, which is the only place the edges read correctly,
   `scripts/deckard effect <name>` picks one and `scripts/deckard shutter [package]` fires it: the
@@ -186,8 +216,8 @@ deliberate exceptions: **Pangram's own text** (`headline`, `confidence`, `predic
 `%` after the human share, the vendor name `PANGRAM`) is not language.
 
 The resources group by where they're said: `voice_*`, `setup_*`, `card_*`, `stamp_*`. The shutter
-picker's row names are `setup_shutter_*` and belong to the setup screen, not to Deckard — they name
-an effect, they are not something he says, so they never go through `DeckardVoice`.
+picker's row names are `settings_shutter_*` and belong to the settings screen, not to Deckard —
+they name an effect, they are not something he says, so they never go through `DeckardVoice`.
 
 - **`mascot/DeckardVoice.kt`** decides *which* line each fact gets; `strings.xml` decides *what* the
   line is. The `when`s are exhaustive over the sealed types, so an unwritten line is a compile error
@@ -452,9 +482,10 @@ with the chosen `shutter/` effect) → **Pangram detection** → the bubble show
 Done: the API→domain→UI wiring (`AiDetectorRepository` + `DetectSlopUseCase`, base URL/auth in
 `NetworkModule`), the report-card UI, Deckard's look (see above), content isolation on the
 screenshot path, two per-app extractors (LinkedIn, X), the four screenshot effects and the picker
-that chooses between them (see *The shutter* above — one of them still has to win), and every word
-the app says now living in `strings.xml` behind `:textresource` (see *Copy* above). His **voice** — the wording itself — is
-still not written; only the thinking state was rewritten. It is now all in one file to rewrite.
+that chooses between them (see *The shutter* above — one of them still has to win), the settings
+screen the picker now lives on and the Navigation 3 back stack behind it (see *The Activity's two
+screens* above), and every word the app says now living in `strings.xml` behind `:textresource`
+(see *Copy* above).
 
 Cleared out along the way: the JSONPlaceholder/Todo demo (repository, mapper, domain/API models,
 service, the `jsonPlaceHolderRepository()` entry-point method, `NetworkModule`'s todo wiring,
