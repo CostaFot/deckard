@@ -42,7 +42,10 @@ twice; the numbers below are the warm ones unless they say otherwise.
 Nothing moved. Two levers were not even available:
 
 - The fast model preference fails inside 10 ms with `FEATURE_NOT_FOUND: Feature 645 is not
-  available`. Whatever the fast variant is, this phone does not have it.
+  available`. The preference is not a mode of the model the phone has; it is a different model,
+  and the Magic V5 does not serve it. What the picker can and cannot name is its own section,
+  *Which model this is*, below. `scripts/deckard nano-bench pref=fast` after a system update is
+  the check for whether that has changed.
 - The cached context API exists (`isCachingFeatureAvailable` is true and creating one takes
   268 ms) but the request builder throws `cacheContextName is not supported for image input`. A
   cached prefix is for text-only chat.
@@ -50,6 +53,48 @@ Nothing moved. Two levers were not even available:
 The image token count is the tell: 486 tokens at 1024 px and 486 at 512 px. The image is a fixed
 cost however big it is, roughly 258 tokens, and the rules are the other 228. Shrinking the picture
 saves nothing and can only lose letters.
+
+## Which model this is, and which it could be
+
+The names confuse because two families run side by side, one open and one on the phone:
+
+- **Gemini Nano** is what AICore serves. It is Google's, closed, and arrives with system updates;
+  the app does not choose a version. On the Magic V5 `getBaseModelName()` says `nano-v3`, even
+  though Google's device list still files the phone under nano-v2.
+- **Gemma** is the open-weight family built on the same architecture. nano-v3 is built on
+  [Gemma 3n](https://blog.google/products/gemini/gemini-nano-pixel-10-updates/), in Google's own
+  words at the Pixel 10 launch. Gemma 4, released into AICore as a developer preview on
+  [2 April 2026](https://developer.android.com/blog/posts/announcing-gemma-4-in-the-ai-core-developer-preview)
+  in E2B and E4B sizes, is "the foundation for the next generation of Gemini Nano": Gemini Nano 4,
+  due on devices later in 2026. So Gemma 3n pairs with nano-v3 and Gemma 4 with Nano 4. nano-v3 is
+  not Gemma 4.
+
+`ModelConfig` is the only picker the API has, and it has two axes, not one:
+
+| | `ModelPreference.FULL` | `ModelPreference.FAST` |
+|---|---|---|
+| `ModelReleaseStage.STABLE` (the default) | the model the phone ships, nano-v3 here | feature 645, empty on the Magic V5 |
+| `ModelReleaseStage.PREVIEW` | Gemma 4 E4B, developer preview | Gemma 4 E2B, developer preview |
+
+The preview row is inferred: the announcement's snippet is `PREVIEW` plus `FULL`, and it says E4B
+is for reasoning and E2B for speed ("3x faster than the E4B"), but never says which configuration
+names which model. `getBaseModelName()` is the check. AICore tracks each cell it can serve as a
+numbered feature, and which cells a device gets is decided per device by Google and the OEM;
+Honor's build fills the stable full cell only. `Generation.getClient()` with no config returns that
+cell, which is why there is no version picker beyond this table.
+
+The preview row is gated by [enrolment](https://developers.google.com/ml-kit/genai/aicore-dev-preview),
+not code: the testing account joins the aicore-experimental Google group, opts in as an AICore
+tester on the Play Store, and takes an AICore beta update. Models come down over Wi-Fi only, the
+first inference can take about a minute, and the quota bypass is Pixel-only. Whether Honor's AICore
+takes the beta channel at all is unknown. `genai-prompt` 1.0.0-beta4, the version pinned here and
+the newest on Google's Maven, already ships `ModelReleaseStage`, so nothing needs bumping. The
+bench takes `pref=`; a `stage=` key is the one-line addition that would run all four cells.
+
+What Gemma 4 claims: up to 4x the speed of the previous generation, 60% less battery, and better
+OCR and handwriting. Against 22 tokens a second it is the one lever left. The verbatim rule still
+decides: a smaller model is a worse copier, so E2B's extra 3x is worth having only if the
+transcription survives, which is what the bench's logged text is there to catch.
 
 ## Where the time goes
 
@@ -143,5 +188,8 @@ the part of the wait that is not Nano at all.
 - Streaming would not make the read shorter, but the words start arriving at half a second. A
   bubble that fills as he reads is a different product from a card that lands after ten seconds
   of shutter effect. Not started.
-- The rate itself belongs to AICore and the phone. A different device, or a future nano, is the
-  only thing that changes 22 tokens a second.
+- The rate itself belongs to AICore and the phone. A different device, or a different model, is
+  the only thing that changes 22 tokens a second, and the Gemma 4 preview is the first candidate:
+  enrol the Magic V5, add a `stage=` key to the bench, and run the four cells of the table above
+  with the text compared word for word. If the phone never serves the preview, the same code is
+  the Nano 4 path when that ships.
