@@ -79,7 +79,6 @@ dependencyGuard {
 }
 
 dependencies {
-    implementation(project(":auth"))
     implementation(project(":design"))
     implementation(project(":common"))
     implementation(project(":logging"))
@@ -108,7 +107,8 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.navigation3)
 
 
-    // on-device LLM inference
+    // on-device vision: the phone's own Gemini Nano through AICore where it has one, LiteRT-LM otherwise
+    implementation(libs.mlkit.genai.prompt)
     implementation(libs.litertlm.android)
 
     // networking

@@ -10,4 +10,16 @@
         <item name="android:windowBackground">@color/deckard_paper</item>
     </style>
 
+    <!--
+      Worn by the see-through Activity a Gemini Nano read runs inside: the app underneath stays
+      visible, and nothing animates or flashes on the way in or out.
+    -->
+    <style name="Theme.Deckard.Foreground">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowAnimationStyle">@null</item>
+        <item name="android:windowDisablePreview">true</item>
+    </style>
+
 </resources>

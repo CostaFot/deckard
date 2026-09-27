@@ -66,11 +66,7 @@ internal fun SettingsScreen(
 
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     SectionLabel(text = stringResource(R.string.settings_section_the_shutter))
-                    Text(
-                        text = stringResource(R.string.settings_shutter_detail),
-                        style = BodyTextStyle.copy(fontSize = 13.sp, lineHeight = 18.sp),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
+                    SectionNote(text = stringResource(R.string.settings_shutter_detail))
                     ShutterEffect.entries.forEach { effect ->
                         ShutterRow(
                             effect = effect,
@@ -81,6 +77,14 @@ internal fun SettingsScreen(
                             },
                         )
                     }
+                }
+
+                // Not a choice, a notice: the terms of the Prompt API want the user told that Google
+                // receives metrics when the phone's model reads, and this is the page a user comes to
+                // for how he works.
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    SectionLabel(text = stringResource(R.string.settings_section_his_eyes))
+                    SectionNote(text = stringResource(R.string.settings_eyes_detail))
                 }
             }
 
@@ -131,6 +135,16 @@ private fun Heading(onBack: () -> Unit) {
         }
         Text(text = stringResource(R.string.settings_title), style = DisplayTextStyle)
     }
+}
+
+/** The paragraph under a section's label, in the quieter ink. */
+@Composable
+private fun SectionNote(text: String) {
+    Text(
+        text = text,
+        style = BodyTextStyle.copy(fontSize = 13.sp, lineHeight = 18.sp),
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
 }
 
 /**

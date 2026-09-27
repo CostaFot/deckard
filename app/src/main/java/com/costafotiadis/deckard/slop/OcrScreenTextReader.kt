@@ -1,15 +1,17 @@
 package com.costafotiadis.deckard.slop
 
 import com.costafotiadis.deckard.accessibility.ScreenshotCapturer
-import com.costafotiadis.deckard.llm.LlmEngine
 import com.costafotiadis.deckard.llm.OcrPrompt
+import com.costafotiadis.deckard.llm.VisionFailure
+import com.costafotiadis.deckard.llm.VisionModel
+import com.costafotiadis.deckard.llm.VisionReply
 import com.costafotiadis.logging.logDebug
 import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
  * [ScreenTextReader] backed by screenshot OCR: grabs the screen (via the accessibility service's
- * [ScreenshotCapturer]) and asks the on-device multimodal model ([LlmEngine.generateWithImage]) to
+ * [ScreenshotCapturer]) and asks the on-device [VisionModel] to
  * transcribe **all** of it. A screenshot is inherently the visible viewport only, so this captures
  * just what the user can see — no off-screen feed scrollback. Slow (a vision inference per summon)
  * but accurate, and it hard-requires a loaded model.
@@ -17,11 +19,11 @@ import javax.inject.Singleton
 @Singleton
 class OcrScreenTextReader @Inject constructor(
     private val screenshotCapturer: ScreenshotCapturer,
-    private val engine: LlmEngine,
+    private val model: VisionModel,
 ) : ScreenTextReader {
 
     override suspend fun read(onScreenCaptured: () -> Unit): ScreenReadResult =
-        ocrRead(screenshotCapturer, engine, OcrPrompt.transcribe(), onScreenCaptured)
+        ocrRead(screenshotCapturer, model, OcrPrompt.transcribe(), onScreenCaptured)
 }
 
 /**
@@ -33,11 +35,11 @@ class OcrScreenTextReader @Inject constructor(
 @Singleton
 class OcrContentScreenTextReader @Inject constructor(
     private val screenshotCapturer: ScreenshotCapturer,
-    private val engine: LlmEngine,
+    private val model: VisionModel,
 ) : ScreenTextReader {
 
     override suspend fun read(onScreenCaptured: () -> Unit): ScreenReadResult =
-        ocrRead(screenshotCapturer, engine, OcrPrompt.extractMainContent(), onScreenCaptured)
+        ocrRead(screenshotCapturer, model, OcrPrompt.extractMainContent(), onScreenCaptured)
 }
 
 /**
@@ -45,23 +47,25 @@ class OcrContentScreenTextReader @Inject constructor(
  * [onScreenCaptured] fires the instant the shutter closes and before the vision inference, so the
  * caller can draw over a screen it no longer owns — anything drawn earlier is in the JPEG.
  */
-private suspend fun ocrRead(
+internal suspend fun ocrRead(
     screenshotCapturer: ScreenshotCapturer,
-    engine: LlmEngine,
+    model: VisionModel,
     prompt: String,
     onScreenCaptured: () -> Unit,
 ): ScreenReadResult {
     if (!screenshotCapturer.isAvailable) {
         return ScreenReadResult.Unavailable(ScreenReadFailure.NoAccessibilityService)
     }
-    if (engine.engineOrNull() == null) {
+    if (!model.isReady) {
         return ScreenReadResult.Unavailable(ScreenReadFailure.ModelNotReady)
     }
     val jpeg = screenshotCapturer.capture()
         ?: return ScreenReadResult.Unavailable(ScreenReadFailure.ScreenshotFailed)
     onScreenCaptured()
-    val raw = engine.generateWithImage(jpeg, prompt)
-        ?: return ScreenReadResult.Unavailable(ScreenReadFailure.TranscriptionFailed)
+    val raw = when (val reply = model.read(jpeg, prompt)) {
+        is VisionReply.Failed -> return ScreenReadResult.Unavailable(reply.reason.asScreenReadFailure())
+        is VisionReply.Text -> reply.value
+    }
     logDebug { "ocr raw: $raw" }
     val text = OcrPrompt.clean(raw)
     return if (text.isEmpty()) {
@@ -69,4 +73,12 @@ private suspend fun ocrRead(
     } else {
         ScreenReadResult.Text(text)
     }
+}
+
+private fun VisionFailure.asScreenReadFailure(): ScreenReadFailure = when (this) {
+    VisionFailure.NotReady -> ScreenReadFailure.ModelNotReady
+    VisionFailure.NotInFront -> ScreenReadFailure.ModelNotInFront
+    VisionFailure.Refused -> ScreenReadFailure.ModelRefused
+    VisionFailure.OutOfQuota -> ScreenReadFailure.ModelOutOfQuota
+    VisionFailure.Failed -> ScreenReadFailure.TranscriptionFailed
 }

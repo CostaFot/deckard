@@ -60,6 +60,15 @@
         </activity>
 
 
+        <!-- see-through and on top for the length of a Gemini Nano read: AICore serves only the app in front -->
+        <activity
+            android:name=".llm.nano.ForegroundActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:taskAffinity=""
+            android:theme="@style/Theme.Deckard.Foreground" />
+
         <!-- takes the screenshot the slop detector reads; only an accessibility service can -->
         <service
             android:name=".accessibility.DeckardAccessibilityService"
@@ -78,18 +87,6 @@
         <service
             android:name=".mascot.DeckardOverlayService"
             android:exported="false" />
-
-        <service
-            android:name="com.costafotiadis.auth.AuthenticatorService"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.accounts.AccountAuthenticator" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.accounts.AccountAuthenticator"
-                android:resource="@xml/authenticator" />
-        </service>
     </application>
 
 </manifest>

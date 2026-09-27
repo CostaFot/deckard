@@ -141,8 +141,14 @@ class AiDetectorRepository @Inject constructor(
         const val PANGRAM_MODEL = "pangram-4"
         const val STAGE_SUCCESS = "STAGE_SUCCESS"
         const val STAGE_FAILED = "STAGE_FAILED"
-        const val POLL_INTERVAL_MS = 1500L
-        const val MAX_POLL_ATTEMPTS = 40
+
+        /**
+         * Pangram answers in about three seconds; a poll every half second lands the verdict within
+         * that of the answer, where every 1.5 s wasted a second of it. The attempts keep the timeout
+         * at a minute.
+         */
+        const val POLL_INTERVAL_MS = 500L
+        const val MAX_POLL_ATTEMPTS = 120
         const val MOCK_AI = "ai"
         const val MOCK_ASSISTED = "assisted"
         const val MOCK_HUMAN = "human"
